@@ -1,0 +1,193 @@
+import React, { useState } from 'react'
+import { Megaphone, Send, Users, ShieldAlert, CheckCircle2, Bell, Radio, MessageSquare } from 'lucide-react'
+
+export default function BroadcastCenter({ currentUser, broadcasts, onSendBroadcast }) {
+  const isAuthority = currentUser.role === 'senior_sec' || currentUser.role === 'management'
+  
+  const [targetAudience, setTargetAudience] = useState('junior_secs')
+  const [broadcastTitle, setBroadcastTitle] = useState('')
+  const [broadcastMessage, setBroadcastMessage] = useState('')
+  const [isSending, setIsSending] = useState(false)
+  const [sendSuccess, setSendSuccess] = useState(false)
+
+  // Filter broadcasts visible to the current role
+  const visibleBroadcasts = broadcasts.filter(b => {
+    if (currentUser.role === 'senior_sec' || currentUser.role === 'management') return true
+    if (b.audience === 'all') return true
+    if (currentUser.role === 'junior_sec' && b.audience === 'junior_secs') return true
+    if (currentUser.role === 'intern' && b.audience === 'interns') return true
+    return false
+  })
+
+  const handleSend = (e) => {
+    e.preventDefault()
+    if (!broadcastTitle || !broadcastMessage) return
+
+    setIsSending(true)
+    const newBroadcast = {
+      id: `bc-${Date.now()}`,
+      sender: currentUser.name,
+      title: broadcastTitle,
+      message: broadcastMessage,
+      audience: targetAudience,
+      date: 'Just now',
+      isNew: true
+    }
+
+    setTimeout(() => {
+      onSendBroadcast(newBroadcast)
+      setIsSending(false)
+      setSendSuccess(true)
+      setBroadcastTitle('')
+      setBroadcastMessage('')
+      setTimeout(() => setSendSuccess(false), 4000)
+    }, 400)
+  }
+
+  const getAudienceLabel = (aud) => {
+    switch (aud) {
+      case 'junior_secs':
+        return { label: 'All 3 Junior Secretaries', bg: 'bg-emerald-100 text-emerald-800 border-emerald-200' }
+      case 'interns':
+        return { label: 'All Interns & Scholars', bg: 'bg-amber-100 text-amber-800 border-amber-200' }
+      case 'management':
+        return { label: 'Management Board', bg: 'bg-purple-100 text-purple-800 border-purple-200' }
+      default:
+        return { label: 'Entire Organization (All)', bg: 'bg-indigo-100 text-indigo-800 border-indigo-200' }
+    }
+  }
+
+  return (
+    <div className="space-y-6">
+      
+      {/* Header */}
+      <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <h2 className="text-2xl font-bold text-slate-900 tracking-tight flex items-center">
+            <Radio className="w-6 h-6 mr-2 text-indigo-600 animate-pulse" />
+            Secretariat Broadcast & Notification Hub
+          </h2>
+          <p className="text-slate-500 text-xs mt-1">
+            Targeted announcements system. Send direct notices to Junior Secretaries or entire cohort.
+          </p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        {/* Sender Composer (Senior Sec & Management) */}
+        {isAuthority && (
+          <div className="lg:col-span-5 bg-white rounded-2xl p-6 border border-slate-200 shadow-xs space-y-4">
+            <div className="flex items-center space-x-2 pb-3 border-b border-slate-100">
+              <Megaphone className="w-5 h-5 text-indigo-600" />
+              <h3 className="font-bold text-slate-900 text-base">Dispatch Targeted Broadcast</h3>
+            </div>
+
+            {sendSuccess && (
+              <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold flex items-center">
+                <CheckCircle2 className="w-4 h-4 mr-1.5 text-emerald-600" />
+                Notification broadcast successfully transmitted to target audience!
+              </div>
+            )}
+
+            <form onSubmit={handleSend} className="space-y-4 text-xs">
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Select Target Audience *</label>
+                <select
+                  value={targetAudience}
+                  onChange={(e) => setTargetAudience(e.target.value)}
+                  className="w-full text-xs font-semibold rounded-xl border border-slate-300 p-2.5 bg-slate-50 focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
+                >
+                  <option value="junior_secs">All 3 Junior Secretaries (Secretariat Briefing)</option>
+                  <option value="interns">All Interns & Scholars (~70 Members)</option>
+                  <option value="all">Entire NGO (All Members)</option>
+                  <option value="management">Board / Management</option>
+                </select>
+                <span className="text-[11px] text-slate-500 mt-1 block">
+                  {targetAudience === 'junior_secs' && '⚡ Only Priya, Rohan, and Sneha will receive this notification.'}
+                  {targetAudience === 'interns' && '⚡ Broadcast delivered to all scholars across all wings.'}
+                  {targetAudience === 'all' && '⚡ Delivered to everyone in the portal.'}
+                </span>
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Subject / Headline *</label>
+                <input
+                  required
+                  type="text"
+                  value={broadcastTitle}
+                  onChange={(e) => setBroadcastTitle(e.target.value)}
+                  placeholder="e.g. Action Required: Review reports before Friday"
+                  className="w-full text-xs rounded-xl border border-slate-300 p-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Announcement Message *</label>
+                <textarea
+                  required
+                  rows={4}
+                  value={broadcastMessage}
+                  onChange={(e) => setBroadcastMessage(e.target.value)}
+                  placeholder="Write instructions, deadlines, or meeting agenda..."
+                  className="w-full text-xs rounded-xl border border-slate-300 p-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={isSending}
+                className="w-full py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs shadow-xs transition-colors flex items-center justify-center cursor-pointer"
+              >
+                <Send className="w-3.5 h-3.5 mr-1.5" />
+                {isSending ? 'Transmitting...' : 'Send Broadcast Notification'}
+              </button>
+            </form>
+          </div>
+        )}
+
+        {/* Notifications Feed */}
+        <div className={isAuthority ? 'lg:col-span-7 space-y-4' : 'lg:col-span-12 space-y-4'}>
+          <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs">
+            <h3 className="font-bold text-slate-900 text-base mb-1 flex items-center">
+              <Bell className="w-5 h-5 mr-2 text-indigo-600" />
+              Active Notices & Circulars ({visibleBroadcasts.length})
+            </h3>
+            <p className="text-xs text-slate-500 mb-4">Official memos and notifications relevant to your role</p>
+
+            <div className="space-y-3">
+              {visibleBroadcasts.map((b) => {
+                const aud = getAudienceLabel(b.audience)
+
+                return (
+                  <div key={b.id} className="p-4 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100/70 transition-colors space-y-2 text-xs">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                      <div className="flex items-center space-x-2">
+                        <span className={`text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full border ${aud.bg}`}>
+                          Audience: {aud.label}
+                        </span>
+                        {b.isNew && (
+                          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-rose-500 text-white animate-pulse">
+                            NEW
+                          </span>
+                        )}
+                      </div>
+                      <span className="text-[11px] text-slate-400">{b.date} • by {b.sender}</span>
+                    </div>
+
+                    <h4 className="font-bold text-slate-900 text-sm">{b.title}</h4>
+                    <p className="text-slate-700 leading-relaxed bg-white p-3 rounded-lg border border-slate-200">
+                      {b.message}
+                    </p>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  )
+}
