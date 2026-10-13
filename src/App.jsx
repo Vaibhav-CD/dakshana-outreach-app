@@ -241,6 +241,7 @@ export default function App() {
         isOpen={isAuthModalOpen}
         onClose={() => setIsAuthModalOpen(false)}
         allUsers={allUsers}
+        onRegisterScholar={handleAddIntern}
         onLogin={(selectedUser) => {
           setCurrentUser(selectedUser)
           // Interns cannot view visual stats board directly, fallback to dashboard
