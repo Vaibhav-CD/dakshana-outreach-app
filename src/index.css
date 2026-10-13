@@ -1,8 +1,45 @@
 @import "tailwindcss";
 
 @layer base {
+  :root {
+    --dakshana-green: #0A643B;
+    --dakshana-green-dark: #074D2D;
+    --dakshana-green-light: #EBF7F0;
+    --dakshana-plum: #7B2E68;
+    --dakshana-plum-dark: #5F2150;
+    --dakshana-plum-light: #F8EDF5;
+    --dakshana-gold: #C5A059;
+  }
+
   body {
     @apply bg-slate-50 text-slate-900 antialiased min-h-screen;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   }
+}
+
+/* Custom Dakshana Theme Utility Classes */
+.bg-dakshana-green {
+  background-color: #0A643B;
+}
+.bg-dakshana-green-dark {
+  background-color: #074D2D;
+}
+.text-dakshana-green {
+  color: #0A643B;
+}
+.border-dakshana-green {
+  border-color: #0A643B;
+}
+
+.bg-dakshana-plum {
+  background-color: #7B2E68;
+}
+.bg-dakshana-plum-dark {
+  background-color: #5F2150;
+}
+.text-dakshana-plum {
+  color: #7B2E68;
+}
+.border-dakshana-plum {
+  border-color: #7B2E68;
 }

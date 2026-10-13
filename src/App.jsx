@@ -228,7 +228,7 @@ export default function App() {
 
       {/* Footer */}
       <footer className="border-t border-slate-200 bg-white py-4 text-center text-xs text-slate-500">
-        Inspire NGO Coordination & Scholar Management Portal • PWA Ready (Mobile & Web)
+        Dakshana Outreach Internship Portal • "Honor. Knowledge. Service" • PWA Ready (Mobile & Web)
       </footer>
 
     </div>

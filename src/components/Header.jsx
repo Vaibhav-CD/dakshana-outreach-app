@@ -13,13 +13,13 @@ export default function Header({
   const getRoleBadge = (role) => {
     switch (role) {
       case 'management':
-        return { label: 'Management', bg: 'bg-purple-100 text-purple-800 border-purple-200' }
+        return { label: 'Trustees / Management', bg: 'bg-[#F8EDF5] text-[#7B2E68] border-[#7B2E68]/30' }
       case 'senior_sec':
-        return { label: 'Senior Secretary', bg: 'bg-indigo-100 text-indigo-800 border-indigo-200' }
+        return { label: 'Senior Secretary', bg: 'bg-[#EBF7F0] text-[#0A643B] border-[#0A643B]/30' }
       case 'junior_sec':
-        return { label: 'Junior Secretary', bg: 'bg-emerald-100 text-emerald-800 border-emerald-200' }
+        return { label: 'Junior Secretary', bg: 'bg-emerald-50 text-emerald-800 border-emerald-200' }
       case 'intern':
-        return { label: 'Scholar / Intern', bg: 'bg-amber-100 text-amber-800 border-amber-200' }
+        return { label: 'Outreach Scholar', bg: 'bg-amber-50 text-amber-900 border-amber-200' }
       default:
         return { label: role, bg: 'bg-gray-100 text-gray-800 border-gray-200' }
     }
@@ -39,26 +39,32 @@ export default function Header({
   return (
     <header className="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+        <div className="flex justify-between items-center h-20">
           
-          {/* Logo */}
-          <div className="flex items-center space-x-3 cursor-pointer" onClick={() => setActiveTab('dashboard')}>
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-indigo-700 flex items-center justify-center text-white shadow-sm">
-              <Layers className="w-5 h-5" />
-            </div>
+          {/* Dakshana Official Logo & Branding */}
+          <div className="flex items-center space-x-3.5 cursor-pointer" onClick={() => setActiveTab('dashboard')}>
+            <img
+              src="/logo.png"
+              alt="Dakshana Outreach Internship Logo"
+              className="w-13 h-13 rounded-full object-cover shadow-xs border-2 border-[#0A643B]/20 flex-shrink-0"
+            />
             <div>
-              <div className="flex items-center space-x-1.5">
-                <span className="font-bold text-base text-slate-900 tracking-tight">Inspire NGO</span>
-                <span className="text-[10px] px-2 py-0.2 rounded-full font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200">
-                  v2.0
+              <div className="flex items-center space-x-2">
+                <span className="font-extrabold text-lg text-[#0A643B] tracking-tight">
+                  DAKSHANA
+                </span>
+                <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-[#F8EDF5] text-[#7B2E68] border border-[#7B2E68]/30">
+                  Outreach Internship
                 </span>
               </div>
-              <p className="text-[11px] text-slate-500 hidden sm:block">Cohort Coordination & Scholar Portal</p>
+              <p className="text-[10px] text-slate-500 font-medium tracking-wide uppercase">
+                Honor • Knowledge • Service
+              </p>
             </div>
           </div>
 
-          {/* Center Navigation Tabs */}
-          <nav className="hidden lg:flex items-center space-x-1">
+          {/* Center Navigation Tabs with Dakshana Brand Palette */}
+          <nav className="hidden lg:flex items-center space-x-1.5">
             {navItems.map((item) => {
               const Icon = item.icon
               const isActive = activeTab === item.id
@@ -66,16 +72,16 @@ export default function Header({
                 <button
                   key={item.id}
                   onClick={() => setActiveTab(item.id)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center space-x-1.5 transition-colors cursor-pointer ${
+                  className={`px-3.5 py-2 rounded-xl text-xs font-bold flex items-center space-x-1.5 transition-all cursor-pointer ${
                     isActive
-                      ? 'bg-indigo-600 text-white shadow-2xs'
-                      : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                      ? 'bg-[#0A643B] text-white shadow-xs'
+                      : 'text-slate-600 hover:bg-[#EBF7F0] hover:text-[#0A643B]'
                   }`}
                 >
                   <Icon className="w-3.5 h-3.5" />
                   <span>{item.label}</span>
                   {item.count > 0 && (
-                    <span className="ml-1 px-1.5 py-0.2 rounded-full text-[10px] bg-rose-500 text-white font-bold animate-pulse">
+                    <span className="ml-1 px-1.5 py-0.2 rounded-full text-[10px] bg-[#7B2E68] text-white font-extrabold animate-pulse">
                       {item.count}
                     </span>
                   )}
@@ -84,21 +90,21 @@ export default function Header({
             })}
           </nav>
 
-          {/* User Profile & Switch Auth */}
+          {/* User Profile & Role Switch Button */}
           <div className="flex items-center space-x-3">
             <button
               onClick={onOpenAuth}
               className="flex items-center space-x-2 p-1.5 rounded-xl hover:bg-slate-50 border border-slate-200 transition-colors cursor-pointer"
-              title="Click to switch user or sign in"
+              title="Click to switch role or sign in"
             >
               <img
                 src={currentUser.photo}
                 alt={currentUser.name}
-                className="w-7 h-7 rounded-lg object-cover border border-slate-200"
+                className="w-8 h-8 rounded-lg object-cover border border-slate-200 shadow-2xs"
               />
               <div className="text-left hidden sm:block pr-1">
                 <span className="text-xs font-bold text-slate-900 block leading-tight">{currentUser.name}</span>
-                <span className={`text-[10px] font-semibold ${badge.label === 'Senior Secretary' ? 'text-indigo-600' : 'text-slate-500'}`}>
+                <span className={`text-[10px] font-semibold ${badge.label === 'Senior Secretary' ? 'text-[#0A643B]' : 'text-slate-500'}`}>
                   {badge.label}
                 </span>
               </div>
@@ -117,9 +123,9 @@ export default function Header({
               <button
                 key={item.id}
                 onClick={() => setActiveTab(item.id)}
-                className={`px-3 py-1 rounded-lg text-xs font-semibold whitespace-nowrap flex items-center space-x-1.5 ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap flex items-center space-x-1.5 ${
                   isActive
-                    ? 'bg-indigo-600 text-white'
+                    ? 'bg-[#0A643B] text-white'
                     : 'bg-slate-100 text-slate-700'
                 }`}
               >

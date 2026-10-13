@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Smartphone, Download, X, Check, Share2, PlusSquare } from 'lucide-react'
+import { Smartphone, Download, X, Share2, PlusSquare } from 'lucide-react'
 
 export default function InstallAppBanner() {
   const [deferredPrompt, setDeferredPrompt] = useState(null)
@@ -8,7 +8,6 @@ export default function InstallAppBanner() {
   const [isStandalone, setIsStandalone] = useState(false)
 
   useEffect(() => {
-    // Check if already opened in installed standalone PWA mode
     if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
       setIsStandalone(true)
     }
@@ -39,29 +38,34 @@ export default function InstallAppBanner() {
 
   return (
     <>
-      <div className="bg-gradient-to-r from-indigo-900 via-indigo-800 to-slate-900 text-white px-4 py-2.5 shadow-md">
+      <div className="bg-gradient-to-r from-[#074D2D] via-[#0A643B] to-[#7B2E68] text-white px-4 py-2.5 shadow-md">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 rounded-lg bg-indigo-500/30 flex items-center justify-center flex-shrink-0 text-indigo-200 border border-indigo-400/30">
-              <Smartphone className="w-4 h-4" />
-            </div>
+            <img
+              src="/logo.png"
+              alt="Dakshana"
+              className="w-7 h-7 rounded-full object-cover border border-white/40 flex-shrink-0"
+            />
             <div>
-              <p className="font-bold text-white">Get the Inspire NGO Mobile App</p>
-              <p className="text-indigo-200 text-[11px]">Install directly on your phone or PC for 1-tap offline access. Both website and app stay in sync!</p>
+              <p className="font-bold text-white flex items-center gap-1.5">
+                <span>Install Dakshana Outreach App</span>
+                <span className="text-[10px] bg-white/20 px-2 py-0.2 rounded-full font-normal">PWA</span>
+              </p>
+              <p className="text-emerald-100 text-[11px]">Install on your phone or PC for 1-tap offline access. Both website and app stay in sync!</p>
             </div>
           </div>
 
           <div className="flex items-center space-x-2 w-full sm:w-auto justify-end">
             <button
               onClick={handleInstallClick}
-              className="px-3.5 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs flex items-center shadow-xs transition-colors cursor-pointer"
+              className="px-3.5 py-1.5 rounded-lg bg-white text-[#0A643B] hover:bg-emerald-50 font-extrabold text-xs flex items-center shadow-xs transition-colors cursor-pointer"
             >
-              <Download className="w-3.5 h-3.5 mr-1.5" />
-              Download / Install App
+              <Download className="w-3.5 h-3.5 mr-1.5 text-[#0A643B]" />
+              Install Dakshana App
             </button>
             <button
               onClick={() => setShowBanner(false)}
-              className="p-1 rounded-lg text-indigo-300 hover:text-white hover:bg-white/10 cursor-pointer"
+              className="p-1 rounded-lg text-emerald-200 hover:text-white hover:bg-white/10 cursor-pointer"
               aria-label="Dismiss banner"
             >
               <X className="w-4 h-4" />
@@ -76,8 +80,8 @@ export default function InstallAppBanner() {
           <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 text-slate-800">
             <div className="flex justify-between items-center pb-3 border-b border-slate-100">
               <h3 className="font-bold text-base text-slate-900 flex items-center">
-                <Smartphone className="w-5 h-5 mr-2 text-indigo-600" />
-                How to Install the App
+                <img src="/logo.png" className="w-5 h-5 rounded-full mr-2" alt="" />
+                How to Install the Dakshana App
               </h3>
               <button
                 onClick={() => setShowInstructions(false)}
@@ -90,37 +94,32 @@ export default function InstallAppBanner() {
             <div className="py-4 space-y-4 text-xs">
               <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
                 <p className="font-bold text-slate-900 mb-1 flex items-center">
-                  <Share2 className="w-3.5 h-3.5 mr-1.5 text-indigo-600" />
+                  <Share2 className="w-3.5 h-3.5 mr-1.5 text-[#0A643B]" />
                   On iPhone (Safari):
                 </p>
                 <ol className="list-decimal list-inside space-y-1 text-slate-600 pl-1">
                   <li>Tap the <strong>Share</strong> button at the bottom of Safari.</li>
                   <li>Scroll down and tap <strong>"Add to Home Screen"</strong>.</li>
-                  <li>Tap <strong>Add</strong>. It will appear on your phone screen just like an App Store app!</li>
+                  <li>Tap <strong>Add</strong>. The Dakshana icon will be added to your home screen!</li>
                 </ol>
               </div>
 
               <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
                 <p className="font-bold text-slate-900 mb-1 flex items-center">
-                  <PlusSquare className="w-3.5 h-3.5 mr-1.5 text-emerald-600" />
+                  <PlusSquare className="w-3.5 h-3.5 mr-1.5 text-[#7B2E68]" />
                   On Android (Chrome):
                 </p>
                 <ol className="list-decimal list-inside space-y-1 text-slate-600 pl-1">
                   <li>Tap the <strong>three dots (⋮)</strong> menu in Chrome.</li>
                   <li>Select <strong>"Install app"</strong> or <strong>"Add to Home screen"</strong>.</li>
-                  <li>Confirm install. The icon will be placed in your app drawer.</li>
+                  <li>Confirm install. The Dakshana icon will appear in your app launcher.</li>
                 </ol>
-              </div>
-
-              <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
-                <p className="font-bold text-slate-900 mb-1">On Windows / Mac (Chrome or Edge):</p>
-                <p className="text-slate-600">Click the install icon in the right side of the browser address bar (looks like a monitor with a down arrow).</p>
               </div>
             </div>
 
             <button
               onClick={() => setShowInstructions(false)}
-              className="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs cursor-pointer shadow-sm"
+              className="w-full py-2.5 rounded-xl bg-[#0A643B] hover:bg-[#074D2D] text-white font-semibold text-xs cursor-pointer shadow-sm"
             >
               Got it, thanks!
             </button>

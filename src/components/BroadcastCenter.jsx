@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Megaphone, Send, Users, ShieldAlert, CheckCircle2, Bell, Radio, MessageSquare } from 'lucide-react'
+import { Megaphone, Send, CheckCircle2, Bell, Radio } from 'lucide-react'
 
 export default function BroadcastCenter({ currentUser, broadcasts, onSendBroadcast }) {
   const isAuthority = currentUser.role === 'senior_sec' || currentUser.role === 'management'
@@ -10,7 +10,6 @@ export default function BroadcastCenter({ currentUser, broadcasts, onSendBroadca
   const [isSending, setIsSending] = useState(false)
   const [sendSuccess, setSendSuccess] = useState(false)
 
-  // Filter broadcasts visible to the current role
   const visibleBroadcasts = broadcasts.filter(b => {
     if (currentUser.role === 'senior_sec' || currentUser.role === 'management') return true
     if (b.audience === 'all') return true
@@ -47,13 +46,13 @@ export default function BroadcastCenter({ currentUser, broadcasts, onSendBroadca
   const getAudienceLabel = (aud) => {
     switch (aud) {
       case 'junior_secs':
-        return { label: 'All 3 Junior Secretaries', bg: 'bg-emerald-100 text-emerald-800 border-emerald-200' }
+        return { label: 'All 3 Junior Secretaries', bg: 'bg-[#EBF7F0] text-[#0A643B] border-[#0A643B]/30' }
       case 'interns':
-        return { label: 'All Interns & Scholars', bg: 'bg-amber-100 text-amber-800 border-amber-200' }
+        return { label: 'All Outreach Scholars', bg: 'bg-amber-50 text-amber-900 border-amber-200' }
       case 'management':
-        return { label: 'Management Board', bg: 'bg-purple-100 text-purple-800 border-purple-200' }
+        return { label: 'Board / Trustees', bg: 'bg-[#F8EDF5] text-[#7B2E68] border-[#7B2E68]/30' }
       default:
-        return { label: 'Entire Organization (All)', bg: 'bg-indigo-100 text-indigo-800 border-indigo-200' }
+        return { label: 'Entire Dakshana Cohort', bg: 'bg-[#EBF7F0] text-[#0A643B] border-[#0A643B]/30' }
     }
   }
 
@@ -64,11 +63,11 @@ export default function BroadcastCenter({ currentUser, broadcasts, onSendBroadca
       <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h2 className="text-2xl font-bold text-slate-900 tracking-tight flex items-center">
-            <Radio className="w-6 h-6 mr-2 text-indigo-600 animate-pulse" />
-            Secretariat Broadcast & Notification Hub
+            <Radio className="w-6 h-6 mr-2 text-[#0A643B] animate-pulse" />
+            Dakshana Notification & Circular Center
           </h2>
           <p className="text-slate-500 text-xs mt-1">
-            Targeted announcements system. Send direct notices to Junior Secretaries or entire cohort.
+            Targeted announcements system. Transmit notices to all 3 Junior Secretaries or entire scholar cohort.
           </p>
         </div>
       </div>
@@ -79,13 +78,13 @@ export default function BroadcastCenter({ currentUser, broadcasts, onSendBroadca
         {isAuthority && (
           <div className="lg:col-span-5 bg-white rounded-2xl p-6 border border-slate-200 shadow-xs space-y-4">
             <div className="flex items-center space-x-2 pb-3 border-b border-slate-100">
-              <Megaphone className="w-5 h-5 text-indigo-600" />
-              <h3 className="font-bold text-slate-900 text-base">Dispatch Targeted Broadcast</h3>
+              <Megaphone className="w-5 h-5 text-[#0A643B]" />
+              <h3 className="font-bold text-slate-900 text-base">Dispatch Targeted Circular</h3>
             </div>
 
             {sendSuccess && (
-              <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold flex items-center">
-                <CheckCircle2 className="w-4 h-4 mr-1.5 text-emerald-600" />
+              <div className="p-3 rounded-xl bg-[#EBF7F0] border border-[#0A643B]/30 text-[#0A643B] text-xs font-semibold flex items-center">
+                <CheckCircle2 className="w-4 h-4 mr-1.5" />
                 Notification broadcast successfully transmitted to target audience!
               </div>
             )}
@@ -96,12 +95,12 @@ export default function BroadcastCenter({ currentUser, broadcasts, onSendBroadca
                 <select
                   value={targetAudience}
                   onChange={(e) => setTargetAudience(e.target.value)}
-                  className="w-full text-xs font-semibold rounded-xl border border-slate-300 p-2.5 bg-slate-50 focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
+                  className="w-full text-xs font-semibold rounded-xl border border-slate-300 p-2.5 bg-slate-50 focus:ring-2 focus:ring-[#0A643B] focus:outline-hidden"
                 >
-                  <option value="junior_secs">All 3 Junior Secretaries (Secretariat Briefing)</option>
-                  <option value="interns">All Interns & Scholars (~70 Members)</option>
-                  <option value="all">Entire NGO (All Members)</option>
-                  <option value="management">Board / Management</option>
+                  <option value="junior_secs">All 3 Junior Secretaries (Secretariat Direct Briefing)</option>
+                  <option value="interns">All Outreach Scholars (~70 Members)</option>
+                  <option value="all">Entire Dakshana Cohort (All Members)</option>
+                  <option value="management">Board / Trustees</option>
                 </select>
                 <span className="text-[11px] text-slate-500 mt-1 block">
                   {targetAudience === 'junior_secs' && '⚡ Only Priya, Rohan, and Sneha will receive this notification.'}
@@ -118,7 +117,7 @@ export default function BroadcastCenter({ currentUser, broadcasts, onSendBroadca
                   value={broadcastTitle}
                   onChange={(e) => setBroadcastTitle(e.target.value)}
                   placeholder="e.g. Action Required: Review reports before Friday"
-                  className="w-full text-xs rounded-xl border border-slate-300 p-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
+                  className="w-full text-xs rounded-xl border border-slate-300 p-2.5 focus:ring-2 focus:ring-[#0A643B] focus:outline-hidden"
                 />
               </div>
 
@@ -130,14 +129,14 @@ export default function BroadcastCenter({ currentUser, broadcasts, onSendBroadca
                   value={broadcastMessage}
                   onChange={(e) => setBroadcastMessage(e.target.value)}
                   placeholder="Write instructions, deadlines, or meeting agenda..."
-                  className="w-full text-xs rounded-xl border border-slate-300 p-2.5 focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
+                  className="w-full text-xs rounded-xl border border-slate-300 p-2.5 focus:ring-2 focus:ring-[#0A643B] focus:outline-hidden"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={isSending}
-                className="w-full py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs shadow-xs transition-colors flex items-center justify-center cursor-pointer"
+                className="w-full py-2.5 px-4 rounded-xl bg-[#0A643B] hover:bg-[#074D2D] text-white font-bold text-xs shadow-xs transition-colors flex items-center justify-center cursor-pointer"
               >
                 <Send className="w-3.5 h-3.5 mr-1.5" />
                 {isSending ? 'Transmitting...' : 'Send Broadcast Notification'}
@@ -150,10 +149,10 @@ export default function BroadcastCenter({ currentUser, broadcasts, onSendBroadca
         <div className={isAuthority ? 'lg:col-span-7 space-y-4' : 'lg:col-span-12 space-y-4'}>
           <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs">
             <h3 className="font-bold text-slate-900 text-base mb-1 flex items-center">
-              <Bell className="w-5 h-5 mr-2 text-indigo-600" />
-              Active Notices & Circulars ({visibleBroadcasts.length})
+              <Bell className="w-5 h-5 mr-2 text-[#0A643B]" />
+              Official Notices & Memos ({visibleBroadcasts.length})
             </h3>
-            <p className="text-xs text-slate-500 mb-4">Official memos and notifications relevant to your role</p>
+            <p className="text-xs text-slate-500 mb-4">Circulars and instructions relevant to your role</p>
 
             <div className="space-y-3">
               {visibleBroadcasts.map((b) => {
@@ -167,7 +166,7 @@ export default function BroadcastCenter({ currentUser, broadcasts, onSendBroadca
                           Audience: {aud.label}
                         </span>
                         {b.isNew && (
-                          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-rose-500 text-white animate-pulse">
+                          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-[#7B2E68] text-white animate-pulse">
                             NEW
                           </span>
                         )}

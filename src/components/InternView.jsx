@@ -10,12 +10,8 @@ export default function InternView({ currentUser, allUsers, reports, onSubmitRep
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitSuccess, setSubmitSuccess] = useState(false)
 
-  // Find intern's assigned Junior Secretary
   const assignedSec = allUsers.find(u => u.id === currentUser.assignedTo)
-
-  // Intern's past reports
   const internReports = reports.filter(r => r.internId === currentUser.id)
-  const hasSubmittedThisMonth = internReports.some(r => r.monthYear === month)
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -53,28 +49,38 @@ export default function InternView({ currentUser, allUsers, reports, onSubmitRep
   const getStatusBadge = (status) => {
     switch (status) {
       case 'reviewed':
-        return <span className="inline-flex items-center text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200"><CheckCircle className="w-3.5 h-3.5 mr-1" /> Approved & Reviewed</span>
+        return <span className="inline-flex items-center text-xs font-semibold px-2.5 py-1 rounded-full bg-[#EBF7F0] text-[#0A643B] border border-[#0A643B]/30"><CheckCircle className="w-3.5 h-3.5 mr-1" /> Approved & Reviewed</span>
       case 'revision_requested':
-        return <span className="inline-flex items-center text-xs font-semibold px-2.5 py-1 rounded-full bg-rose-100 text-rose-800 border border-rose-200"><AlertCircle className="w-3.5 h-3.5 mr-1" /> Revision Requested</span>
+        return <span className="inline-flex items-center text-xs font-semibold px-2.5 py-1 rounded-full bg-[#F8EDF5] text-[#7B2E68] border border-[#7B2E68]/30"><AlertCircle className="w-3.5 h-3.5 mr-1" /> Revision Requested</span>
       default:
-        return <span className="inline-flex items-center text-xs font-semibold px-2.5 py-1 rounded-full bg-amber-100 text-amber-800 border border-amber-200"><Clock className="w-3.5 h-3.5 mr-1" /> Pending Review</span>
+        return <span className="inline-flex items-center text-xs font-semibold px-2.5 py-1 rounded-full bg-amber-50 text-amber-800 border border-amber-200"><Clock className="w-3.5 h-3.5 mr-1" /> Pending Review</span>
     }
   }
 
   return (
     <div className="space-y-6">
       
-      {/* Intern Welcome Card */}
-      <div className="bg-gradient-to-r from-amber-500 to-amber-600 rounded-2xl p-6 text-white shadow-md">
+      {/* Scholar Welcome Card */}
+      <div className="bg-gradient-to-r from-[#074D2D] via-[#0A643B] to-[#7B2E68] rounded-2xl p-6 text-white shadow-md">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div>
-            <h2 className="text-2xl font-bold">Hello, {currentUser.name}!</h2>
-            <p className="text-amber-100 text-sm mt-1">Intern Portal • {currentUser.department || 'NGO Operations'}</p>
+          <div className="flex items-center space-x-4">
+            <img
+              src={currentUser.photo}
+              alt={currentUser.name}
+              className="w-14 h-14 rounded-2xl object-cover border-2 border-white/40 shadow-sm"
+            />
+            <div>
+              <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-white/20 text-white">
+                Dakshana Scholar
+              </span>
+              <h2 className="text-2xl font-bold mt-1">{currentUser.name}</h2>
+              <p className="text-emerald-100 text-xs">{currentUser.department || 'Grassroots Outreach'}</p>
+            </div>
           </div>
-          <div className="bg-white/15 backdrop-blur-sm px-4 py-2 rounded-xl border border-white/20 text-xs">
-            <span className="text-amber-200 block">Assigned Supervisor:</span>
-            <span className="font-semibold text-white">{assignedSec ? assignedSec.name : 'Junior Secretary'}</span>
-            <span className="text-xs text-amber-200 block">{assignedSec ? assignedSec.email : ''}</span>
+          <div className="bg-white/15 backdrop-blur-sm px-4 py-2.5 rounded-xl border border-white/20 text-xs">
+            <span className="text-emerald-200 block">Assigned Wing Supervisor:</span>
+            <span className="font-bold text-white text-sm">{assignedSec ? assignedSec.name : 'Junior Secretary'}</span>
+            <span className="text-[11px] text-emerald-100 block">{assignedSec ? assignedSec.email : ''}</span>
           </div>
         </div>
       </div>
@@ -86,20 +92,20 @@ export default function InternView({ currentUser, allUsers, reports, onSubmitRep
           <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-5">
             <div>
               <h3 className="font-bold text-slate-900 text-lg flex items-center">
-                <FileText className="w-5 h-5 mr-2 text-indigo-600" />
-                Monthly Progress Submission
+                <FileText className="w-5 h-5 mr-2 text-[#0A643B]" />
+                Monthly Scholar Progress Submission
               </h3>
-              <p className="text-xs text-slate-500 mt-0.5">Submit your monthly milestone summary to your Junior Secretary</p>
+              <p className="text-xs text-slate-500 mt-0.5">Report your teaching sessions and field activities to your Junior Secretary</p>
             </div>
-            <div className="flex items-center text-xs font-medium text-slate-600 bg-slate-100 px-3 py-1 rounded-lg">
-              <Calendar className="w-3.5 h-3.5 mr-1 text-slate-500" />
+            <div className="flex items-center text-xs font-semibold text-[#0A643B] bg-[#EBF7F0] px-3 py-1 rounded-lg border border-[#0A643B]/20">
+              <Calendar className="w-3.5 h-3.5 mr-1" />
               {month}
             </div>
           </div>
 
           {submitSuccess && (
-            <div className="mb-4 p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm flex items-center">
-              <CheckCircle className="w-5 h-5 mr-2 text-emerald-600 flex-shrink-0" />
+            <div className="mb-4 p-4 rounded-xl bg-[#EBF7F0] border border-[#0A643B]/30 text-[#0A643B] text-sm flex items-center">
+              <CheckCircle className="w-5 h-5 mr-2 text-[#0A643B] flex-shrink-0" />
               Your monthly report has been submitted to your Junior Secretary for review!
             </div>
           )}
@@ -107,22 +113,22 @@ export default function InternView({ currentUser, allUsers, reports, onSubmitRep
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
-                Tasks Completed & Major Contributions *
+                Sessions & Tasks Completed *
               </label>
               <textarea
                 required
                 rows={4}
                 value={tasks}
                 onChange={(e) => setTasks(e.target.value)}
-                placeholder="Describe key activities, events organized, people impacted, or deliverables completed..."
-                className="w-full text-sm rounded-xl border border-slate-300 p-3 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                placeholder="Detail the sessions conducted, topics covered (math/science/etc.), number of students, and materials distributed..."
+                className="w-full text-sm rounded-xl border border-slate-300 p-3 focus:outline-hidden focus:ring-2 focus:ring-[#0A643B]"
               />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
-                  Hours Contributed This Month *
+                  Field Hours Contributed *
                 </label>
                 <input
                   type="number"
@@ -132,18 +138,18 @@ export default function InternView({ currentUser, allUsers, reports, onSubmitRep
                   value={hours}
                   onChange={(e) => setHours(e.target.value)}
                   placeholder="e.g. 35"
-                  className="w-full text-sm rounded-xl border border-slate-300 p-2.5 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  className="w-full text-sm rounded-xl border border-slate-300 p-2.5 focus:outline-hidden focus:ring-2 focus:ring-[#0A643B]"
                 />
               </div>
 
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
-                  Target Reporting Cycle
+                  Reporting Month
                 </label>
                 <select
                   value={month}
                   onChange={(e) => setMonth(e.target.value)}
-                  className="w-full text-sm rounded-xl border border-slate-300 p-2.5 bg-white focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
+                  className="w-full text-sm rounded-xl border border-slate-300 p-2.5 bg-white focus:outline-hidden focus:ring-2 focus:ring-[#0A643B]"
                 >
                   <option value="October 2026">October 2026</option>
                   <option value="November 2026">November 2026</option>
@@ -160,8 +166,8 @@ export default function InternView({ currentUser, allUsers, reports, onSubmitRep
                 rows={2}
                 value={challenges}
                 onChange={(e) => setChallenges(e.target.value)}
-                placeholder="Any obstacles encountered (e.g. logistics, resources, attendance)..."
-                className="w-full text-sm rounded-xl border border-slate-300 p-3 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                placeholder="Logistics, learning kits, transportation, attendance hurdles..."
+                className="w-full text-sm rounded-xl border border-slate-300 p-3 focus:outline-hidden focus:ring-2 focus:ring-[#0A643B]"
               />
             </div>
 
@@ -173,18 +179,18 @@ export default function InternView({ currentUser, allUsers, reports, onSubmitRep
                 rows={2}
                 value={nextGoals}
                 onChange={(e) => setNextGoals(e.target.value)}
-                placeholder="What do you plan to achieve in the upcoming cycle?..."
-                className="w-full text-sm rounded-xl border border-slate-300 p-3 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                placeholder="Key milestones you aim to achieve next cycle..."
+                className="w-full text-sm rounded-xl border border-slate-300 p-3 focus:outline-hidden focus:ring-2 focus:ring-[#0A643B]"
               />
             </div>
 
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full py-3 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm shadow-sm transition-colors flex items-center justify-center cursor-pointer"
+              className="w-full py-3 px-4 rounded-xl bg-[#0A643B] hover:bg-[#074D2D] text-white font-bold text-sm shadow-sm transition-colors flex items-center justify-center cursor-pointer"
             >
               <Send className="w-4 h-4 mr-2" />
-              {isSubmitting ? 'Submitting...' : 'Submit Monthly Report'}
+              {isSubmitting ? 'Transmitting Report...' : 'Submit Monthly Report to Wing Lead'}
             </button>
           </form>
         </div>
@@ -193,10 +199,10 @@ export default function InternView({ currentUser, allUsers, reports, onSubmitRep
         <div className="lg:col-span-5 space-y-4">
           <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs">
             <h3 className="font-bold text-slate-900 text-lg flex items-center mb-1">
-              <Clock className="w-5 h-5 mr-2 text-indigo-600" />
-              Your Submission History
+              <Clock className="w-5 h-5 mr-2 text-[#0A643B]" />
+              Submission History
             </h3>
-            <p className="text-xs text-slate-500 mb-4">Past reports and supervisor evaluation</p>
+            <p className="text-xs text-slate-500 mb-4">Past evaluations from your Junior Secretary</p>
 
             {internReports.length === 0 ? (
               <div className="text-center py-8 border-2 border-dashed border-slate-200 rounded-xl">
@@ -216,13 +222,13 @@ export default function InternView({ currentUser, allUsers, reports, onSubmitRep
                     </div>
 
                     <p className="text-xs text-slate-700 bg-white p-3 rounded-lg border border-slate-200">
-                      <strong className="text-slate-900 block mb-1">Work Accomplished:</strong>
+                      <strong className="text-slate-900 block mb-1">Field Sessions:</strong>
                       {rep.tasksCompleted}
                     </p>
 
                     {rep.reviewerFeedback && (
-                      <div className="text-xs bg-indigo-50/80 border border-indigo-100 p-3 rounded-lg text-indigo-900">
-                        <div className="flex items-center space-x-1 font-semibold text-indigo-800 mb-1">
+                      <div className="text-xs bg-[#EBF7F0] border border-[#0A643B]/20 p-3 rounded-lg text-[#074D2D]">
+                        <div className="flex items-center space-x-1 font-semibold text-[#0A643B] mb-1">
                           <MessageSquare className="w-3.5 h-3.5 mr-1" />
                           Feedback from {rep.reviewedBy || 'Junior Secretary'}:
                         </div>
