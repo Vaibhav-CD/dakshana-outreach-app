@@ -1,5 +1,6 @@
 import React from 'react'
 import { Layers, BarChart3, CreditCard, FolderLock, Users, Radio, LogIn, Bell } from 'lucide-react'
+import logoImg from '../assets/logo.png'
 
 export default function Header({
   currentUser,
@@ -44,7 +45,7 @@ export default function Header({
           {/* Dakshana Official Logo & Branding */}
           <div className="flex items-center space-x-3.5 cursor-pointer" onClick={() => setActiveTab('dashboard')}>
             <img
-              src="/logo.png"
+              src={logoImg}
               alt="Dakshana Outreach Internship Logo"
               className="w-13 h-13 rounded-full object-cover shadow-xs border-2 border-[#0A643B]/20 flex-shrink-0"
             />

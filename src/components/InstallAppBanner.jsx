@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Smartphone, Download, X, Share2, PlusSquare } from 'lucide-react'
+import logoImg from '../assets/logo.png'
 
 export default function InstallAppBanner() {
   const [deferredPrompt, setDeferredPrompt] = useState(null)
@@ -42,7 +43,7 @@ export default function InstallAppBanner() {
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
           <div className="flex items-center space-x-3">
             <img
-              src="/logo.png"
+              src={logoImg}
               alt="Dakshana"
               className="w-7 h-7 rounded-full object-cover border border-white/40 flex-shrink-0"
             />
@@ -80,7 +81,7 @@ export default function InstallAppBanner() {
           <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 text-slate-800">
             <div className="flex justify-between items-center pb-3 border-b border-slate-100">
               <h3 className="font-bold text-base text-slate-900 flex items-center">
-                <img src="/logo.png" className="w-5 h-5 rounded-full mr-2" alt="" />
+                <img src={logoImg} className="w-5 h-5 rounded-full mr-2" alt="" />
                 How to Install the Dakshana App
               </h3>
               <button

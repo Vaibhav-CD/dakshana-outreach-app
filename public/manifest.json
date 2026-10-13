@@ -3,12 +3,12 @@
   "name": "Dakshana Outreach Internship",
   "icons": [
     {
-      "src": "/logo.png",
+      "src": "/dakshana-outreach-app/logo.png",
       "type": "image/png",
       "sizes": "192x192 512x512"
     }
   ],
-  "start_url": "/",
+  "start_url": "/dakshana-outreach-app/",
   "background_color": "#ffffff",
   "theme_color": "#0A643B",
   "display": "standalone",

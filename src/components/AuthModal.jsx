@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { Shield, Lock, Mail, ArrowRight, X } from 'lucide-react'
+import logoImg from '../assets/logo.png'
 
 export default function AuthModal({ isOpen, onClose, allUsers, onLogin }) {
   const [email, setEmail] = useState('')
@@ -29,7 +30,7 @@ export default function AuthModal({ isOpen, onClose, allUsers, onLogin }) {
       <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 animate-in fade-in duration-200">
         <div className="flex justify-between items-center pb-3 border-b border-slate-100">
           <div className="flex items-center space-x-2.5">
-            <img src="/logo.png" className="w-8 h-8 rounded-full border border-[#0A643B]/30 object-cover" alt="" />
+            <img src={logoImg} className="w-8 h-8 rounded-full border border-[#0A643B]/30 object-cover" alt="" />
             <div>
               <h3 className="font-bold text-slate-900 text-base">Dakshana Portal Sign-In</h3>
               <p className="text-[11px] text-slate-500">Role-Based Access Control</p>

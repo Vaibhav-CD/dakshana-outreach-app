@@ -1,5 +1,6 @@
 import React from 'react'
 import { Mail, Shield, Award, Users, Sparkles } from 'lucide-react'
+import logoImg from '../assets/logo.png'
 
 export default function TeamShowcase({ allUsers }) {
   const management = allUsers.find(u => u.role === 'management')
@@ -12,7 +13,7 @@ export default function TeamShowcase({ allUsers }) {
       <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs flex flex-col md:flex-row justify-between items-center gap-6">
         <div className="flex items-center space-x-5">
           <img
-            src="/logo.png"
+            src={logoImg}
             alt="Dakshana Outreach Internship Official Seal"
             className="w-24 h-24 rounded-full object-cover shadow-md border-3 border-[#0A643B] flex-shrink-0"
           />
