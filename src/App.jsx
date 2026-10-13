@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Header from './components/Header'
 import InstallAppBanner from './components/InstallAppBanner'
 import SeniorSecView from './components/SeniorSecView'
@@ -20,6 +20,20 @@ import {
   INITIAL_RESOURCES,
   INITIAL_BROADCASTS
 } from './mockData'
+import {
+  isSupabaseConfigured,
+  dbFetchProfiles,
+  dbCreateProfile,
+  dbUpdateProfile,
+  dbFetchReports,
+  dbCreateReport,
+  dbUpdateReport,
+  dbFetchClaims,
+  dbCreateClaim,
+  dbUpdateClaim,
+  dbFetchBroadcasts,
+  dbCreateBroadcast
+} from './supabase'
 
 export default function App() {
   const [allUsers, setAllUsers] = useState(INITIAL_USERS)
@@ -34,6 +48,37 @@ export default function App() {
   const [currentUser, setCurrentUser] = useState(INITIAL_USERS[0])
   const [activeTab, setActiveTab] = useState('dashboard')
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
+
+  // 1. Initial Cloud Sync from Supabase on App Mount
+  useEffect(() => {
+    async function syncFromCloud() {
+      try {
+        const [cloudProfiles, cloudReports, cloudClaims, cloudBroadcasts] = await Promise.all([
+          dbFetchProfiles(),
+          dbFetchReports(),
+          dbFetchClaims(),
+          dbFetchBroadcasts()
+        ])
+
+        if (cloudProfiles && cloudProfiles.length > 0) {
+          // Merge leadership if not present
+          setAllUsers(prev => {
+            const combined = [...cloudProfiles]
+            INITIAL_USERS.slice(0, 5).forEach(lead => {
+              if (!combined.some(u => u.email === lead.email)) combined.unshift(lead)
+            })
+            return combined
+          })
+        }
+        if (cloudReports && cloudReports.length > 0) setReports(cloudReports)
+        if (cloudClaims && cloudClaims.length > 0) setClaims(cloudClaims)
+        if (cloudBroadcasts && cloudBroadcasts.length > 0) setBroadcasts(cloudBroadcasts)
+      } catch (err) {
+        console.warn('Running in offline/prototype mode:', err)
+      }
+    }
+    syncFromCloud()
+  }, [])
 
   // Handlers
   const handleReassignIntern = (internId, newJuniorSecId) => {
@@ -50,6 +95,9 @@ export default function App() {
       }
       return rep
     }))
+
+    // Persist to Supabase
+    dbUpdateProfile(internId, { assignedTo: newJuniorSecId }).catch(console.error)
   }
 
   const handleUpdateInternBatch = (internId, newBatch) => {
@@ -73,14 +121,21 @@ export default function App() {
       }
       return s
     }))
+
+    // Persist to Supabase
+    dbUpdateProfile(internId, { batch: newBatch }).catch(console.error)
   }
 
   const handleAddIntern = (newIntern) => {
     setAllUsers(prev => [...prev, newIntern])
+    // Persist to Supabase
+    dbCreateProfile(newIntern).catch(console.error)
   }
 
   const handleSubmitReport = (newReport) => {
     setReports(prev => [newReport, ...prev])
+    // Persist to Supabase
+    dbCreateReport(newReport).catch(console.error)
   }
 
   const handleUpdateReport = (reportId, updates) => {
@@ -90,6 +145,8 @@ export default function App() {
       }
       return rep
     }))
+    // Persist to Supabase
+    dbUpdateReport(reportId, updates).catch(console.error)
   }
 
   // Reimbursement handlers
@@ -103,6 +160,8 @@ export default function App() {
 
   const handleSubmitClaim = (newClaim) => {
     setClaims(prev => [newClaim, ...prev])
+    // Persist to Supabase
+    dbCreateClaim(newClaim).catch(console.error)
   }
 
   const handleUpdateClaimStatus = (claimId, newStatus, approverName) => {
@@ -117,6 +176,12 @@ export default function App() {
       }
       return c
     }))
+    // Persist to Supabase
+    dbUpdateClaim(claimId, {
+      status: newStatus,
+      approvedBy: approverName,
+      paidAt: newStatus === 'paid' ? new Date().toISOString() : null
+    }).catch(console.error)
   }
 
   // Resources handlers
@@ -127,6 +192,8 @@ export default function App() {
   // Broadcast handlers
   const handleSendBroadcast = (newBroadcast) => {
     setBroadcasts(prev => [newBroadcast, ...prev])
+    // Persist to Supabase
+    dbCreateBroadcast(newBroadcast).catch(console.error)
   }
 
   const unreadCount = broadcasts.filter(b => b.isNew).length
