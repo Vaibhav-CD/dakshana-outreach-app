@@ -3,107 +3,112 @@ export const INITIAL_USERS = [
     id: 'user-senior-sec',
     name: 'Senior Secretary',
     title: 'Senior Secretary & Central Operations Lead',
-    email: 'senior.sec@inspire-ngo.org',
+    email: 'senior.sec@dakshana.org',
     role: 'senior_sec',
     department: 'Central Coordination',
     photo: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80',
-    bio: 'Oversees overall workflow, intern allocations, policy execution, and monthly disbursement cycles across all wings.'
+    bio: 'Highest operational authority: coordinates Batch 1 & Batch 2 allocations, supervises the 3 Junior Secretaries, controls financial reimbursement cycles, and dispatches circulars.'
   },
   {
     id: 'user-mgmt',
     name: 'Dr. Rajiv Menon',
     title: 'Executive Director & Trustee',
-    email: 'management@inspire-ngo.org',
+    email: 'trustee@dakshana.org',
     role: 'management',
     department: 'Governing Board',
     photo: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&auto=format&fit=crop&q=80',
-    bio: 'Guides long-term institutional vision, budget governance, and organizational impact strategies.'
+    bio: 'Board-level governance, institutional audit oversight, and long-term strategy.'
   },
   {
     id: 'user-jsec-1',
     name: 'Priya Sharma',
     title: 'Junior Secretary - Wing 1',
-    email: 'priya.jsec@inspire-ngo.org',
+    email: 'priya.jsec@dakshana.org',
     role: 'junior_sec',
     department: 'Community Outreach & Fieldwork',
     photo: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&auto=format&fit=crop&q=80',
-    bio: 'Directly mentors field interns, validates grassroots session reports, and handles local community logistics.'
+    bio: 'Limited supervisory scope: mentors and reviews monthly reports strictly for her assigned wing scholars.'
   },
   {
     id: 'user-jsec-2',
     name: 'Rohan Verma',
     title: 'Junior Secretary - Wing 2',
-    email: 'rohan.jsec@inspire-ngo.org',
+    email: 'rohan.jsec@dakshana.org',
     role: 'junior_sec',
     department: 'Education & Curriculum Support',
     photo: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&auto=format&fit=crop&q=80',
-    bio: 'Coordinates teaching scholars, reviews student progress metrics, and standardizes educational curriculum.'
+    bio: 'Limited supervisory scope: reviews STEM & educational progress reports strictly for his assigned wing scholars.'
   },
   {
     id: 'user-jsec-3',
     name: 'Sneha Kulkarni',
     title: 'Junior Secretary - Wing 3',
-    email: 'sneha.jsec@inspire-ngo.org',
+    email: 'sneha.jsec@dakshana.org',
     role: 'junior_sec',
     department: 'Digital Media & Communications',
     photo: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&auto=format&fit=crop&q=80',
-    bio: 'Leads digital storytelling, newsletters, student impact broadcasts, and media interns.'
+    bio: 'Limited supervisory scope: evaluates storytelling, media outputs, and digital documentation for her assigned scholars.'
   },
-  // Sample Interns
+  // Sample Scholars with Batch 1 and Batch 2 assignments
   {
     id: 'user-intern-1',
     name: 'Aarav Gupta',
-    title: 'Teaching Fellow / Scholar',
-    email: 'aarav.intern@inspire-ngo.org',
+    title: 'Outreach Scholar',
+    email: 'aarav.scholar@dakshana.org',
     role: 'intern',
+    batch: 'Batch 1',
     assignedTo: 'user-jsec-1',
     department: 'Community Outreach',
     photo: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400&auto=format&fit=crop&q=80',
-    bio: 'Conducting weekend foundational learning sessions in Cluster B.'
+    bio: 'Batch 1 Scholar • Conducting weekend foundational numeracy sessions.'
   },
   {
     id: 'user-intern-2',
     name: 'Meera Iyer',
-    title: 'Community Field Scholar',
-    email: 'meera.intern@inspire-ngo.org',
+    title: 'Outreach Scholar',
+    email: 'meera.scholar@dakshana.org',
     role: 'intern',
+    batch: 'Batch 1',
     assignedTo: 'user-jsec-1',
     department: 'Community Outreach',
     photo: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&auto=format&fit=crop&q=80',
-    bio: 'Focusing on maternal health and nutrition survey implementation.'
+    bio: 'Batch 1 Scholar • Focus on rural health survey implementation.'
   },
   {
     id: 'user-intern-3',
     name: 'Kabir Das',
-    title: 'STEM Curriculum Intern',
-    email: 'kabir.intern@inspire-ngo.org',
+    title: 'Outreach Scholar',
+    email: 'kabir.scholar@dakshana.org',
     role: 'intern',
+    batch: 'Batch 2',
     assignedTo: 'user-jsec-2',
     department: 'Education',
     photo: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&auto=format&fit=crop&q=80',
-    bio: 'Conducting STEM lab modules for middle school students.'
+    bio: 'Batch 2 Scholar • Conducting robotics & science lab modules.'
   },
   {
     id: 'user-intern-4',
     name: 'Ananya Rao',
-    title: 'Literacy Mentor',
-    email: 'ananya.intern@inspire-ngo.org',
+    title: 'Outreach Scholar',
+    email: 'ananya.scholar@dakshana.org',
     role: 'intern',
+    batch: 'Batch 2',
     assignedTo: 'user-jsec-2',
     department: 'Education',
     photo: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400&auto=format&fit=crop&q=80',
-    bio: 'Teaching foundational reading and spoken English classes.'
+    bio: 'Batch 2 Scholar • Teaching foundational reading circles.'
   },
   {
     id: 'user-intern-5',
     name: 'Vikram Joshi',
-    title: 'Media & Documentation Intern',
-    email: 'vikram.intern@inspire-ngo.org',
+    title: 'Outreach Scholar',
+    email: 'vikram.scholar@dakshana.org',
     role: 'intern',
+    batch: 'Batch 2',
     assignedTo: 'user-jsec-3',
     department: 'Digital Media',
     photo: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&auto=format&fit=crop&q=80',
-    bio: 'Recording field documentaries and drafting monthly impact summaries.'
+    bio: 'Batch 2 Scholar • Documentation & field impact filmmaking.'
   }
 ]
 
@@ -112,6 +117,7 @@ export const INITIAL_REPORTS = [
     id: 'rep-1',
     internId: 'user-intern-1',
     internName: 'Aarav Gupta',
+    batch: 'Batch 1',
     juniorSecId: 'user-jsec-1',
     monthYear: 'October 2026',
     tasksCompleted: 'Conducted 16 learning sessions across 2 community hubs. Mentored 42 individual scholars.',
@@ -127,6 +133,7 @@ export const INITIAL_REPORTS = [
     id: 'rep-2',
     internId: 'user-intern-2',
     internName: 'Meera Iyer',
+    batch: 'Batch 1',
     juniorSecId: 'user-jsec-1',
     monthYear: 'October 2026',
     tasksCompleted: 'Conducted 12 health education sessions for 85 village residents.',
@@ -142,6 +149,7 @@ export const INITIAL_REPORTS = [
     id: 'rep-3',
     internId: 'user-intern-3',
     internName: 'Kabir Das',
+    batch: 'Batch 2',
     juniorSecId: 'user-jsec-2',
     monthYear: 'October 2026',
     tasksCompleted: 'Held 18 robotics & science hands-on workshop periods with grade 7 scholars.',
@@ -157,6 +165,7 @@ export const INITIAL_REPORTS = [
     id: 'rep-4',
     internId: 'user-intern-4',
     internName: 'Ananya Rao',
+    batch: 'Batch 2',
     juniorSecId: 'user-jsec-2',
     monthYear: 'October 2026',
     tasksCompleted: '14 English reading circles completed; 30 beginner readers tested.',
@@ -170,19 +179,19 @@ export const INITIAL_REPORTS = [
   }
 ]
 
-// Visual Session Tracking Data (Sessions done by scholars)
+// Visual Session Tracking Data with Batch breakdown
 export const INITIAL_SESSIONS = [
-  { internId: 'user-intern-1', internName: 'Aarav Gupta', sessionsCount: 16, studentsReached: 48, wing: 'Wing 1 (Priya)', topic: 'Foundational Numeracy' },
-  { internId: 'user-intern-2', internName: 'Meera Iyer', sessionsCount: 12, studentsReached: 65, wing: 'Wing 1 (Priya)', topic: 'Health & Hygiene' },
-  { internId: 'user-intern-3', internName: 'Kabir Das', sessionsCount: 18, studentsReached: 54, wing: 'Wing 2 (Rohan)', topic: 'Robotics & Science' },
-  { internId: 'user-intern-4', internName: 'Ananya Rao', sessionsCount: 14, studentsReached: 38, wing: 'Wing 2 (Rohan)', topic: 'Literacy & Phonics' },
-  { internId: 'user-intern-5', internName: 'Vikram Joshi', sessionsCount: 8, studentsReached: 120, wing: 'Wing 3 (Sneha)', topic: 'Media Storytelling' },
+  { internId: 'user-intern-1', internName: 'Aarav Gupta', batch: 'Batch 1', sessionsCount: 16, studentsReached: 48, wing: 'Wing 1 (Priya)', topic: 'Foundational Numeracy' },
+  { internId: 'user-intern-2', internName: 'Meera Iyer', batch: 'Batch 1', sessionsCount: 12, studentsReached: 65, wing: 'Wing 1 (Priya)', topic: 'Health & Hygiene' },
+  { internId: 'user-intern-3', internName: 'Kabir Das', batch: 'Batch 2', sessionsCount: 18, studentsReached: 54, wing: 'Wing 2 (Rohan)', topic: 'Robotics & Science' },
+  { internId: 'user-intern-4', internName: 'Ananya Rao', batch: 'Batch 2', sessionsCount: 14, studentsReached: 38, wing: 'Wing 2 (Rohan)', topic: 'Literacy & Phonics' },
+  { internId: 'user-intern-5', internName: 'Vikram Joshi', batch: 'Batch 2', sessionsCount: 8, studentsReached: 120, wing: 'Wing 3 (Sneha)', topic: 'Media Storytelling' },
 ]
 
 // Reimbursement Cycle Data
 export const INITIAL_REIMBURSEMENT_CYCLE = {
   monthYear: 'October 2026',
-  isActive: true, // Activated by Senior Sec / Management
+  isActive: true,
   activatedBy: 'Senior Secretary',
   deadline: '2026-10-25',
   stipendStandard: 3000
@@ -193,6 +202,7 @@ export const INITIAL_REIMBURSEMENT_CLAIMS = [
     id: 'clm-1',
     internId: 'user-intern-1',
     internName: 'Aarav Gupta',
+    batch: 'Batch 1',
     monthYear: 'October 2026',
     amount: 3250,
     upiOrBank: 'aarav@okaxis',
@@ -205,6 +215,7 @@ export const INITIAL_REIMBURSEMENT_CLAIMS = [
     id: 'clm-2',
     internId: 'user-intern-2',
     internName: 'Meera Iyer',
+    batch: 'Batch 1',
     monthYear: 'October 2026',
     amount: 3000,
     upiOrBank: 'meera.iyer@okhdfcbank',
@@ -217,6 +228,7 @@ export const INITIAL_REIMBURSEMENT_CLAIMS = [
     id: 'clm-3',
     internId: 'user-intern-3',
     internName: 'Kabir Das',
+    batch: 'Batch 2',
     monthYear: 'October 2026',
     amount: 3400,
     upiOrBank: 'kabir.das@sbi',
@@ -227,16 +239,15 @@ export const INITIAL_REIMBURSEMENT_CLAIMS = [
   }
 ]
 
-// Resources Hub: 2 distinct spaces (Staff vs Interns)
+// Resources Hub
 export const INITIAL_RESOURCES = [
-  // Space 1: Staff / Leadership Only
   {
     id: 'res-staff-1',
     targetSpace: 'staff',
     title: 'Secretarial Standard Operating Procedures (SOP 2026)',
     category: 'Governance & SOP',
     url: 'https://docs.google.com/document/d/sample-sop',
-    description: 'Detailed rubric for Junior Secretaries on grading monthly reports, escalation chains, and dispute resolution.',
+    description: 'Guidelines for Junior Secretaries on evaluating monthly scholar reports, escalation chains, and dispute resolution.',
     addedBy: 'Senior Secretary'
   },
   {
@@ -249,72 +260,61 @@ export const INITIAL_RESOURCES = [
     addedBy: 'Dr. Rajiv Menon'
   },
   {
-    id: 'res-staff-3',
-    targetSpace: 'staff',
-    title: 'Intern Reallocation & Track Transfer Form',
-    category: 'HR & Workflows',
-    url: 'https://forms.google.com/sample-reallocation',
-    description: 'Official form for Junior Secretaries to request transferring an intern between wings.',
-    addedBy: 'Senior Secretary'
-  },
-
-  // Space 2: Interns / Scholars Materials
-  {
     id: 'res-intern-1',
     targetSpace: 'interns',
     title: 'Monthly Progress Report Template & Guidelines',
     category: 'Reporting Guide',
     url: 'https://docs.google.com/document/d/sample-template',
-    description: 'Official template for structuring your monthly progress report before submitting.',
+    description: 'Official template for scholars to document their teaching sessions and achievements before submitting.',
     addedBy: 'Senior Secretary'
   },
   {
     id: 'res-intern-2',
     targetSpace: 'interns',
-    title: 'Teaching Scholars Curriculum Drive (Grade 1-8)',
+    title: 'Outreach Curriculum Drive (Batch 1 & Batch 2)',
     category: 'Study Materials',
     url: 'https://drive.google.com/drive/folders/sample-curriculum',
-    description: 'Approved worksheets, session lesson plans, and audio-visual aids for grassroots classes.',
+    description: 'Approved worksheets, lesson plans, and experimental learning modules for grassroots classes.',
     addedBy: 'Rohan Verma (Junior Sec)'
-  },
-  {
-    id: 'res-intern-3',
-    targetSpace: 'interns',
-    title: 'Reimbursement Claim & Receipt Submission Rules',
-    category: 'Finance FAQ',
-    url: 'https://docs.google.com/document/d/sample-reimbursement-rules',
-    description: 'Instructions on submitting UPI details, allowable travel expenses, and monthly payout deadlines.',
-    addedBy: 'Senior Secretary'
   }
 ]
 
-// Broadcast Notifications
+// Broadcast Notifications with Batch Targeting
 export const INITIAL_BROADCASTS = [
   {
     id: 'bc-1',
     sender: 'Senior Secretary',
-    title: 'Urgent: Monthly Report Review Deadline for Junior Secretaries',
-    message: 'All 3 Junior Secretaries are requested to complete pending intern reviews by Friday 5 PM so that monthly stipends can be processed without delay.',
+    title: 'Secretariat Notice: Evaluation Deadline for Junior Secretaries',
+    message: 'All 3 Junior Secretaries are requested to complete pending reviews for both Batch 1 and Batch 2 by Friday 5 PM so that monthly stipends can be processed.',
     audience: 'junior_secs',
     date: 'Today, 2:30 PM',
     isNew: true
   },
   {
     id: 'bc-2',
-    sender: 'Senior Secretary & Management',
-    title: 'October Reimbursement Portal is Now Active!',
-    message: 'Scholars can now submit their October stipend and conveyance reimbursement claim in the Reimbursement section.',
-    audience: 'interns',
-    date: 'Yesterday, 10:00 AM',
-    isNew: false
+    sender: 'Senior Secretary',
+    title: 'Batch 1 Scholars: Mid-Tenure Reflection Call',
+    message: 'All Batch 1 scholars are invited to the mid-tenure reflection check-in this Saturday at 4:00 PM on Google Meet.',
+    audience: 'batch_1',
+    date: 'Today, 11:00 AM',
+    isNew: true
   },
   {
     id: 'bc-3',
-    sender: 'Dr. Rajiv Menon (Management)',
-    title: 'Quarterly Townhall Meeting Link',
-    message: 'Join us for our whole-team celebration and quarterly review on Saturday at 11:00 AM IST.',
-    audience: 'all',
-    date: '3 days ago',
+    sender: 'Senior Secretary',
+    title: 'Batch 2 Scholars: Classroom Kit Distribution Reminder',
+    message: 'Scholars enrolled in Batch 2 can collect their updated teaching kits and math workbooks from their respective wing leads.',
+    audience: 'batch_2',
+    date: 'Yesterday, 3:15 PM',
+    isNew: false
+  },
+  {
+    id: 'bc-4',
+    sender: 'Senior Secretary',
+    title: 'Stipend Portal Activated for All Scholars',
+    message: 'The reimbursement window for October is now active. Please submit your claims in the Reimbursements tab.',
+    audience: 'all_interns',
+    date: '2 days ago',
     isNew: false
   }
 ]

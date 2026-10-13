@@ -1,19 +1,20 @@
 -- ==============================================================================
--- NGO INTERN TRACKING & COORDINATION SYSTEM - EXPANDED SCHEMA
+-- DAKSHANA OUTREACH INTERNSHIP - DATABASE SCHEMA (SUPABASE POSTGRESQL)
 -- ==============================================================================
 
 -- 1. Roles & Status Enums
 CREATE TYPE user_role AS ENUM ('management', 'senior_sec', 'junior_sec', 'intern');
 CREATE TYPE report_status AS ENUM ('draft', 'submitted', 'reviewed', 'revision_requested');
 CREATE TYPE reimbursement_status AS ENUM ('pending', 'approved', 'rejected', 'paid');
-CREATE TYPE audience_target AS ENUM ('all', 'junior_secs', 'interns', 'management');
+CREATE TYPE audience_target AS ENUM ('all', 'junior_secs', 'batch_1', 'batch_2', 'all_interns', 'management');
 
--- 2. User Profiles Table
+-- 2. User Profiles Table (Batch 1 & Batch 2 Support)
 CREATE TABLE public.profiles (
     id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
     email TEXT NOT NULL UNIQUE,
     full_name TEXT NOT NULL,
     role user_role NOT NULL DEFAULT 'intern',
+    batch TEXT DEFAULT 'Batch 1' CHECK (batch IN ('Batch 1', 'Batch 2')),
     phone TEXT,
     photo_url TEXT,
     bio TEXT,
@@ -21,7 +22,7 @@ CREATE TABLE public.profiles (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- 3. Intern Supervision Mapping
+-- 3. Intern Supervision Mapping (Senior Sec allocates to Junior Secs)
 CREATE TABLE public.intern_assignments (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     intern_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
@@ -49,10 +50,11 @@ CREATE TABLE public.monthly_reports (
     CONSTRAINT unique_intern_monthly_report UNIQUE (intern_id, month_year)
 );
 
--- 5. Student / Intern Sessions Tracker (Visual Session Data)
+-- 5. Student / Intern Sessions Tracker (Visual Session Data with Batch)
 CREATE TABLE public.session_logs (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     intern_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+    batch TEXT NOT NULL DEFAULT 'Batch 1',
     session_date DATE NOT NULL DEFAULT CURRENT_DATE,
     sessions_conducted INTEGER NOT NULL DEFAULT 1,
     students_attended INTEGER NOT NULL DEFAULT 0,
@@ -60,10 +62,10 @@ CREATE TABLE public.session_logs (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- 6. Reimbursement Cycles & Claims
+-- 6. Reimbursement Cycles & Claims (Controlled by Senior Secretary)
 CREATE TABLE public.reimbursement_cycles (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    month_year TEXT NOT NULL UNIQUE, -- e.g. 'October 2026'
+    month_year TEXT NOT NULL UNIQUE,
     is_active BOOLEAN NOT NULL DEFAULT false,
     activated_by UUID REFERENCES public.profiles(id),
     deadline DATE,
@@ -83,7 +85,7 @@ CREATE TABLE public.reimbursement_claims (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- 7. Resource Spaces (Staff vs Intern Materials)
+-- 7. Resource Spaces (Staff Vault vs Scholars Hub)
 CREATE TABLE public.resources (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     title TEXT NOT NULL,
@@ -95,7 +97,7 @@ CREATE TABLE public.resources (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- 8. Broadcast Notification Center
+-- 8. Broadcast Notification Center (Batch-Targeted)
 CREATE TABLE public.broadcast_messages (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     sender_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,

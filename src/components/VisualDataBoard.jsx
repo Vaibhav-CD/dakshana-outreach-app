@@ -3,17 +3,20 @@ import { BarChart3, TrendingUp, Filter } from 'lucide-react'
 
 export default function VisualDataBoard({ sessions, allUsers }) {
   const [selectedWing, setSelectedWing] = useState('all')
+  const [selectedBatch, setSelectedBatch] = useState('all')
 
-  const filteredSessions = selectedWing === 'all'
-    ? sessions
-    : sessions.filter(s => s.wing.includes(selectedWing))
+  const filteredSessions = sessions.filter(s => {
+    const matchesWing = selectedWing === 'all' || s.wing.includes(selectedWing)
+    const matchesBatch = selectedBatch === 'all' || s.batch === selectedBatch
+    return matchesWing && matchesBatch
+  })
 
   const totalSessions = filteredSessions.reduce((acc, curr) => acc + curr.sessionsCount, 0)
   const totalStudentsReached = filteredSessions.reduce((acc, curr) => acc + curr.studentsReached, 0)
   const averageSessions = filteredSessions.length > 0 ? (totalSessions / filteredSessions.length).toFixed(1) : 0
   const maxSessionCount = Math.max(...sessions.map(s => s.sessionsCount), 20)
 
-  const topScholar = [...sessions].sort((a, b) => b.sessionsCount - a.sessionsCount)[0]
+  const topScholar = [...filteredSessions].sort((a, b) => b.sessionsCount - a.sessionsCount)[0]
 
   return (
     <div className="space-y-6">
@@ -28,24 +31,38 @@ export default function VisualDataBoard({ sessions, allUsers }) {
             </div>
             <h2 className="text-2xl font-bold">Field Sessions & Scholar Impact Board</h2>
             <p className="text-emerald-100 text-sm mt-1">
-              Live graphical telemetry of grassroots sessions delivered by our scholars.
+              Live graphical telemetry of grassroots sessions delivered by Batch 1 & Batch 2 scholars.
             </p>
           </div>
 
-          {/* Wing Filter */}
-          <div className="flex items-center space-x-2 bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/20 text-xs">
-            <Filter className="w-3.5 h-3.5 text-emerald-200" />
-            <span className="text-emerald-200">Wing Filter:</span>
-            <select
-              value={selectedWing}
-              onChange={(e) => setSelectedWing(e.target.value)}
-              className="bg-transparent text-white font-bold focus:outline-hidden cursor-pointer"
-            >
-              <option value="all" className="text-slate-900">All Wings (Whole Cohort)</option>
-              <option value="Wing 1" className="text-slate-900">Wing 1 (Priya Sharma)</option>
-              <option value="Wing 2" className="text-slate-900">Wing 2 (Rohan Verma)</option>
-              <option value="Wing 3" className="text-slate-900">Wing 3 (Sneha Kulkarni)</option>
-            </select>
+          {/* Dual Filters: Batch & Wing */}
+          <div className="flex flex-wrap items-center gap-2 bg-white/10 backdrop-blur-md p-2 rounded-xl border border-white/20 text-xs">
+            <div className="flex items-center space-x-1.5">
+              <span className="text-emerald-200 font-bold">Batch:</span>
+              <select
+                value={selectedBatch}
+                onChange={(e) => setSelectedBatch(e.target.value)}
+                className="bg-white/20 text-white font-bold rounded-lg px-2 py-1 focus:outline-hidden cursor-pointer"
+              >
+                <option value="all" className="text-slate-900">All Batches</option>
+                <option value="Batch 1" className="text-slate-900">Batch 1</option>
+                <option value="Batch 2" className="text-slate-900">Batch 2</option>
+              </select>
+            </div>
+
+            <div className="flex items-center space-x-1.5 border-l border-white/20 pl-2">
+              <span className="text-emerald-200 font-bold">Wing:</span>
+              <select
+                value={selectedWing}
+                onChange={(e) => setSelectedWing(e.target.value)}
+                className="bg-white/20 text-white font-bold rounded-lg px-2 py-1 focus:outline-hidden cursor-pointer"
+              >
+                <option value="all" className="text-slate-900">All Wings</option>
+                <option value="Wing 1" className="text-slate-900">Wing 1 (Priya)</option>
+                <option value="Wing 2" className="text-slate-900">Wing 2 (Rohan)</option>
+                <option value="Wing 3" className="text-slate-900">Wing 3 (Sneha)</option>
+              </select>
+            </div>
           </div>
         </div>
 
@@ -64,7 +81,7 @@ export default function VisualDataBoard({ sessions, allUsers }) {
             <span className="text-2xl font-extrabold text-white mt-1 block">{averageSessions}</span>
           </div>
           <div className="bg-white/10 rounded-xl p-3 border border-white/10">
-            <span className="text-xs text-emerald-200 block">Lead Contributing Scholar</span>
+            <span className="text-xs text-emerald-200 block">Top Contributing Scholar</span>
             <span className="text-sm font-bold text-amber-300 mt-2 block truncate">
               ★ {topScholar ? topScholar.internName : 'N/A'} ({topScholar ? topScholar.sessionsCount : 0} sessions)
             </span>
@@ -97,6 +114,9 @@ export default function VisualDataBoard({ sessions, allUsers }) {
                       {index + 1}
                     </span>
                     <span className="font-bold text-slate-900 text-sm">{item.internName}</span>
+                    <span className={`text-[10px] font-bold px-1.5 py-0.2 rounded-sm ${item.batch === 'Batch 2' ? 'bg-[#F8EDF5] text-[#7B2E68]' : 'bg-[#EBF7F0] text-[#0A643B]'}`}>
+                      {item.batch}
+                    </span>
                     <span className="text-[11px] text-slate-500 px-2 py-0.5 rounded-md bg-slate-100">{item.wing}</span>
                     <span className="text-[11px] text-[#0A643B] font-semibold italic">({item.topic})</span>
                   </div>
@@ -106,7 +126,7 @@ export default function VisualDataBoard({ sessions, allUsers }) {
                   </div>
                 </div>
 
-                {/* Progress Visual Bar with Dakshana Green to Plum Gradient */}
+                {/* Progress Visual Bar */}
                 <div className="w-full bg-slate-100 rounded-full h-4 overflow-hidden p-0.5 border border-slate-200 flex">
                   <div
                     className="h-full rounded-full bg-gradient-to-r from-[#0A643B] via-[#11844E] to-[#7B2E68] transition-all duration-500 flex items-center justify-end pr-2 text-[10px] font-bold text-white"

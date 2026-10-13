@@ -22,6 +22,7 @@ export default function InternView({ currentUser, allUsers, reports, onSubmitRep
       id: `rep-${Date.now()}`,
       internId: currentUser.id,
       internName: currentUser.name,
+      batch: currentUser.batch || 'Batch 1',
       juniorSecId: currentUser.assignedTo || 'user-jsec-1',
       monthYear: month,
       tasksCompleted: tasks,
@@ -60,7 +61,7 @@ export default function InternView({ currentUser, allUsers, reports, onSubmitRep
   return (
     <div className="space-y-6">
       
-      {/* Scholar Welcome Card */}
+      {/* Scholar Welcome Card - Only what is required */}
       <div className="bg-gradient-to-r from-[#074D2D] via-[#0A643B] to-[#7B2E68] rounded-2xl p-6 text-white shadow-md">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div className="flex items-center space-x-4">
@@ -70,9 +71,14 @@ export default function InternView({ currentUser, allUsers, reports, onSubmitRep
               className="w-14 h-14 rounded-2xl object-cover border-2 border-white/40 shadow-sm"
             />
             <div>
-              <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-white/20 text-white">
-                Dakshana Scholar
-              </span>
+              <div className="flex items-center space-x-2">
+                <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-white/20 text-white">
+                  Dakshana Scholar
+                </span>
+                <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full ${currentUser.batch === 'Batch 2' ? 'bg-[#7B2E68] text-white border border-white/30' : 'bg-emerald-200 text-[#074D2D]'}`}>
+                  {currentUser.batch || 'Batch 1'}
+                </span>
+              </div>
               <h2 className="text-2xl font-bold mt-1">{currentUser.name}</h2>
               <p className="text-emerald-100 text-xs">{currentUser.department || 'Grassroots Outreach'}</p>
             </div>
@@ -95,7 +101,7 @@ export default function InternView({ currentUser, allUsers, reports, onSubmitRep
                 <FileText className="w-5 h-5 mr-2 text-[#0A643B]" />
                 Monthly Scholar Progress Submission
               </h3>
-              <p className="text-xs text-slate-500 mt-0.5">Report your teaching sessions and field activities to your Junior Secretary</p>
+              <p className="text-xs text-slate-500 mt-0.5">Submit your field teaching and student outreach milestones</p>
             </div>
             <div className="flex items-center text-xs font-semibold text-[#0A643B] bg-[#EBF7F0] px-3 py-1 rounded-lg border border-[#0A643B]/20">
               <Calendar className="w-3.5 h-3.5 mr-1" />
@@ -144,7 +150,7 @@ export default function InternView({ currentUser, allUsers, reports, onSubmitRep
 
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
-                  Reporting Month
+                  Reporting Cycle
                 </label>
                 <select
                   value={month}

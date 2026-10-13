@@ -52,6 +52,29 @@ export default function App() {
     }))
   }
 
+  const handleUpdateInternBatch = (internId, newBatch) => {
+    setAllUsers(prev => prev.map(user => {
+      if (user.id === internId) {
+        return { ...user, batch: newBatch }
+      }
+      return user
+    }))
+
+    setReports(prev => prev.map(rep => {
+      if (rep.internId === internId) {
+        return { ...rep, batch: newBatch }
+      }
+      return rep
+    }))
+
+    setSessions(prev => prev.map(s => {
+      if (s.internId === internId) {
+        return { ...s, batch: newBatch }
+      }
+      return s
+    }))
+  }
+
   const handleAddIntern = (newIntern) => {
     setAllUsers(prev => [...prev, newIntern])
   }
@@ -134,6 +157,7 @@ export default function App() {
                 allUsers={allUsers}
                 reports={reports}
                 onReassignIntern={handleReassignIntern}
+                onUpdateInternBatch={handleUpdateInternBatch}
                 onAddIntern={handleAddIntern}
               />
             )}

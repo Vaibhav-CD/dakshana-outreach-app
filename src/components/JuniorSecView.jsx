@@ -1,16 +1,16 @@
 import React, { useState } from 'react'
-import { CheckCircle2, AlertCircle, Clock, Users, ChevronRight, Check, X } from 'lucide-react'
+import { CheckCircle2, AlertCircle, Clock, Users, ChevronRight, Check, X, Shield } from 'lucide-react'
 
 export default function JuniorSecView({ currentUser, allUsers, reports, onUpdateReport }) {
   const [selectedReport, setSelectedReport] = useState(null)
   const [feedbackText, setFeedbackText] = useState('')
   const [newStatus, setNewStatus] = useState('reviewed')
 
-  // Filter only interns assigned to this Junior Secretary
+  // Strictly limited scope: Only interns assigned to this specific Junior Secretary
   const assignedInterns = allUsers.filter(u => u.role === 'intern' && u.assignedTo === currentUser.id)
   const assignedInternIds = assignedInterns.map(i => i.id)
 
-  // Reports only belonging to assigned interns
+  // Strictly limited scope: Reports only belonging to their own wing scholars
   const myReports = reports.filter(r => assignedInternIds.includes(r.internId) || r.juniorSecId === currentUser.id)
   const pendingReports = myReports.filter(r => r.status === 'submitted')
   const completedReports = myReports.filter(r => r.status === 'reviewed')
@@ -36,12 +36,13 @@ export default function JuniorSecView({ currentUser, allUsers, reports, onUpdate
   return (
     <div className="space-y-6">
       
-      {/* Junior Sec Banner */}
+      {/* Junior Sec Banner - Limited Supervisory Scope */}
       <div className="bg-gradient-to-r from-[#074D2D] to-[#0A643B] rounded-2xl p-6 text-white shadow-md">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <div className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-white/20 text-xs font-semibold mb-2">
-              <span>Dakshana Wing Leadership</span>
+              <Shield className="w-3.5 h-3.5 mr-1" />
+              <span>Wing Supervisor Portal (Field Evaluation Scope)</span>
             </div>
             <h2 className="text-2xl font-bold">Welcome, {currentUser.name}</h2>
             <p className="text-emerald-100 text-sm mt-1">{currentUser.title} • {currentUser.department}</p>
@@ -53,7 +54,7 @@ export default function JuniorSecView({ currentUser, allUsers, reports, onUpdate
             </div>
             <div className="bg-white/15 px-4 py-2 rounded-xl backdrop-blur-xs border border-white/20">
               <span className="block text-xl font-bold text-amber-200">{pendingReports.length}</span>
-              <span className="text-xs text-emerald-100">Needs Review</span>
+              <span className="text-xs text-emerald-100">Pending Review</span>
             </div>
           </div>
         </div>
@@ -61,13 +62,13 @@ export default function JuniorSecView({ currentUser, allUsers, reports, onUpdate
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-        {/* Left Column: Review Queue */}
+        {/* Left Column: Review Queue (Limited strictly to assigned scholars) */}
         <div className="lg:col-span-8 space-y-4">
           <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs">
             <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
               <h3 className="font-bold text-slate-900 text-lg flex items-center">
                 <Clock className="w-5 h-5 mr-2 text-[#0A643B]" />
-                Monthly Scholar Reports Requiring Review ({pendingReports.length})
+                Monthly Reports Requiring Review ({pendingReports.length})
               </h3>
               <span className="text-xs text-slate-500">Only showing your assigned wing scholars</span>
             </div>
@@ -75,7 +76,7 @@ export default function JuniorSecView({ currentUser, allUsers, reports, onUpdate
             {pendingReports.length === 0 ? (
               <div className="text-center py-10 bg-slate-50 border border-slate-200 rounded-xl">
                 <CheckCircle2 className="w-8 h-8 text-[#0A643B] mx-auto mb-2" />
-                <p className="text-sm font-semibold text-slate-800">All caught up!</p>
+                <p className="text-sm font-semibold text-slate-800">All evaluations completed!</p>
                 <p className="text-xs text-slate-500 mt-1">There are no pending submissions awaiting your review right now.</p>
               </div>
             ) : (
@@ -84,7 +85,12 @@ export default function JuniorSecView({ currentUser, allUsers, reports, onUpdate
                   <div key={rep.id} className="p-4 rounded-xl border border-amber-200 bg-amber-50/40 hover:bg-amber-50 transition-colors">
                     <div className="flex justify-between items-start">
                       <div>
-                        <h4 className="font-bold text-slate-900">{rep.internName}</h4>
+                        <div className="flex items-center space-x-2">
+                          <h4 className="font-bold text-slate-900">{rep.internName}</h4>
+                          <span className={`text-[10px] font-extrabold px-2 py-0.2 rounded-md ${rep.batch === 'Batch 2' ? 'bg-[#F8EDF5] text-[#7B2E68]' : 'bg-[#EBF7F0] text-[#0A643B]'}`}>
+                            {rep.batch || 'Batch 1'}
+                          </span>
+                        </div>
                         <span className="text-xs text-slate-500">{rep.monthYear} • {rep.hoursContributed} hrs clocked</span>
                       </div>
                       <button
@@ -112,6 +118,7 @@ export default function JuniorSecView({ currentUser, allUsers, reports, onUpdate
                 <div key={rep.id} className="p-3 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-between text-xs">
                   <div>
                     <span className="font-bold text-slate-800">{rep.internName}</span>
+                    <span className="ml-2 text-[10px] px-1.5 py-0.2 rounded-sm bg-white border border-slate-200 text-slate-600 font-semibold">{rep.batch || 'Batch 1'}</span>
                     <span className="text-slate-500 ml-2">({rep.monthYear})</span>
                     <p className="text-slate-600 mt-0.5 italic">"{rep.reviewerFeedback}"</p>
                   </div>
@@ -127,7 +134,7 @@ export default function JuniorSecView({ currentUser, allUsers, reports, onUpdate
           </div>
         </div>
 
-        {/* Right Column: Assigned Interns List */}
+        {/* Right Column: Assigned Scholars (Limited to their wing) */}
         <div className="lg:col-span-4 space-y-4">
           <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs">
             <h3 className="font-bold text-slate-900 text-base flex items-center mb-1">
@@ -145,7 +152,12 @@ export default function JuniorSecView({ currentUser, allUsers, reports, onUpdate
                       <img src={intern.photo} className="w-8 h-8 rounded-lg object-cover" alt="" />
                       <div>
                         <p className="text-xs font-bold text-slate-900">{intern.name}</p>
-                        <p className="text-[11px] text-slate-500">{intern.department}</p>
+                        <div className="flex items-center space-x-1.5 mt-0.5">
+                          <span className={`text-[9px] font-bold px-1.5 py-0.2 rounded-sm ${intern.batch === 'Batch 2' ? 'bg-[#F8EDF5] text-[#7B2E68]' : 'bg-[#EBF7F0] text-[#0A643B]'}`}>
+                            {intern.batch}
+                          </span>
+                          <span className="text-[10px] text-slate-500">{intern.department}</span>
+                        </div>
                       </div>
                     </div>
                     <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${hasReport ? 'bg-[#EBF7F0] text-[#0A643B]' : 'bg-slate-200 text-slate-700'}`}>
@@ -167,7 +179,7 @@ export default function JuniorSecView({ currentUser, allUsers, reports, onUpdate
             <div className="flex justify-between items-center pb-3 border-b border-slate-100">
               <div>
                 <h3 className="font-bold text-slate-900 text-lg">Evaluate Scholar Report</h3>
-                <p className="text-xs text-slate-500">{selectedReport.internName} • {selectedReport.monthYear}</p>
+                <p className="text-xs text-slate-500">{selectedReport.internName} ({selectedReport.batch}) • {selectedReport.monthYear}</p>
               </div>
               <button
                 onClick={() => setSelectedReport(null)}
