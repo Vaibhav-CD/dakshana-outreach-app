@@ -1,19 +1,52 @@
 import React, { useState } from 'react'
-import { CheckCircle2, AlertCircle, Clock, Users, ChevronRight, Check, X, Shield } from 'lucide-react'
+import {
+  CheckCircle2,
+  AlertCircle,
+  Clock,
+  Users,
+  ChevronRight,
+  Check,
+  X,
+  Shield,
+  Sparkles,
+  Key,
+  Layers,
+  CreditCard,
+  Radio,
+  Filter
+} from 'lucide-react'
 
-export default function JuniorSecView({ currentUser, allUsers, reports, onUpdateReport }) {
+export default function JuniorSecView({
+  currentUser,
+  allUsers,
+  reports,
+  onUpdateReport,
+  delegatedPowers = {},
+  onReassignIntern,
+  onUpdateInternBatch
+}) {
   const [selectedReport, setSelectedReport] = useState(null)
   const [feedbackText, setFeedbackText] = useState('')
   const [newStatus, setNewStatus] = useState('reviewed')
+  const [reportScope, setReportScope] = useState('my_wing') // 'my_wing' | 'all_wings'
 
-  // Strictly limited scope: Only interns assigned to this specific Junior Secretary
+  const myPowers = delegatedPowers?.[currentUser.id] || {}
+  const hasAnyPower = Object.values(myPowers).some(Boolean)
+
+  const juniorSecs = allUsers.filter(u => u.role === 'junior_sec')
+  const allInterns = allUsers.filter(u => u.role === 'intern')
+
+  // Wing interns
   const assignedInterns = allUsers.filter(u => u.role === 'intern' && u.assignedTo === currentUser.id)
   const assignedInternIds = assignedInterns.map(i => i.id)
 
-  // Strictly limited scope: Reports only belonging to their own wing scholars
-  const myReports = reports.filter(r => assignedInternIds.includes(r.internId) || r.juniorSecId === currentUser.id)
-  const pendingReports = myReports.filter(r => r.status === 'submitted')
-  const completedReports = myReports.filter(r => r.status === 'reviewed')
+  // Report scoping: if canViewAllReports is true, user can toggle between my_wing and all_wings
+  const effectiveReports = (myPowers.canViewAllReports && reportScope === 'all_wings')
+    ? reports
+    : reports.filter(r => assignedInternIds.includes(r.internId) || r.juniorSecId === currentUser.id)
+
+  const pendingReports = effectiveReports.filter(r => r.status === 'submitted')
+  const completedReports = effectiveReports.filter(r => r.status === 'reviewed')
 
   const handleOpenReview = (report) => {
     setSelectedReport(report)
@@ -36,13 +69,19 @@ export default function JuniorSecView({ currentUser, allUsers, reports, onUpdate
   return (
     <div className="space-y-6">
       
-      {/* Junior Sec Banner - Limited Supervisory Scope */}
+      {/* Junior Sec Banner */}
       <div className="bg-gradient-to-r from-[#074D2D] to-[#0A643B] rounded-2xl p-6 text-white shadow-md">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <div className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-white/20 text-xs font-semibold mb-2">
               <Shield className="w-3.5 h-3.5 mr-1" />
-              <span>Wing Supervisor Portal (Field Evaluation Scope)</span>
+              <span>Wing Supervisor Portal</span>
+              {hasAnyPower && (
+                <span className="ml-2 inline-flex items-center text-[10px] font-bold px-2 py-0.2 rounded-full bg-amber-400 text-slate-900">
+                  <Sparkles className="w-3 h-3 mr-1" />
+                  Elevated Powers Active
+                </span>
+              )}
             </div>
             <h2 className="text-2xl font-bold">Welcome, {currentUser.name}</h2>
             <p className="text-emerald-100 text-sm mt-1">{currentUser.title} • {currentUser.department}</p>
@@ -58,19 +97,85 @@ export default function JuniorSecView({ currentUser, allUsers, reports, onUpdate
             </div>
           </div>
         </div>
+
+        {/* Delegated Special Powers Banner */}
+        {hasAnyPower && (
+          <div className="mt-5 pt-4 border-t border-white/20">
+            <div className="flex items-center space-x-2 mb-2">
+              <Key className="w-4 h-4 text-amber-300" />
+              <span className="text-xs font-bold text-amber-200 uppercase tracking-wider">
+                Senior Secretary Delegated Special Privileges:
+              </span>
+            </div>
+            <div className="flex flex-wrap gap-2 text-xs">
+              {myPowers.canManageReimbursements && (
+                <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-white/20 border border-white/30 text-white font-semibold">
+                  <CreditCard className="w-3.5 h-3.5 mr-1.5 text-emerald-200" />
+                  Reimbursement Window & Claims Authority
+                </span>
+              )}
+              {myPowers.canReassignBatches && (
+                <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-white/20 border border-white/30 text-white font-semibold">
+                  <Users className="w-3.5 h-3.5 mr-1.5 text-purple-200" />
+                  Batch Allocation & Scholar Transfer
+                </span>
+              )}
+              {myPowers.canBroadcast && (
+                <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-white/20 border border-white/30 text-white font-semibold">
+                  <Radio className="w-3.5 h-3.5 mr-1.5 text-blue-200" />
+                  Cohort Circular Broadcast Dispatch
+                </span>
+              )}
+              {myPowers.canViewAllReports && (
+                <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-white/20 border border-white/30 text-white font-semibold">
+                  <Layers className="w-3.5 h-3.5 mr-1.5 text-amber-200" />
+                  Cross-Wing Report Evaluation
+                </span>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-        {/* Left Column: Review Queue (Limited strictly to assigned scholars) */}
+        {/* Left Column: Review Queue */}
         <div className="lg:col-span-8 space-y-4">
           <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs">
-            <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
-              <h3 className="font-bold text-slate-900 text-lg flex items-center">
-                <Clock className="w-5 h-5 mr-2 text-[#0A643B]" />
-                Monthly Reports Requiring Review ({pendingReports.length})
-              </h3>
-              <span className="text-xs text-slate-500">Only showing your assigned wing scholars</span>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 pb-3 border-b border-slate-100 gap-2">
+              <div>
+                <h3 className="font-bold text-slate-900 text-lg flex items-center">
+                  <Clock className="w-5 h-5 mr-2 text-[#0A643B]" />
+                  Monthly Reports Requiring Review ({pendingReports.length})
+                </h3>
+                <p className="text-xs text-slate-500">
+                  {myPowers.canViewAllReports && reportScope === 'all_wings'
+                    ? 'Showing submissions across ALL cohort wings (delegated authority)'
+                    : 'Showing submissions from your assigned wing scholars'}
+                </p>
+              </div>
+
+              {/* Scope toggle for delegated Cross-Wing Evaluators */}
+              {myPowers.canViewAllReports && (
+                <div className="flex items-center space-x-1.5 bg-slate-100 p-1 rounded-xl text-xs font-bold">
+                  <button
+                    onClick={() => setReportScope('my_wing')}
+                    className={`px-2.5 py-1 rounded-lg transition-colors cursor-pointer ${
+                      reportScope === 'my_wing' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-600'
+                    }`}
+                  >
+                    My Wing
+                  </button>
+                  <button
+                    onClick={() => setReportScope('all_wings')}
+                    className={`px-2.5 py-1 rounded-lg transition-colors cursor-pointer ${
+                      reportScope === 'all_wings' ? 'bg-[#0A643B] text-white shadow-2xs' : 'text-slate-600'
+                    }`}
+                  >
+                    All Wings ({reports.length})
+                  </button>
+                </div>
+              )}
             </div>
 
             {pendingReports.length === 0 ? (
@@ -134,35 +239,64 @@ export default function JuniorSecView({ currentUser, allUsers, reports, onUpdate
           </div>
         </div>
 
-        {/* Right Column: Assigned Scholars (Limited to their wing) */}
+        {/* Right Column: Supervised Scholars & Delegated Batch Controls */}
         <div className="lg:col-span-4 space-y-4">
           <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs">
-            <h3 className="font-bold text-slate-900 text-base flex items-center mb-1">
-              <Users className="w-4 h-4 mr-2 text-[#0A643B]" />
-              Your Wing Scholars ({assignedInterns.length})
-            </h3>
-            <p className="text-xs text-slate-500 mb-4">Assigned to your wing by Senior Secretary</p>
+            <div className="flex items-center justify-between mb-1">
+              <h3 className="font-bold text-slate-900 text-base flex items-center">
+                <Users className="w-4 h-4 mr-2 text-[#0A643B]" />
+                Supervised Scholars ({assignedInterns.length})
+              </h3>
+            </div>
+            <p className="text-xs text-slate-500 mb-4">
+              {myPowers.canReassignBatches
+                ? 'Elevated power active: You can reassign batches or transfer scholars'
+                : 'Scholars assigned to your wing for field evaluation'}
+            </p>
 
             <div className="space-y-3">
               {assignedInterns.map(intern => {
-                const hasReport = myReports.some(r => r.internId === intern.id)
+                const hasReport = effectiveReports.some(r => r.internId === intern.id)
                 return (
-                  <div key={intern.id} className="p-3 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-between">
-                    <div className="flex items-center space-x-2.5">
-                      <img src={intern.photo} className="w-8 h-8 rounded-lg object-cover" alt="" />
-                      <div>
-                        <p className="text-xs font-bold text-slate-900">{intern.name}</p>
-                        <div className="flex items-center space-x-1.5 mt-0.5">
-                          <span className={`text-[9px] font-bold px-1.5 py-0.2 rounded-sm ${intern.batch === 'Batch 2' ? 'bg-[#F8EDF5] text-[#7B2E68]' : 'bg-[#EBF7F0] text-[#0A643B]'}`}>
-                            {intern.batch}
-                          </span>
+                  <div key={intern.id} className="p-3 rounded-xl border border-slate-200 bg-slate-50 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2.5">
+                        <img src={intern.photo} className="w-8 h-8 rounded-lg object-cover" alt="" />
+                        <div>
+                          <p className="text-xs font-bold text-slate-900">{intern.name}</p>
                           <span className="text-[10px] text-slate-500">{intern.department}</span>
                         </div>
                       </div>
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${hasReport ? 'bg-[#EBF7F0] text-[#0A643B]' : 'bg-slate-200 text-slate-700'}`}>
+                        {hasReport ? 'Active' : 'Awaiting'}
+                      </span>
                     </div>
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${hasReport ? 'bg-[#EBF7F0] text-[#0A643B]' : 'bg-slate-200 text-slate-700'}`}>
-                      {hasReport ? 'Active' : 'Awaiting'}
-                    </span>
+
+                    {/* If Junior Secretary has delegated batch power */}
+                    {myPowers.canReassignBatches && (
+                      <div className="pt-2 border-t border-slate-200/60 flex items-center justify-between gap-2 text-xs">
+                        <select
+                          aria-label={`Change batch for ${intern.name}`}
+                          value={intern.batch || 'Batch 1'}
+                          onChange={(e) => onUpdateInternBatch && onUpdateInternBatch(intern.id, e.target.value)}
+                          className="text-[11px] font-bold rounded-md px-1.5 py-0.5 border bg-white border-slate-300"
+                        >
+                          <option value="Batch 1">Batch 1</option>
+                          <option value="Batch 2">Batch 2</option>
+                        </select>
+
+                        <select
+                          aria-label={`Transfer ${intern.name}`}
+                          value={intern.assignedTo || ''}
+                          onChange={(e) => onReassignIntern && onReassignIntern(intern.id, e.target.value)}
+                          className="text-[11px] font-semibold rounded-md px-1.5 py-0.5 border bg-white border-slate-300 max-w-[130px] truncate"
+                        >
+                          {juniorSecs.map(j => (
+                            <option key={j.id} value={j.id}>Transfer: {j.name}</option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
                   </div>
                 )
               })}

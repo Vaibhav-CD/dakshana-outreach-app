@@ -39,7 +39,29 @@ export default function App() {
   const [allUsers, setAllUsers] = useState(INITIAL_USERS)
   const [reports, setReports] = useState(INITIAL_REPORTS)
   const [sessions, setSessions] = useState(INITIAL_SESSIONS)
-  const [cycle, setCycle] = useState(INITIAL_REIMBURSEMENT_CYCLE)
+  
+  // Reimbursement cycle state with local persistence
+  const [cycle, setCycle] = useState(() => {
+    const saved = localStorage.getItem('dakshana_reimbursement_cycle')
+    if (saved) {
+      try { return JSON.parse(saved) } catch (e) { }
+    }
+    return INITIAL_REIMBURSEMENT_CYCLE
+  })
+
+  // Delegated special powers state: Senior Secretary -> Junior Secretaries
+  const [delegatedPowers, setDelegatedPowers] = useState(() => {
+    const saved = localStorage.getItem('dakshana_delegated_powers')
+    if (saved) {
+      try { return JSON.parse(saved) } catch (e) { }
+    }
+    return {
+      'user-jsec-1': { canManageReimbursements: false, canReassignBatches: false, canBroadcast: false, canViewAllReports: false },
+      'user-jsec-2': { canManageReimbursements: false, canReassignBatches: false, canBroadcast: false, canViewAllReports: false },
+      'user-jsec-3': { canManageReimbursements: false, canReassignBatches: false, canBroadcast: false, canViewAllReports: false }
+    }
+  })
+
   const [claims, setClaims] = useState(INITIAL_REIMBURSEMENT_CLAIMS)
   const [resources, setResources] = useState(INITIAL_RESOURCES)
   const [broadcasts, setBroadcasts] = useState(INITIAL_BROADCASTS)
@@ -151,11 +173,23 @@ export default function App() {
 
   // Reimbursement handlers
   const handleToggleCycle = () => {
-    setCycle(prev => ({
-      ...prev,
-      isActive: !prev.isActive,
-      activatedBy: currentUser.name
-    }))
+    setCycle(prev => {
+      const updated = {
+        ...prev,
+        isActive: !prev.isActive,
+        activatedBy: currentUser.name
+      }
+      localStorage.setItem('dakshana_reimbursement_cycle', JSON.stringify(updated))
+      return updated
+    })
+  }
+
+  const handleUpdateCycleSettings = (updates) => {
+    setCycle(prev => {
+      const updated = { ...prev, ...updates }
+      localStorage.setItem('dakshana_reimbursement_cycle', JSON.stringify(updated))
+      return updated
+    })
   }
 
   const handleSubmitClaim = (newClaim) => {
@@ -182,6 +216,43 @@ export default function App() {
       approvedBy: approverName,
       paidAt: newStatus === 'paid' ? new Date().toISOString() : null
     }).catch(console.error)
+  }
+
+  // Privilege delegation handlers
+  const handleTogglePrivilege = (juniorSecId, privilegeKey) => {
+    setDelegatedPowers(prev => {
+      const secPowers = prev[juniorSecId] || {
+        canManageReimbursements: false,
+        canReassignBatches: false,
+        canBroadcast: false,
+        canViewAllReports: false
+      }
+      const updated = {
+        ...prev,
+        [juniorSecId]: {
+          ...secPowers,
+          [privilegeKey]: !secPowers[privilegeKey]
+        }
+      }
+      localStorage.setItem('dakshana_delegated_powers', JSON.stringify(updated))
+      return updated
+    })
+  }
+
+  const handleBulkPrivilege = (juniorSecId, grantAll) => {
+    setDelegatedPowers(prev => {
+      const updated = {
+        ...prev,
+        [juniorSecId]: {
+          canManageReimbursements: grantAll,
+          canReassignBatches: grantAll,
+          canBroadcast: grantAll,
+          canViewAllReports: grantAll
+        }
+      }
+      localStorage.setItem('dakshana_delegated_powers', JSON.stringify(updated))
+      return updated
+    })
   }
 
   // Resources handlers
@@ -226,6 +297,9 @@ export default function App() {
                 onReassignIntern={handleReassignIntern}
                 onUpdateInternBatch={handleUpdateInternBatch}
                 onAddIntern={handleAddIntern}
+                delegatedPowers={delegatedPowers}
+                onTogglePrivilege={handleTogglePrivilege}
+                onBulkPrivilege={handleBulkPrivilege}
               />
             )}
 
@@ -235,6 +309,9 @@ export default function App() {
                 allUsers={allUsers}
                 reports={reports}
                 onUpdateReport={handleUpdateReport}
+                delegatedPowers={delegatedPowers}
+                onReassignIntern={handleReassignIntern}
+                onUpdateInternBatch={handleUpdateInternBatch}
               />
             )}
 
@@ -270,9 +347,11 @@ export default function App() {
             currentUser={currentUser}
             cycle={cycle}
             onToggleCycle={handleToggleCycle}
+            onUpdateCycleSettings={handleUpdateCycleSettings}
             claims={claims}
             onSubmitClaim={handleSubmitClaim}
             onUpdateClaimStatus={handleUpdateClaimStatus}
+            delegatedPowers={delegatedPowers}
           />
         )}
 
@@ -298,6 +377,7 @@ export default function App() {
             currentUser={currentUser}
             broadcasts={broadcasts}
             onSendBroadcast={handleSendBroadcast}
+            delegatedPowers={delegatedPowers}
           />
         )}
 

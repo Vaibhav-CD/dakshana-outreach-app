@@ -1,8 +1,31 @@
 import React, { useState } from 'react'
-import { Users, ShieldAlert, UserPlus, Filter } from 'lucide-react'
+import {
+  Users,
+  ShieldAlert,
+  UserPlus,
+  Filter,
+  ShieldCheck,
+  Key,
+  Check,
+  CreditCard,
+  Radio,
+  Layers,
+  Sparkles,
+  ToggleLeft,
+  ToggleRight
+} from 'lucide-react'
 
-export default function SeniorSecView({ allUsers, reports, onReassignIntern, onUpdateInternBatch, onAddIntern }) {
-  const [activeTab, setActiveTab] = useState('assignments')
+export default function SeniorSecView({
+  allUsers,
+  reports,
+  onReassignIntern,
+  onUpdateInternBatch,
+  onAddIntern,
+  delegatedPowers = {},
+  onTogglePrivilege,
+  onBulkPrivilege
+}) {
+  const [activeTab, setActiveTab] = useState('assignments') // 'assignments' | 'reports' | 'delegation'
   const [selectedBatchFilter, setSelectedBatchFilter] = useState('all') // 'all' | 'Batch 1' | 'Batch 2'
   const [showAddModal, setShowAddModal] = useState(false)
   const [newInternName, setNewInternName] = useState('')
@@ -48,6 +71,37 @@ export default function SeniorSecView({ allUsers, reports, onReassignIntern, onU
     setShowAddModal(false)
   }
 
+  const privilegeDefinitions = [
+    {
+      key: 'canManageReimbursements',
+      title: 'Reimbursement Window & Payout Authority',
+      desc: 'Can open/close reimbursement cycles, edit announcement message & Google Form link, and approve claims.',
+      icon: CreditCard,
+      color: 'text-[#0A643B] bg-emerald-50 border-emerald-200'
+    },
+    {
+      key: 'canReassignBatches',
+      title: 'Batch Allocation & Scholar Transfer',
+      desc: 'Can reallocate scholars between Batch 1 and Batch 2, transfer scholars across wings, and onboard new scholars.',
+      icon: Users,
+      color: 'text-[#7B2E68] bg-purple-50 border-purple-200'
+    },
+    {
+      key: 'canBroadcast',
+      title: 'Cohort-Wide Notice & Circular Dispatch',
+      desc: 'Can publish official broadcast notices directly to Batch 1, Batch 2, or all interns across the organization.',
+      icon: Radio,
+      color: 'text-blue-700 bg-blue-50 border-blue-200'
+    },
+    {
+      key: 'canViewAllReports',
+      title: 'Multi-Wing Scholar Evaluation',
+      desc: 'Can view and evaluate monthly reports across all wings (not restricted solely to their assigned wing).',
+      icon: Layers,
+      color: 'text-amber-800 bg-amber-50 border-amber-200'
+    }
+  ]
+
   return (
     <div className="space-y-6">
       
@@ -61,17 +115,26 @@ export default function SeniorSecView({ allUsers, reports, onReassignIntern, onU
             </div>
             <h2 className="text-2xl font-bold">Senior Secretary Central Command</h2>
             <p className="text-emerald-100 text-sm mt-1">
-              Complete oversight over Batch 1 ({batch1Count}) & Batch 2 ({batch2Count}), wing supervision, and cohort disbursements.
+              Complete oversight over Batch 1 ({batch1Count}) & Batch 2 ({batch2Count}), wing supervision, privilege delegation, and disbursements.
             </p>
           </div>
 
-          <button
-            onClick={() => setShowAddModal(true)}
-            className="px-4 py-2.5 rounded-xl bg-white text-[#0A643B] hover:bg-emerald-50 font-bold text-xs flex items-center shadow-md transition-all cursor-pointer"
-          >
-            <UserPlus className="w-4 h-4 mr-2 text-[#0A643B]" />
-            Onboard New Scholar
-          </button>
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              onClick={() => setActiveTab('delegation')}
+              className="px-3.5 py-2.5 rounded-xl bg-white/15 hover:bg-white/25 border border-white/25 text-white font-bold text-xs flex items-center shadow-xs transition-all cursor-pointer"
+            >
+              <Key className="w-4 h-4 mr-1.5 text-amber-300" />
+              Delegate Powers
+            </button>
+            <button
+              onClick={() => setShowAddModal(true)}
+              className="px-4 py-2.5 rounded-xl bg-white text-[#0A643B] hover:bg-emerald-50 font-bold text-xs flex items-center shadow-md transition-all cursor-pointer"
+            >
+              <UserPlus className="w-4 h-4 mr-2 text-[#0A643B]" />
+              Onboard New Scholar
+            </button>
+          </div>
         </div>
 
         {/* Quick Stats Grid */}
@@ -101,10 +164,20 @@ export default function SeniorSecView({ allUsers, reports, onReassignIntern, onU
 
       {/* Junior Secretaries Cards */}
       <div>
-        <h3 className="font-bold text-slate-900 text-base mb-3 flex items-center">
-          <Users className="w-4 h-4 mr-2 text-[#0A643B]" />
-          Junior Secretaries & Wing Distribution (Subordinate Scope)
-        </h3>
+        <div className="flex justify-between items-center mb-3">
+          <h3 className="font-bold text-slate-900 text-base flex items-center">
+            <Users className="w-4 h-4 mr-2 text-[#0A643B]" />
+            Junior Secretaries & Subordinate Wings
+          </h3>
+          <button
+            onClick={() => setActiveTab('delegation')}
+            className="text-xs font-bold text-[#0A643B] hover:underline flex items-center cursor-pointer"
+          >
+            <Key className="w-3.5 h-3.5 mr-1" />
+            Manage Special Delegated Powers →
+          </button>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {juniorSecs.map((jsec) => {
             const secInterns = interns.filter(i => i.assignedTo === jsec.id)
@@ -113,30 +186,54 @@ export default function SeniorSecView({ allUsers, reports, onReassignIntern, onU
             const b1 = secInterns.filter(i => i.batch === 'Batch 1').length
             const b2 = secInterns.filter(i => i.batch === 'Batch 2').length
 
+            const powers = delegatedPowers[jsec.id] || {}
+            const activePowerCount = Object.values(powers).filter(Boolean).length
+
             return (
-              <div key={jsec.id} className="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs hover:border-[#0A643B]/40 transition-all">
-                <div className="flex items-center space-x-3 mb-3">
-                  <img
-                    src={jsec.photo}
-                    alt={jsec.name}
-                    className="w-10 h-10 rounded-xl object-cover border border-[#0A643B]/20"
-                  />
-                  <div>
-                    <h4 className="font-bold text-slate-900 text-sm">{jsec.name}</h4>
-                    <p className="text-[11px] text-slate-500">{jsec.department}</p>
+              <div key={jsec.id} className="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs hover:border-[#0A643B]/40 transition-all flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center space-x-3">
+                      <img
+                        src={jsec.photo}
+                        alt={jsec.name}
+                        className="w-10 h-10 rounded-xl object-cover border border-[#0A643B]/20"
+                      />
+                      <div>
+                        <h4 className="font-bold text-slate-900 text-sm">{jsec.name}</h4>
+                        <p className="text-[11px] text-slate-500">{jsec.department}</p>
+                      </div>
+                    </div>
+
+                    {activePowerCount > 0 ? (
+                      <span className="inline-flex items-center text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200" title={`${activePowerCount} special powers delegated`}>
+                        <Sparkles className="w-3 h-3 mr-1 text-amber-600" />
+                        {activePowerCount} Delegated
+                      </span>
+                    ) : (
+                      <span className="text-[10px] text-slate-400 font-semibold">Standard Scope</span>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 text-center text-xs bg-slate-50 p-2.5 rounded-xl border border-slate-100 mb-3">
+                    <div>
+                      <span className="font-extrabold text-[#0A643B] block text-base">{secInterns.length}</span>
+                      <span className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">Scholars ({b1} B1 / {b2} B2)</span>
+                    </div>
+                    <div>
+                      <span className="font-extrabold text-[#7B2E68] block text-base">{secPending}</span>
+                      <span className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">Pending Review</span>
+                    </div>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-2 text-center text-xs bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-                  <div>
-                    <span className="font-extrabold text-[#0A643B] block text-base">{secInterns.length}</span>
-                    <span className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">Scholars ({b1} B1 / {b2} B2)</span>
-                  </div>
-                  <div>
-                    <span className="font-extrabold text-[#7B2E68] block text-base">{secPending}</span>
-                    <span className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">Pending Review</span>
-                  </div>
-                </div>
+                <button
+                  onClick={() => setActiveTab('delegation')}
+                  className="w-full py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold text-xs transition-colors cursor-pointer flex items-center justify-center"
+                >
+                  <Key className="w-3.5 h-3.5 mr-1 text-slate-500" />
+                  Configure Privileges
+                </button>
               </div>
             )
           })}
@@ -159,6 +256,13 @@ export default function SeniorSecView({ allUsers, reports, onReassignIntern, onU
             >
               All Monthly Reports ({reports.length})
             </button>
+            <button
+              onClick={() => setActiveTab('delegation')}
+              className={`pb-3 border-b-2 cursor-pointer transition-colors flex items-center space-x-1.5 ${activeTab === 'delegation' ? 'border-[#7B2E68] text-[#7B2E68]' : 'border-transparent text-slate-500 hover:text-slate-800'}`}
+            >
+              <Key className="w-3.5 h-3.5" />
+              <span>Special Privilege Delegation (Senior Sec Exclusive)</span>
+            </button>
           </div>
 
           {/* Batch Selector Filter */}
@@ -169,19 +273,19 @@ export default function SeniorSecView({ allUsers, reports, onReassignIntern, onU
               <div className="flex bg-slate-200/60 p-0.5 rounded-lg text-[11px] font-bold">
                 <button
                   onClick={() => setSelectedBatchFilter('all')}
-                  className={`px-2.5 py-1 rounded-md transition-colors ${selectedBatchFilter === 'all' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-600'}`}
+                  className={`px-2.5 py-1 rounded-md transition-colors cursor-pointer ${selectedBatchFilter === 'all' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-600'}`}
                 >
                   All ({totalInterns})
                 </button>
                 <button
                   onClick={() => setSelectedBatchFilter('Batch 1')}
-                  className={`px-2.5 py-1 rounded-md transition-colors ${selectedBatchFilter === 'Batch 1' ? 'bg-[#0A643B] text-white shadow-2xs' : 'text-slate-600'}`}
+                  className={`px-2.5 py-1 rounded-md transition-colors cursor-pointer ${selectedBatchFilter === 'Batch 1' ? 'bg-[#0A643B] text-white shadow-2xs' : 'text-slate-600'}`}
                 >
                   Batch 1 ({batch1Count})
                 </button>
                 <button
                   onClick={() => setSelectedBatchFilter('Batch 2')}
-                  className={`px-2.5 py-1 rounded-md transition-colors ${selectedBatchFilter === 'Batch 2' ? 'bg-[#7B2E68] text-white shadow-2xs' : 'text-slate-600'}`}
+                  className={`px-2.5 py-1 rounded-md transition-colors cursor-pointer ${selectedBatchFilter === 'Batch 2' ? 'bg-[#7B2E68] text-white shadow-2xs' : 'text-slate-600'}`}
                 >
                   Batch 2 ({batch2Count})
                 </button>
@@ -305,24 +409,151 @@ export default function SeniorSecView({ allUsers, reports, onReassignIntern, onU
           </div>
         )}
 
+        {/* Tab 3: Special Privilege Delegation (Senior Secretary to Junior Secretaries) */}
+        {activeTab === 'delegation' && (
+          <div className="p-6 space-y-6">
+            <div className="bg-gradient-to-r from-purple-50 via-emerald-50 to-teal-50 p-5 rounded-2xl border border-purple-200/60">
+              <div className="flex items-start space-x-3">
+                <div className="w-10 h-10 rounded-xl bg-[#7B2E68] text-white flex items-center justify-center flex-shrink-0 shadow-xs">
+                  <Key className="w-5 h-5 text-amber-300" />
+                </div>
+                <div>
+                  <h4 className="font-extrabold text-slate-900 text-base">
+                    Senior Secretary Privilege Delegation System
+                  </h4>
+                  <p className="text-xs text-slate-600 mt-1 leading-relaxed">
+                    As Senior Secretary, you hold sole executive command. Here you can selectively delegate your administrative powers to specific Junior Secretaries. When a power is granted, that Junior Secretary immediately unlocks those capabilities in their session.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* List of Junior Secretaries with individual privilege switches */}
+            <div className="space-y-6">
+              {juniorSecs.map((jsec) => {
+                const secPowers = delegatedPowers[jsec.id] || {}
+                const activeCount = Object.values(secPowers).filter(Boolean).length
+                const allActive = activeCount === privilegeDefinitions.length
+
+                return (
+                  <div key={jsec.id} className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs">
+                    
+                    {/* Header for this Junior Secretary */}
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-4 border-b border-slate-100 gap-3">
+                      <div className="flex items-center space-x-3">
+                        <img
+                          src={jsec.photo}
+                          alt={jsec.name}
+                          className="w-11 h-11 rounded-xl object-cover border border-[#0A643B]/20"
+                        />
+                        <div>
+                          <div className="flex items-center space-x-2">
+                            <h4 className="font-bold text-slate-900 text-base">{jsec.name}</h4>
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700">
+                              {jsec.department}
+                            </span>
+                          </div>
+                          <p className="text-xs text-slate-500">
+                            Currently assigned: {interns.filter(i => i.assignedTo === jsec.id).length} scholars
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-2">
+                        <span className={`text-xs font-bold px-3 py-1 rounded-full ${
+                          activeCount > 0
+                            ? 'bg-amber-50 text-amber-900 border border-amber-300'
+                            : 'bg-slate-100 text-slate-600'
+                        }`}>
+                          {activeCount} of {privilegeDefinitions.length} Privileges Granted
+                        </span>
+
+                        <button
+                          onClick={() => onBulkPrivilege(jsec.id, !allActive)}
+                          className={`px-3 py-1 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
+                            allActive
+                              ? 'bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200'
+                              : 'bg-[#0A643B] text-white hover:bg-[#074D2D]'
+                          }`}
+                        >
+                          {allActive ? 'Revoke All' : 'Grant All Powers'}
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Privilege Switches Grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 mt-4">
+                      {privilegeDefinitions.map((priv) => {
+                        const isGranted = Boolean(secPowers[priv.key])
+                        const Icon = priv.icon
+
+                        return (
+                          <div
+                            key={priv.key}
+                            onClick={() => onTogglePrivilege(jsec.id, priv.key)}
+                            className={`p-4 rounded-xl border transition-all cursor-pointer flex items-start justify-between gap-3 ${
+                              isGranted
+                                ? 'bg-emerald-50/50 border-[#0A643B]/40 shadow-xs ring-1 ring-[#0A643B]/20'
+                                : 'bg-slate-50/70 border-slate-200 hover:border-slate-300'
+                            }`}
+                          >
+                            <div className="flex items-start space-x-3">
+                              <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                                isGranted ? 'bg-[#0A643B] text-white' : 'bg-slate-200 text-slate-500'
+                              }`}>
+                                <Icon className="w-4 h-4" />
+                              </div>
+                              <div>
+                                <div className="flex items-center space-x-2">
+                                  <h5 className={`font-bold text-xs ${isGranted ? 'text-slate-900' : 'text-slate-700'}`}>
+                                    {priv.title}
+                                  </h5>
+                                </div>
+                                <p className="text-[11px] text-slate-500 mt-1 leading-relaxed">
+                                  {priv.desc}
+                                </p>
+                              </div>
+                            </div>
+
+                            <button
+                              type="button"
+                              aria-label={`Toggle ${priv.title}`}
+                              className={`p-1 rounded-full transition-colors flex-shrink-0 ${
+                                isGranted ? 'text-[#0A643B]' : 'text-slate-300'
+                              }`}
+                            >
+                              {isGranted ? <ToggleRight className="w-7 h-7" /> : <ToggleLeft className="w-7 h-7" />}
+                            </button>
+                          </div>
+                        )
+                      })}
+                    </div>
+
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )}
+
       </div>
 
-      {/* Modal: Onboard New Scholar */}
+      {/* Onboard Scholar Modal */}
       {showAddModal && (
         <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200">
-            <h3 className="font-bold text-slate-900 text-lg mb-1">Onboard Dakshana Scholar</h3>
-            <p className="text-xs text-slate-500 mb-4">Enroll a new scholar into Batch 1 or Batch 2 and assign under a Junior Secretary.</p>
+            <h3 className="font-bold text-slate-900 text-lg mb-1">Onboard New Scholar</h3>
+            <p className="text-xs text-slate-500 mb-4">Add a new scholar to the Outreach cohort and assign supervision wing.</p>
 
             <form onSubmit={handleAddInternSubmit} className="space-y-4 text-xs">
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Scholar Full Name *</label>
+                <label className="block font-bold text-slate-700 mb-1">Full Name *</label>
                 <input
                   required
                   type="text"
                   value={newInternName}
                   onChange={(e) => setNewInternName(e.target.value)}
-                  placeholder="e.g. Rahul Sharma"
+                  placeholder="e.g. Diya Sen"
                   className="w-full text-sm rounded-xl border border-slate-300 p-2.5 focus:ring-2 focus:ring-[#0A643B] focus:outline-hidden"
                 />
               </div>
@@ -334,18 +565,18 @@ export default function SeniorSecView({ allUsers, reports, onReassignIntern, onU
                   type="email"
                   value={newInternEmail}
                   onChange={(e) => setNewInternEmail(e.target.value)}
-                  placeholder="e.g. rahul@dakshana.org"
+                  placeholder="e.g. diya.sen@dakshana.org"
                   className="w-full text-sm rounded-xl border border-slate-300 p-2.5 focus:ring-2 focus:ring-[#0A643B] focus:outline-hidden"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Assign Batch *</label>
+                  <label className="block font-bold text-slate-700 mb-1">Cohort Batch *</label>
                   <select
                     value={newInternBatch}
                     onChange={(e) => setNewInternBatch(e.target.value)}
-                    className="w-full text-sm rounded-xl border border-slate-300 p-2.5 bg-white font-bold text-[#0A643B] focus:ring-2 focus:ring-[#0A643B] focus:outline-hidden"
+                    className="w-full text-sm rounded-xl border border-slate-300 p-2.5 bg-white focus:ring-2 focus:ring-[#0A643B] focus:outline-hidden cursor-pointer"
                   >
                     <option value="Batch 1">Batch 1</option>
                     <option value="Batch 2">Batch 2</option>
@@ -369,7 +600,7 @@ export default function SeniorSecView({ allUsers, reports, onReassignIntern, onU
                 <select
                   value={newInternSec}
                   onChange={(e) => setNewInternSec(e.target.value)}
-                  className="w-full text-sm rounded-xl border border-slate-300 p-2.5 bg-white focus:ring-2 focus:ring-[#0A643B] focus:outline-hidden"
+                  className="w-full text-sm rounded-xl border border-slate-300 p-2.5 bg-white focus:ring-2 focus:ring-[#0A643B] focus:outline-hidden cursor-pointer"
                 >
                   {juniorSecs.map((j) => (
                     <option key={j.id} value={j.id}>{j.name} ({j.department})</option>

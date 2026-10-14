@@ -1,9 +1,10 @@
 import React, { useState } from 'react'
 import { Megaphone, Send, CheckCircle2, Bell, Radio } from 'lucide-react'
 
-export default function BroadcastCenter({ currentUser, broadcasts, onSendBroadcast }) {
-  // Only Senior Secretary & Management have broadcast dispatching powers
-  const isAuthority = currentUser.role === 'senior_sec' || currentUser.role === 'management'
+export default function BroadcastCenter({ currentUser, broadcasts, onSendBroadcast, delegatedPowers = {} }) {
+  // Senior Secretary, Management & Delegated Junior Secretaries have broadcast dispatching powers
+  const userPowers = currentUser.role === 'junior_sec' ? (delegatedPowers[currentUser.id] || {}) : {}
+  const isAuthority = currentUser.role === 'senior_sec' || currentUser.role === 'management' || Boolean(userPowers.canBroadcast)
   
   const [targetAudience, setTargetAudience] = useState('batch_1')
   const [broadcastTitle, setBroadcastTitle] = useState('')

@@ -190,10 +190,54 @@ export const INITIAL_SESSIONS = [
 
 // Reimbursement Cycle Data
 export const INITIAL_REIMBURSEMENT_CYCLE = {
-  monthYear: 'October 2026',
+  monthYear: 'July - August 2026',
   isActive: true,
   activatedBy: 'Senior Secretary',
-  deadline: '2026-10-25',
+  deadline: '5th August (Expenses up to 31st July)',
+  formUrl: 'https://bit.ly/Reimbursement_OutreachInternship',
+  announcementTitle: '📢 Outreach Internship Reimbursement Announcement',
+  messageText: `📢 *Dear Interns* ,
+
+Thank you for your valuable contribution in visiting schools and conducting outreach sessions for the Dakshana Foundation. Your efforts are helping deserving students learn about the Dakshana Scholarship Program.
+
+To claim your reimbursement, please fill out the Outreach Internship Reimbursement Form 2026–27.
+
+🔗 Reimbursement Form:
+https://bit.ly/Reimbursement_OutreachInternship
+
+📌 Important Instructions
+
+1. Submit this form *only once per month* , after completing all your school visits for that month.
+
+2. Include all approved school visit expenses incurred during the month in a single submission.
+
+3. Download the Expense Report Excel sheet, fill in all visit and expense details accurately, and upload the completed Excel sheet in the form.
+
+4. In the Expense Report Excel sheet, select the correct Expense Type for each expense:
+
+* Billed – Expenses for which you have a bill/invoice.
+* Unbilled – Expenses paid through UPI or other digital payments where no bill is available.
+* Cash Voucher – Expenses paid in cash where no bill is available.
+
+5. Combine all your bills into a single PDF, including:
+
+* Travel bills (Bus/Train/Taxi/Other)
+* Cash Voucher(s), if applicable
+
+6. For Cash Voucher expenses:
+
+* Download the Cash Voucher PDF provided.
+* Take a printout, fill it and either take a clear photo/scan or fill it digitally.
+* Include all completed Cash Vouchers in the same bills PDF.
+* Each Cash Voucher can be claimed for a maximum of ₹ 250. If your cash expense exceeds ₹ 250, use multiple Cash Vouchers and include all of them in the bills PDF.
+
+7. Enter your Internship Batch, Panel Number, and bank account details carefully. Reimbursement will be processed based on the details provided in the form.
+
+⏰ Deadline: Please submit the reimbursement form on or before *5th August* including *expenses up to 31st July*, so that we can verify your submissions and process your reimbursements at the earliest.
+
+If you have any questions or face any issues while filling out the form, please contact us.
+
+Thank you once again for your dedication and support! 🌟`,
   stipendStandard: 3000
 }
 
