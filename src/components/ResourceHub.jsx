@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { FolderLock, BookOpen, ExternalLink, Plus, Lock, Globe } from 'lucide-react'
+import { FolderLock, BookOpen, ExternalLink, Plus, Lock, Globe, Sparkles, FileText, Briefcase } from 'lucide-react'
 
 export default function ResourceHub({ currentUser, resources, onAddResource }) {
   const isStaff = currentUser.role !== 'intern'
@@ -12,7 +12,7 @@ export default function ResourceHub({ currentUser, resources, onAddResource }) {
   const [description, setDescription] = useState('')
   const [targetSpace, setTargetSpace] = useState(isStaff ? 'staff' : 'interns')
 
-  const filteredResources = resources.filter(r => r.targetSpace === activeSpace)
+  const filteredResources = resources.filter(r => r.targetSpace === activeSpace || r.targetSpace === 'both')
 
   const handleAddSubmit = (e) => {
     e.preventDefault()
@@ -42,7 +42,7 @@ export default function ResourceHub({ currentUser, resources, onAddResource }) {
         <div>
           <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Dakshana Resource & Materials Hub</h2>
           <p className="text-slate-500 text-xs mt-1">
-            Curriculum repositories, secretarial SOPs, lesson drives, and reporting templates.
+            Curriculum repositories, secretarial SOPs, official session logging forms, and outreach toolkits.
           </p>
         </div>
 
@@ -56,6 +56,90 @@ export default function ResourceHub({ currentUser, resources, onAddResource }) {
             Add New Resource Link
           </button>
         )}
+      </div>
+
+      {/* Featured Essential Tools Callout */}
+      <div className="bg-gradient-to-r from-emerald-50 via-teal-50/60 to-purple-50/60 rounded-2xl p-5 border-2 border-[#0A643B]/20 shadow-xs">
+        <div className="flex items-center space-x-2 mb-3">
+          <Sparkles className="w-4 h-4 text-[#0A643B]" />
+          <h3 className="font-extrabold text-slate-900 text-sm uppercase tracking-wider">
+            Essential Outreach Portals & Toolkits (2026–27)
+          </h3>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          
+          {/* Essential Link 1: Session Form */}
+          <div className="bg-white p-4 rounded-xl border border-emerald-200 shadow-xs flex flex-col justify-between hover:border-[#0A643B] transition-all">
+            <div>
+              <div className="flex items-start space-x-3 mb-2">
+                <div className="w-10 h-10 rounded-xl bg-emerald-100 text-[#0A643B] flex items-center justify-center flex-shrink-0 font-bold">
+                  <FileText className="w-5 h-5" />
+                </div>
+                <div>
+                  <div className="flex items-center space-x-2">
+                    <h4 className="font-bold text-slate-900 text-sm">Dakshana outreach session form</h4>
+                    <span className="text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-[#EBF7F0] text-[#0A643B]">
+                      Mandatory Form
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-600 mt-1">
+                    Fill this official session form to record each school visit, student attendance, and outreach classroom topics.
+                  </p>
+                </div>
+              </div>
+              <div className="text-[11px] font-mono text-[#0A643B] bg-emerald-50/60 px-2 py-1 rounded-md mb-3 break-all">
+                https://tinyurl.com/Outreach-session-form
+              </div>
+            </div>
+
+            <a
+              href="https://tinyurl.com/Outreach-session-form"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full py-2.5 px-3 rounded-xl bg-[#0A643B] hover:bg-[#074D2D] text-white font-bold text-xs flex items-center justify-center transition-colors shadow-2xs"
+            >
+              <span>Open Outreach Session Form</span>
+              <ExternalLink className="w-3.5 h-3.5 ml-1.5" />
+            </a>
+          </div>
+
+          {/* Essential Link 2: Intern Toolkit */}
+          <div className="bg-white p-4 rounded-xl border border-purple-200 shadow-xs flex flex-col justify-between hover:border-[#7B2E68] transition-all">
+            <div>
+              <div className="flex items-start space-x-3 mb-2">
+                <div className="w-10 h-10 rounded-xl bg-[#F8EDF5] text-[#7B2E68] flex items-center justify-center flex-shrink-0 font-bold">
+                  <Briefcase className="w-5 h-5" />
+                </div>
+                <div>
+                  <div className="flex items-center space-x-2">
+                    <h4 className="font-bold text-slate-900 text-sm">Dakshana intern toolkit</h4>
+                    <span className="text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-[#F8EDF5] text-[#7B2E68]">
+                      Official Toolkit
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-600 mt-1">
+                    Comprehensive 2026–27 teaching resources, presentation decks, curriculum modules, and intern guidelines.
+                  </p>
+                </div>
+              </div>
+              <div className="text-[11px] font-mono text-[#7B2E68] bg-[#F8EDF5]/60 px-2 py-1 rounded-md mb-3 break-all">
+                https://tinyurl.com/interntoolkit26-27
+              </div>
+            </div>
+
+            <a
+              href="https://tinyurl.com/interntoolkit26-27"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full py-2.5 px-3 rounded-xl bg-[#7B2E68] hover:bg-[#5F2150] text-white font-bold text-xs flex items-center justify-center transition-colors shadow-2xs"
+            >
+              <span>Open Dakshana Intern Toolkit</span>
+              <ExternalLink className="w-3.5 h-3.5 ml-1.5" />
+            </a>
+          </div>
+
+        </div>
       </div>
 
       {/* Dual Space Tabs */}
@@ -88,7 +172,7 @@ export default function ResourceHub({ currentUser, resources, onAddResource }) {
           <BookOpen className="w-4 h-4" />
           <span>Scholars & Outreach Material Space</span>
           <span className="bg-[#EBF7F0] text-[#0A643B] px-2 py-0.5 rounded-full text-[10px]">
-            {resources.filter(r => r.targetSpace === 'interns').length}
+            {resources.filter(r => r.targetSpace === 'interns' || r.targetSpace === 'both').length}
           </span>
         </button>
       </div>
@@ -113,11 +197,20 @@ export default function ResourceHub({ currentUser, resources, onAddResource }) {
       {/* Resource Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {filteredResources.map((res) => (
-          <div key={res.id} className="bg-white rounded-2xl border border-slate-200 shadow-xs p-5 flex flex-col justify-between hover:shadow-md transition-shadow">
+          <div
+            key={res.id}
+            className={`bg-white rounded-2xl border shadow-xs p-5 flex flex-col justify-between hover:shadow-md transition-shadow ${
+              res.isPinned ? 'border-[#0A643B]/40 ring-1 ring-[#0A643B]/20' : 'border-slate-200'
+            }`}
+          >
             <div>
               <div className="flex items-center justify-between mb-3">
                 <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${
-                  res.targetSpace === 'staff' ? 'bg-[#F8EDF5] text-[#7B2E68]' : 'bg-[#EBF7F0] text-[#0A643B]'
+                  res.isPinned
+                    ? 'bg-[#EBF7F0] text-[#0A643B] border border-[#0A643B]/30'
+                    : res.targetSpace === 'staff'
+                    ? 'bg-[#F8EDF5] text-[#7B2E68]'
+                    : 'bg-slate-100 text-slate-700'
                 }`}>
                   {res.category}
                 </span>
@@ -133,7 +226,11 @@ export default function ResourceHub({ currentUser, resources, onAddResource }) {
                 href={res.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full py-2 px-3 rounded-xl bg-slate-100 hover:bg-[#EBF7F0] hover:text-[#0A643B] text-slate-700 font-semibold text-xs flex items-center justify-center transition-colors"
+                className={`w-full py-2 px-3 rounded-xl font-semibold text-xs flex items-center justify-center transition-colors ${
+                  res.isPinned
+                    ? 'bg-[#0A643B] text-white hover:bg-[#074D2D]'
+                    : 'bg-slate-100 hover:bg-[#EBF7F0] hover:text-[#0A643B] text-slate-700'
+                }`}
               >
                 Open Resource <ExternalLink className="w-3.5 h-3.5 ml-1.5" />
               </a>

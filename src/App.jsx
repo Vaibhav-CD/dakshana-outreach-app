@@ -36,11 +36,65 @@ import {
 } from './supabase'
 
 export default function App() {
-  const [allUsers, setAllUsers] = useState(INITIAL_USERS)
-  const [reports, setReports] = useState(INITIAL_REPORTS)
-  const [sessions, setSessions] = useState(INITIAL_SESSIONS)
+  // 1. Current logged in user (with localStorage persistence across refresh)
+  const [currentUser, setCurrentUser] = useState(() => {
+    const saved = localStorage.getItem('dakshana_current_user')
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved)
+        if (parsed && parsed.id) return parsed
+      } catch (e) { }
+    }
+    return INITIAL_USERS[0]
+  })
+
+  // 2. Active Tab (with localStorage persistence across refresh)
+  const [activeTab, setActiveTab] = useState(() => {
+    return localStorage.getItem('dakshana_active_tab') || 'dashboard'
+  })
+
+  const handleSetActiveTab = (tab) => {
+    setActiveTab(tab)
+    localStorage.setItem('dakshana_active_tab', tab)
+  }
+
+  // 3. All Users (with localStorage persistence)
+  const [allUsers, setAllUsers] = useState(() => {
+    const saved = localStorage.getItem('dakshana_all_users')
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved)
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed
+      } catch (e) { }
+    }
+    return INITIAL_USERS
+  })
+
+  // 4. Reports (with localStorage persistence)
+  const [reports, setReports] = useState(() => {
+    const saved = localStorage.getItem('dakshana_reports')
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved)
+        if (Array.isArray(parsed)) return parsed
+      } catch (e) { }
+    }
+    return INITIAL_REPORTS
+  })
+
+  // 5. Sessions
+  const [sessions, setSessions] = useState(() => {
+    const saved = localStorage.getItem('dakshana_sessions')
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved)
+        if (Array.isArray(parsed)) return parsed
+      } catch (e) { }
+    }
+    return INITIAL_SESSIONS
+  })
   
-  // Reimbursement cycle state with local persistence
+  // 6. Reimbursement cycle state (with localStorage persistence)
   const [cycle, setCycle] = useState(() => {
     const saved = localStorage.getItem('dakshana_reimbursement_cycle')
     if (saved) {
@@ -49,7 +103,7 @@ export default function App() {
     return INITIAL_REIMBURSEMENT_CYCLE
   })
 
-  // Delegated special powers state: Senior Secretary -> Junior Secretaries
+  // 7. Delegated special powers state: Senior Secretary -> Junior Secretaries
   const [delegatedPowers, setDelegatedPowers] = useState(() => {
     const saved = localStorage.getItem('dakshana_delegated_powers')
     if (saved) {
@@ -62,16 +116,74 @@ export default function App() {
     }
   })
 
-  const [claims, setClaims] = useState(INITIAL_REIMBURSEMENT_CLAIMS)
-  const [resources, setResources] = useState(INITIAL_RESOURCES)
-  const [broadcasts, setBroadcasts] = useState(INITIAL_BROADCASTS)
+  // 8. Claims (with localStorage persistence)
+  const [claims, setClaims] = useState(() => {
+    const saved = localStorage.getItem('dakshana_claims')
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved)
+        if (Array.isArray(parsed)) return parsed
+      } catch (e) { }
+    }
+    return INITIAL_REIMBURSEMENT_CLAIMS
+  })
 
-  // Current logged in user (defaults to Senior Secretary)
-  const [currentUser, setCurrentUser] = useState(INITIAL_USERS[0])
-  const [activeTab, setActiveTab] = useState('dashboard')
+  // 9. Resources Hub (with localStorage persistence & guaranteed inclusion of official session form and toolkit)
+  const [resources, setResources] = useState(() => {
+    const saved = localStorage.getItem('dakshana_resources')
+    let list = INITIAL_RESOURCES
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved)
+        if (Array.isArray(parsed) && parsed.length > 0) list = parsed
+      } catch (e) { }
+    }
+    // Ensure the two essential links are always guaranteed
+    const essentialItems = [
+      {
+        id: 'res-outreach-session-form',
+        targetSpace: 'interns',
+        title: 'Dakshana outreach session form',
+        category: 'Essential Form',
+        url: 'https://tinyurl.com/Outreach-session-form',
+        description: 'Official session logging form to record all school visits, scholar counts, topics covered, and outreach activities.',
+        addedBy: 'Dakshana Secretariat',
+        isPinned: true
+      },
+      {
+        id: 'res-intern-toolkit',
+        targetSpace: 'interns',
+        title: 'Dakshana intern toolkit',
+        category: 'Toolkit 2026–27',
+        url: 'https://tinyurl.com/interntoolkit26-27',
+        description: 'Comprehensive outreach toolkit including session presentations, teaching modules, FAQ guidelines, and handbook.',
+        addedBy: 'Dakshana Secretariat',
+        isPinned: true
+      }
+    ]
+    essentialItems.forEach(item => {
+      if (!list.some(r => r.title.toLowerCase().trim() === item.title.toLowerCase().trim() || r.url === item.url)) {
+        list = [item, ...list]
+      }
+    })
+    return list
+  })
+
+  // 10. Broadcasts (with localStorage persistence)
+  const [broadcasts, setBroadcasts] = useState(() => {
+    const saved = localStorage.getItem('dakshana_broadcasts')
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved)
+        if (Array.isArray(parsed)) return parsed
+      } catch (e) { }
+    }
+    return INITIAL_BROADCASTS
+  })
+
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
 
-  // 1. Initial Cloud Sync from Supabase on App Mount
+  // Cloud Sync from Supabase on App Mount
   useEffect(() => {
     async function syncFromCloud() {
       try {
@@ -89,12 +201,34 @@ export default function App() {
             INITIAL_USERS.slice(0, 5).forEach(lead => {
               if (!combined.some(u => u.email === lead.email)) combined.unshift(lead)
             })
+            localStorage.setItem('dakshana_all_users', JSON.stringify(combined))
             return combined
           })
+
+          // Keep current logged-in user refreshed with cloud data if available
+          setCurrentUser(prevUser => {
+            if (!prevUser) return prevUser
+            const matching = cloudProfiles.find(p => p.id === prevUser.id || p.email === prevUser.email)
+            if (matching) {
+              const updated = { ...prevUser, ...matching }
+              localStorage.setItem('dakshana_current_user', JSON.stringify(updated))
+              return updated
+            }
+            return prevUser
+          })
         }
-        if (cloudReports && cloudReports.length > 0) setReports(cloudReports)
-        if (cloudClaims && cloudClaims.length > 0) setClaims(cloudClaims)
-        if (cloudBroadcasts && cloudBroadcasts.length > 0) setBroadcasts(cloudBroadcasts)
+        if (cloudReports && cloudReports.length > 0) {
+          setReports(cloudReports)
+          localStorage.setItem('dakshana_reports', JSON.stringify(cloudReports))
+        }
+        if (cloudClaims && cloudClaims.length > 0) {
+          setClaims(cloudClaims)
+          localStorage.setItem('dakshana_claims', JSON.stringify(cloudClaims))
+        }
+        if (cloudBroadcasts && cloudBroadcasts.length > 0) {
+          setBroadcasts(cloudBroadcasts)
+          localStorage.setItem('dakshana_broadcasts', JSON.stringify(cloudBroadcasts))
+        }
       } catch (err) {
         console.warn('Running in offline/prototype mode:', err)
       }
@@ -102,71 +236,103 @@ export default function App() {
     syncFromCloud()
   }, [])
 
-  // Handlers
+  // Handlers with dual persistence (State + localStorage + Supabase)
   const handleReassignIntern = (internId, newJuniorSecId) => {
-    setAllUsers(prev => prev.map(user => {
-      if (user.id === internId) {
-        return { ...user, assignedTo: newJuniorSecId }
-      }
-      return user
-    }))
+    setAllUsers(prev => {
+      const updated = prev.map(user => {
+        if (user.id === internId) {
+          return { ...user, assignedTo: newJuniorSecId }
+        }
+        return user
+      })
+      localStorage.setItem('dakshana_all_users', JSON.stringify(updated))
+      return updated
+    })
 
-    setReports(prev => prev.map(rep => {
-      if (rep.internId === internId) {
-        return { ...rep, juniorSecId: newJuniorSecId }
-      }
-      return rep
-    }))
+    setReports(prev => {
+      const updated = prev.map(rep => {
+        if (rep.internId === internId) {
+          return { ...rep, juniorSecId: newJuniorSecId }
+        }
+        return rep
+      })
+      localStorage.setItem('dakshana_reports', JSON.stringify(updated))
+      return updated
+    })
 
     // Persist to Supabase
     dbUpdateProfile(internId, { assignedTo: newJuniorSecId }).catch(console.error)
   }
 
   const handleUpdateInternBatch = (internId, newBatch) => {
-    setAllUsers(prev => prev.map(user => {
-      if (user.id === internId) {
-        return { ...user, batch: newBatch }
-      }
-      return user
-    }))
+    setAllUsers(prev => {
+      const updated = prev.map(user => {
+        if (user.id === internId) {
+          return { ...user, batch: newBatch }
+        }
+        return user
+      })
+      localStorage.setItem('dakshana_all_users', JSON.stringify(updated))
+      return updated
+    })
 
-    setReports(prev => prev.map(rep => {
-      if (rep.internId === internId) {
-        return { ...rep, batch: newBatch }
-      }
-      return rep
-    }))
+    setReports(prev => {
+      const updated = prev.map(rep => {
+        if (rep.internId === internId) {
+          return { ...rep, batch: newBatch }
+        }
+        return rep
+      })
+      localStorage.setItem('dakshana_reports', JSON.stringify(updated))
+      return updated
+    })
 
-    setSessions(prev => prev.map(s => {
-      if (s.internId === internId) {
-        return { ...s, batch: newBatch }
-      }
-      return s
-    }))
+    setSessions(prev => {
+      const updated = prev.map(s => {
+        if (s.internId === internId) {
+          return { ...s, batch: newBatch }
+        }
+        return s
+      })
+      localStorage.setItem('dakshana_sessions', JSON.stringify(updated))
+      return updated
+    })
 
     // Persist to Supabase
     dbUpdateProfile(internId, { batch: newBatch }).catch(console.error)
   }
 
   const handleAddIntern = (newIntern) => {
-    setAllUsers(prev => [...prev, newIntern])
+    setAllUsers(prev => {
+      const updated = [...prev, newIntern]
+      localStorage.setItem('dakshana_all_users', JSON.stringify(updated))
+      return updated
+    })
     // Persist to Supabase
     dbCreateProfile(newIntern).catch(console.error)
   }
 
   const handleSubmitReport = (newReport) => {
-    setReports(prev => [newReport, ...prev])
+    setReports(prev => {
+      const updated = [newReport, ...prev]
+      localStorage.setItem('dakshana_reports', JSON.stringify(updated))
+      return updated
+    })
     // Persist to Supabase
     dbCreateReport(newReport).catch(console.error)
   }
 
   const handleUpdateReport = (reportId, updates) => {
-    setReports(prev => prev.map(rep => {
-      if (rep.id === reportId) {
-        return { ...rep, ...updates }
-      }
-      return rep
-    }))
+    setReports(prev => {
+      const updated = prev.map(rep => {
+        if (rep.id === reportId) {
+          return { ...rep, ...updates }
+        }
+        return rep
+      })
+      localStorage.setItem('dakshana_reports', JSON.stringify(updated))
+      return updated
+    })
     // Persist to Supabase
     dbUpdateReport(reportId, updates).catch(console.error)
   }
@@ -193,23 +359,31 @@ export default function App() {
   }
 
   const handleSubmitClaim = (newClaim) => {
-    setClaims(prev => [newClaim, ...prev])
+    setClaims(prev => {
+      const updated = [newClaim, ...prev]
+      localStorage.setItem('dakshana_claims', JSON.stringify(updated))
+      return updated
+    })
     // Persist to Supabase
     dbCreateClaim(newClaim).catch(console.error)
   }
 
   const handleUpdateClaimStatus = (claimId, newStatus, approverName) => {
-    setClaims(prev => prev.map(c => {
-      if (c.id === claimId) {
-        return {
-          ...c,
-          status: newStatus,
-          approvedBy: approverName,
-          paidAt: newStatus === 'paid' ? new Date().toISOString().split('T')[0] : c.paidAt
+    setClaims(prev => {
+      const updated = prev.map(c => {
+        if (c.id === claimId) {
+          return {
+            ...c,
+            status: newStatus,
+            approvedBy: approverName,
+            paidAt: newStatus === 'paid' ? new Date().toISOString().split('T')[0] : c.paidAt
+          }
         }
-      }
-      return c
-    }))
+        return c
+      })
+      localStorage.setItem('dakshana_claims', JSON.stringify(updated))
+      return updated
+    })
     // Persist to Supabase
     dbUpdateClaim(claimId, {
       status: newStatus,
@@ -257,14 +431,31 @@ export default function App() {
 
   // Resources handlers
   const handleAddResource = (newResource) => {
-    setResources(prev => [newResource, ...prev])
+    setResources(prev => {
+      const updated = [newResource, ...prev]
+      localStorage.setItem('dakshana_resources', JSON.stringify(updated))
+      return updated
+    })
   }
 
   // Broadcast handlers
   const handleSendBroadcast = (newBroadcast) => {
-    setBroadcasts(prev => [newBroadcast, ...prev])
+    setBroadcasts(prev => {
+      const updated = [newBroadcast, ...prev]
+      localStorage.setItem('dakshana_broadcasts', JSON.stringify(updated))
+      return updated
+    })
     // Persist to Supabase
     dbCreateBroadcast(newBroadcast).catch(console.error)
+  }
+
+  const handleUserLogin = (selectedUser) => {
+    setCurrentUser(selectedUser)
+    localStorage.setItem('dakshana_current_user', JSON.stringify(selectedUser))
+    // Interns cannot view visual stats board directly, fallback to dashboard
+    if (selectedUser.role === 'intern' && activeTab === 'visual_stats') {
+      handleSetActiveTab('dashboard')
+    }
   }
 
   const unreadCount = broadcasts.filter(b => b.isNew).length
@@ -279,8 +470,8 @@ export default function App() {
       <Header
         currentUser={currentUser}
         activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        onOpenAuth={() => setIsAuthModalOpen(true)}
+        setActiveTab={handleSetActiveTab}
+        onOpenAuth={() => setIsAuthModalOpen(false) || setIsAuthModalOpen(true)}
         unreadBroadcastsCount={unreadCount}
       />
 
@@ -389,13 +580,7 @@ export default function App() {
         onClose={() => setIsAuthModalOpen(false)}
         allUsers={allUsers}
         onRegisterScholar={handleAddIntern}
-        onLogin={(selectedUser) => {
-          setCurrentUser(selectedUser)
-          // Interns cannot view visual stats board directly, fallback to dashboard
-          if (selectedUser.role === 'intern' && activeTab === 'visual_stats') {
-            setActiveTab('dashboard')
-          }
-        }}
+        onLogin={handleUserLogin}
       />
 
       {/* Footer */}

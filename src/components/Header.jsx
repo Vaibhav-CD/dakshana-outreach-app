@@ -105,9 +105,12 @@ export default function Header({
               />
               <div className="text-left hidden sm:block pr-1">
                 <span className="text-xs font-bold text-slate-900 block leading-tight">{currentUser.name}</span>
-                <span className={`text-[10px] font-semibold ${badge.label === 'Senior Secretary' ? 'text-[#0A643B]' : 'text-slate-500'}`}>
-                  {badge.label}
-                </span>
+                <div className="flex items-center space-x-1.5 mt-0.5">
+                  <span className={`text-[10px] font-semibold ${badge.label === 'Senior Secretary' ? 'text-[#0A643B]' : 'text-slate-500'}`}>
+                    {badge.label}
+                  </span>
+                  <span className="text-[9px] bg-slate-100 text-slate-500 px-1 py-0.2 rounded font-medium">Switch</span>
+                </div>
               </div>
               <LogIn className="w-3.5 h-3.5 text-slate-400" />
             </button>

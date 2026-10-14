@@ -286,6 +286,26 @@ export const INITIAL_REIMBURSEMENT_CLAIMS = [
 // Resources Hub
 export const INITIAL_RESOURCES = [
   {
+    id: 'res-outreach-session-form',
+    targetSpace: 'interns',
+    title: 'Dakshana outreach session form',
+    category: 'Essential Form',
+    url: 'https://tinyurl.com/Outreach-session-form',
+    description: 'Official session logging form to record all school visits, scholar counts, topics covered, and outreach activities.',
+    addedBy: 'Dakshana Secretariat',
+    isPinned: true
+  },
+  {
+    id: 'res-intern-toolkit',
+    targetSpace: 'interns',
+    title: 'Dakshana intern toolkit',
+    category: 'Toolkit 2026–27',
+    url: 'https://tinyurl.com/interntoolkit26-27',
+    description: 'Comprehensive outreach toolkit including session presentations, teaching modules, FAQ guidelines, and handbook.',
+    addedBy: 'Dakshana Secretariat',
+    isPinned: true
+  },
+  {
     id: 'res-staff-1',
     targetSpace: 'staff',
     title: 'Secretarial Standard Operating Procedures (SOP 2026)',
