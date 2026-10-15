@@ -12,6 +12,7 @@ import ResourceHub from './components/ResourceHub'
 import BroadcastCenter from './components/BroadcastCenter'
 import PostsFeed from './components/PostsFeed'
 import InternDetailModal from './components/InternDetailModal'
+import EditProfilePhotoModal from './components/EditProfilePhotoModal'
 import AuthModal from './components/AuthModal'
 import {
   INITIAL_USERS,
@@ -163,6 +164,7 @@ export default function App() {
 
   // 12. UI States: Modals & Sidebar
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(() => !localStorage.getItem('dakshana_current_user'))
+  const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false)
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
   const [selectedInternForModal, setSelectedInternForModal] = useState(null)
 
@@ -227,6 +229,25 @@ export default function App() {
   const handleUserLogin = (selectedUser) => {
     setCurrentUser(selectedUser)
     localStorage.setItem('dakshana_current_user', JSON.stringify(selectedUser))
+  }
+
+  const handleUpdatePhoto = async (newPhotoUrl) => {
+    if (!currentUser) return
+    const updatedUser = { ...currentUser, photo: newPhotoUrl }
+    setCurrentUser(updatedUser)
+    localStorage.setItem('dakshana_current_user', JSON.stringify(updatedUser))
+
+    setAllUsers(prev => {
+      const updated = prev.map(u => u.id === currentUser.id ? { ...u, photo: newPhotoUrl } : u)
+      localStorage.setItem('dakshana_all_users', JSON.stringify(updated))
+      return updated
+    })
+
+    try {
+      await dbUpdateProfile(currentUser.id, { photo_url: newPhotoUrl })
+    } catch (err) {
+      console.warn('Could not sync photo to Supabase:', err)
+    }
   }
 
   const handleAddPost = (newPost) => {
@@ -493,6 +514,7 @@ export default function App() {
         unreadBroadcastsCount={unreadCount}
         onSignOut={handleSignOut}
         onSwitchProfile={() => setIsAuthModalOpen(true)}
+        onOpenPhotoModal={() => setIsPhotoModalOpen(true)}
         isMobileOpen={isMobileSidebarOpen}
         setIsMobileOpen={setIsMobileSidebarOpen}
       />
@@ -509,6 +531,7 @@ export default function App() {
           activeTab={activeTab}
           onOpenAuth={() => setIsAuthModalOpen(true)}
           onSignOut={handleSignOut}
+          onOpenPhotoModal={() => setIsPhotoModalOpen(true)}
           onToggleMobileSidebar={() => setIsMobileSidebarOpen(prev => !prev)}
           unreadBroadcastsCount={unreadCount}
         />
@@ -644,6 +667,14 @@ export default function App() {
         allUsers={allUsers}
         onRegisterScholar={handleAddIntern}
         onLogin={handleUserLogin}
+      />
+
+      {/* Edit Profile Photo Modal (Upload or Default Icon) */}
+      <EditProfilePhotoModal
+        isOpen={isPhotoModalOpen}
+        onClose={() => setIsPhotoModalOpen(false)}
+        currentUser={currentUser}
+        onUpdatePhoto={handleUpdatePhoto}
       />
 
     </div>

@@ -1,6 +1,7 @@
 import React from 'react'
-import { Menu, LogOut, LogIn, Bell, CheckCircle2 } from 'lucide-react'
+import { Menu, LogOut, LogIn, Bell, CheckCircle2, Camera } from 'lucide-react'
 import logoImg from '../assets/logo.png'
+import Avatar from './Avatar'
 
 export default function Header({
   currentUser,
@@ -8,7 +9,8 @@ export default function Header({
   onOpenAuth,
   onSignOut,
   onToggleMobileSidebar,
-  unreadBroadcastsCount = 0
+  unreadBroadcastsCount = 0,
+  onOpenPhotoModal
 }) {
   const getRoleBadge = (role) => {
     switch (role) {
@@ -89,26 +91,37 @@ export default function Header({
             
             {currentUser && (
               <>
-                {/* User Pill Button (Click to switch or view profile) */}
-                <button
-                  onClick={onOpenAuth}
-                  className="flex items-center space-x-2 p-1 sm:p-1.5 rounded-xl hover:bg-slate-50 border border-slate-200 transition-colors cursor-pointer"
-                  title="Switch profile or role"
-                >
-                  <img
-                    src={currentUser.photo}
-                    alt={currentUser.name}
-                    className="w-8 h-8 rounded-lg object-cover border border-slate-200 shadow-2xs"
-                  />
-                  <div className="text-left hidden sm:block pr-1">
+                {/* User Pill Button (Click avatar to change photo, click text to switch profile) */}
+                <div className="flex items-center space-x-1.5 p-1 sm:p-1.5 rounded-xl border border-slate-200 bg-white shadow-2xs">
+                  <div
+                    onClick={onOpenPhotoModal}
+                    className="relative group cursor-pointer"
+                    title="Change profile picture or use default icon"
+                  >
+                    <Avatar
+                      src={currentUser.photo}
+                      name={currentUser.name}
+                      role={currentUser.role}
+                      size="sm"
+                    />
+                    <div className="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-[#0A643B] text-white rounded-full flex items-center justify-center shadow-2xs group-hover:scale-110 transition-transform">
+                      <Camera className="w-2 h-2" />
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={onOpenAuth}
+                    className="text-left hidden sm:block pr-1 hover:opacity-80 transition-opacity cursor-pointer"
+                    title="Switch profile or role"
+                  >
                     <span className="text-xs font-bold text-slate-900 block leading-tight truncate max-w-[120px]">
                       {currentUser.name}
                     </span>
                     <span className={`text-[10px] font-bold ${currentUser.role === 'senior_sec' ? 'text-[#0A643B]' : 'text-slate-500'}`}>
                       {badge.label}
                     </span>
-                  </div>
-                </button>
+                  </button>
+                </div>
 
                 {/* Sign Out Button */}
                 <button

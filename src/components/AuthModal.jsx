@@ -11,9 +11,13 @@ import {
   GraduationCap,
   Key,
   Shield,
-  ChevronLeft
+  ChevronLeft,
+  Camera,
+  Upload,
+  Trash2
 } from 'lucide-react'
 import logoImg from '../assets/logo.png'
+import Avatar from './Avatar'
 
 export default function AuthModal({ isOpen, onClose, allUsers, onLogin, onRegisterScholar }) {
   // Step: 'gateway' | 'scholar' | 'leadership'
@@ -38,6 +42,7 @@ export default function AuthModal({ isOpen, onClose, allUsers, onLogin, onRegist
   const [signUpName, setSignUpName] = useState('')
   const [signUpEmail, setSignUpEmail] = useState('')
   const [signUpPassword, setSignUpPassword] = useState('')
+  const [signUpPhoto, setSignUpPhoto] = useState(null) // null = default icon
   const [signUpBatch, setSignUpBatch] = useState('Batch 1')
   const [signUpTrack, setSignUpTrack] = useState('Foundational Numeracy')
   const [signUpPhone, setSignUpPhone] = useState('')
@@ -153,7 +158,7 @@ export default function AuthModal({ isOpen, onClose, allUsers, onLogin, onRegist
       batch: signUpBatch,
       assignedTo: signUpSec,
       department: signUpTrack,
-      photo: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80',
+      photo: signUpPhoto || null, // Custom uploaded photo or null for default icon
       bio: `${signUpBatch} Scholar • Focus on ${signUpTrack}.`
     }
 
@@ -361,6 +366,57 @@ export default function AuthModal({ isOpen, onClose, allUsers, onLogin, onRegist
             {/* NEW SCHOLAR REGISTRATION (No Role field) */}
             {scholarMode === 'signup' && (
               <form onSubmit={handleSignUpSubmit} className="space-y-3 text-xs max-h-[380px] overflow-y-auto pr-1">
+                {/* Profile Photo Option (Upload or Keep Default Icon) */}
+                <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <Avatar
+                      src={signUpPhoto}
+                      name={signUpName || 'New Scholar'}
+                      role="intern"
+                      size="md"
+                    />
+                    <div>
+                      <span className="font-bold text-slate-800 text-xs block">
+                        {signUpPhoto ? 'Custom Photo Attached' : 'Default Icon Active'}
+                      </span>
+                      <span className="text-[10px] text-slate-500">
+                        {signUpPhoto ? 'Photo ready to save' : 'Upload photo or keep default'}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center space-x-1.5">
+                    <label className="px-2.5 py-1.5 rounded-xl bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 font-bold text-[11px] cursor-pointer inline-flex items-center shadow-2xs">
+                      <Camera className="w-3 h-3 mr-1 text-[#0A643B]" />
+                      <span>Upload</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0]
+                          if (file) {
+                            const reader = new FileReader()
+                            reader.onloadend = () => setSignUpPhoto(reader.result)
+                            reader.readAsDataURL(file)
+                          }
+                        }}
+                        className="hidden"
+                      />
+                    </label>
+
+                    {signUpPhoto && (
+                      <button
+                        type="button"
+                        onClick={() => setSignUpPhoto(null)}
+                        className="p-1.5 rounded-xl bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-200 cursor-pointer"
+                        title="Reset to default icon"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                  </div>
+                </div>
+
                 <div>
                   <label className="block font-bold text-slate-700 mb-1">Full Name *</label>
                   <input

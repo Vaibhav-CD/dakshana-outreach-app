@@ -16,6 +16,7 @@ import {
 } from 'lucide-react'
 
 import PodiumSpotlight from './PodiumSpotlight'
+import Avatar from './Avatar'
 
 export default function SeniorSecView({
   allUsers,
@@ -198,10 +199,12 @@ export default function SeniorSecView({
                 <div>
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center space-x-3">
-                      <img
+                      <Avatar
                         src={jsec.photo}
-                        alt={jsec.name}
-                        className="w-10 h-10 rounded-xl object-cover border border-[#0A643B]/20"
+                        name={jsec.name}
+                        role={jsec.role}
+                        size="md"
+                        className="border border-[#0A643B]/20"
                       />
                       <div>
                         <h4 className="font-bold text-slate-900 text-sm">{jsec.name}</h4>
@@ -335,7 +338,13 @@ export default function SeniorSecView({
                           onClick={() => onSelectIntern && onSelectIntern(intern)}
                           className="py-3.5 font-bold text-slate-900 flex items-center space-x-2.5 cursor-pointer group"
                         >
-                          <img src={intern.photo} className="w-8 h-8 rounded-xl object-cover border border-slate-200 group-hover:border-[#0A643B] transition-colors" alt="" />
+                          <Avatar
+                            src={intern.photo}
+                            name={intern.name}
+                            role={intern.role || 'intern'}
+                            size="sm"
+                            className="border border-slate-200 group-hover:border-[#0A643B] transition-colors"
+                          />
                           <div>
                             <span className="group-hover:text-[#0A643B] transition-colors">{intern.name}</span>
                             <span className="block text-[11px] font-normal text-slate-500">{intern.email}</span>
@@ -455,10 +464,12 @@ export default function SeniorSecView({
                     {/* Header for this Junior Secretary */}
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-4 border-b border-slate-100 gap-3">
                       <div className="flex items-center space-x-3">
-                        <img
+                        <Avatar
                           src={jsec.photo}
-                          alt={jsec.name}
-                          className="w-11 h-11 rounded-xl object-cover border border-[#0A643B]/20"
+                          name={jsec.name}
+                          role={jsec.role}
+                          size="md"
+                          className="border border-[#0A643B]/20"
                         />
                         <div>
                           <div className="flex items-center space-x-2">

@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { Trophy, Award, Medal, Flame, Star, Sparkles, ChevronRight, School, Users } from 'lucide-react'
+import Avatar from './Avatar'
 
 export default function PodiumSpotlight({ allUsers = [], sessions = [], onSelectIntern }) {
   const [activeTab, setActiveTab] = useState('overall') // 'overall' | 'batch1' | 'batch2'
@@ -103,10 +104,12 @@ export default function PodiumSpotlight({ allUsers = [], sessions = [], onSelect
               className="flex-1 flex flex-col items-center cursor-pointer group transition-transform hover:-translate-y-1"
             >
               <div className="relative mb-2">
-                <img
+                <Avatar
                   src={second.photo}
-                  alt={second.name}
-                  className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover border-3 border-slate-300 shadow-lg group-hover:ring-4 group-hover:ring-slate-300/50 transition-all"
+                  name={second.name}
+                  role="intern"
+                  size="xl"
+                  className="border-3 border-slate-300 shadow-lg group-hover:ring-4 group-hover:ring-slate-300/50 transition-all"
                 />
                 <div className="absolute -bottom-2.5 -right-2 w-7 h-7 rounded-full bg-slate-300 text-slate-900 font-black text-xs flex items-center justify-center shadow-md">
                   2nd
@@ -146,10 +149,12 @@ export default function PodiumSpotlight({ allUsers = [], sessions = [], onSelect
               </div>
 
               <div className="relative mb-2">
-                <img
+                <Avatar
                   src={first.photo}
-                  alt={first.name}
-                  className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover border-4 border-amber-400 shadow-2xl group-hover:ring-4 group-hover:ring-amber-400/60 transition-all"
+                  name={first.name}
+                  role="intern"
+                  size="2xl"
+                  className="border-4 border-amber-400 shadow-2xl group-hover:ring-4 group-hover:ring-amber-400/60 transition-all"
                 />
                 <div className="absolute -bottom-3 -right-2.5 w-8 h-8 rounded-full bg-gradient-to-br from-amber-300 to-amber-500 text-slate-950 font-black text-sm flex items-center justify-center shadow-lg border-2 border-white">
                   1st
@@ -191,10 +196,12 @@ export default function PodiumSpotlight({ allUsers = [], sessions = [], onSelect
               className="flex-1 flex flex-col items-center cursor-pointer group transition-transform hover:-translate-y-1"
             >
               <div className="relative mb-2">
-                <img
+                <Avatar
                   src={third.photo}
-                  alt={third.name}
-                  className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover border-3 border-amber-700 shadow-lg group-hover:ring-4 group-hover:ring-amber-700/50 transition-all"
+                  name={third.name}
+                  role="intern"
+                  size="xl"
+                  className="border-3 border-amber-700 shadow-lg group-hover:ring-4 group-hover:ring-amber-700/50 transition-all"
                 />
                 <div className="absolute -bottom-2.5 -right-2 w-7 h-7 rounded-full bg-amber-700 text-white font-black text-xs flex items-center justify-center shadow-md">
                   3rd
@@ -235,7 +242,13 @@ export default function PodiumSpotlight({ allUsers = [], sessions = [], onSelect
             className="p-3.5 rounded-2xl bg-white/10 hover:bg-white/15 border border-white/15 flex items-center justify-between cursor-pointer transition-all group"
           >
             <div className="flex items-center space-x-3">
-              <img src={topBatch1.photo} className="w-10 h-10 rounded-xl object-cover border border-amber-300" alt="" />
+              <Avatar
+                src={topBatch1.photo}
+                name={topBatch1.name}
+                role="intern"
+                size="md"
+                className="border border-amber-300"
+              />
               <div>
                 <span className="text-[10px] uppercase font-extrabold text-amber-300 block">
                   🌟 Batch 1 Leader
@@ -259,7 +272,13 @@ export default function PodiumSpotlight({ allUsers = [], sessions = [], onSelect
             className="p-3.5 rounded-2xl bg-white/10 hover:bg-white/15 border border-white/15 flex items-center justify-between cursor-pointer transition-all group"
           >
             <div className="flex items-center space-x-3">
-              <img src={topBatch2.photo} className="w-10 h-10 rounded-xl object-cover border border-amber-300" alt="" />
+              <Avatar
+                src={topBatch2.photo}
+                name={topBatch2.name}
+                role="intern"
+                size="md"
+                className="border border-amber-300"
+              />
               <div>
                 <span className="text-[10px] uppercase font-extrabold text-amber-300 block">
                   🌟 Batch 2 Leader

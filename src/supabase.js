@@ -55,7 +55,7 @@ export async function dbFetchProfiles() {
       title: d.role === 'intern' ? 'Outreach Scholar' : d.role === 'senior_sec' ? 'Senior Secretary' : d.role === 'junior_sec' ? 'Junior Secretary' : 'Trustee',
       department: d.department,
       phone: d.phone,
-      photo: d.photo_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80',
+      photo: d.photo_url || null,
       assignedTo: d.assigned_to,
       bio: d.bio
     }))
@@ -109,6 +109,8 @@ export async function dbUpdateProfile(id, updates) {
     if (updates.name) payload.full_name = updates.name
     if (updates.batch) payload.batch = updates.batch
     if (updates.assignedTo !== undefined) payload.assigned_to = toValidUuid(updates.assignedTo)
+    if (updates.photo_url !== undefined) payload.photo_url = updates.photo_url
+    if (updates.photo !== undefined) payload.photo_url = updates.photo
     const { data, error } = await supabase.from('profiles').update(payload).eq('id', targetId)
     return { data, error }
   } catch (err) {

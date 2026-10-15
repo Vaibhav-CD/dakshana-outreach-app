@@ -1,4 +1,3 @@
-import React from 'react'
 import {
   LayoutDashboard,
   Radio,
@@ -10,9 +9,11 @@ import {
   LogIn,
   X,
   ChevronRight,
-  ShieldCheck
+  ShieldCheck,
+  Camera
 } from 'lucide-react'
 import logoImg from '../assets/logo.png'
+import Avatar from './Avatar'
 
 export default function Sidebar({
   activeTab,
@@ -21,6 +22,7 @@ export default function Sidebar({
   unreadBroadcastsCount = 0,
   onSignOut,
   onSwitchProfile,
+  onOpenPhotoModal,
   isMobileOpen,
   setIsMobileOpen
 }) {
@@ -98,11 +100,17 @@ export default function Sidebar({
       {currentUser && (
         <div className="p-4 mx-3 my-3 rounded-2xl bg-slate-50 border border-slate-200/80 shadow-2xs">
           <div className="flex items-center space-x-3 mb-2.5">
-            <img
-              src={currentUser.photo}
-              alt={currentUser.name}
-              className="w-10 h-10 rounded-xl object-cover border border-slate-200 shadow-2xs flex-shrink-0"
-            />
+            <div className="relative group cursor-pointer" onClick={onOpenPhotoModal} title="Click to change profile picture or use default icon">
+              <Avatar
+                src={currentUser.photo}
+                name={currentUser.name}
+                role={currentUser.role}
+                size="md"
+              />
+              <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-[#0A643B] text-white rounded-full flex items-center justify-center shadow-xs group-hover:scale-110 transition-transform">
+                <Camera className="w-2.5 h-2.5" />
+              </div>
+            </div>
             <div className="min-w-0 flex-1">
               <span className="font-extrabold text-slate-900 text-xs block truncate">
                 {currentUser.name}

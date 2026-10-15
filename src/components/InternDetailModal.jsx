@@ -17,6 +17,7 @@ import {
   TrendingUp,
   MapPin
 } from 'lucide-react'
+import Avatar from './Avatar'
 
 export default function InternDetailModal({
   intern,
@@ -78,10 +79,12 @@ export default function InternDetailModal({
           </button>
 
           <div className="flex flex-col sm:flex-row items-center sm:items-start space-y-3 sm:space-y-0 sm:space-x-4 text-center sm:text-left">
-            <img
+            <Avatar
               src={intern.photo}
-              alt={intern.name}
-              className="w-20 h-20 rounded-2xl object-cover border-3 border-white/80 shadow-md flex-shrink-0"
+              name={intern.name}
+              role={intern.role || 'intern'}
+              size="2xl"
+              className="border-3 border-white/80 shadow-md flex-shrink-0"
             />
             <div className="flex-1 min-w-0">
               <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 mb-1">

@@ -17,6 +17,7 @@ import {
   MapPin,
   Calendar
 } from 'lucide-react'
+import Avatar from './Avatar'
 
 export default function PostsFeed({
   currentUser,
@@ -163,7 +164,7 @@ export default function PostsFeed({
       {showComposer && (
         <div className="bg-white rounded-3xl p-6 border-2 border-[#0A643B]/30 shadow-lg animate-in fade-in duration-200">
           <div className="flex items-center space-x-3 mb-4 pb-3 border-b border-slate-100">
-            <img src={currentUser.photo} className="w-10 h-10 rounded-xl object-cover border border-[#0A643B]/30" alt="" />
+            <Avatar src={currentUser.photo} name={currentUser.name} role={currentUser.role} size="md" className="border border-[#0A643B]/30" />
             <div>
               <span className="font-bold text-slate-900 text-sm block">{currentUser.name}</span>
               <span className="text-[11px] text-[#0A643B] font-semibold">{currentUser.title} • {currentUser.batch || 'Batch 1'}</span>
@@ -376,10 +377,12 @@ export default function PostsFeed({
                     onClick={() => onSelectIntern && onSelectIntern({ id: post.authorId, name: post.authorName, photo: post.authorPhoto, batch: post.batch })}
                     className="flex items-center space-x-3 cursor-pointer group"
                   >
-                    <img
+                    <Avatar
                       src={post.authorPhoto}
-                      alt={post.authorName}
-                      className="w-11 h-11 rounded-2xl object-cover border-2 border-slate-200 group-hover:border-[#0A643B] transition-colors"
+                      name={post.authorName}
+                      role="intern"
+                      size="md"
+                      className="group-hover:ring-2 group-hover:ring-[#0A643B] transition-all"
                     />
                     <div>
                       <div className="flex items-center space-x-2">

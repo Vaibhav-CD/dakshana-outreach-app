@@ -1,6 +1,7 @@
 import React from 'react'
 import { Mail, Shield, Award, Users, Sparkles } from 'lucide-react'
 import logoImg from '../assets/logo.png'
+import Avatar from './Avatar'
 
 export default function TeamShowcase({ allUsers, onSelectIntern }) {
   const management = allUsers.find(u => u.role === 'management')
@@ -39,10 +40,12 @@ export default function TeamShowcase({ allUsers, onSelectIntern }) {
             <div className="absolute top-0 right-0 bg-[#7B2E68] text-white text-[10px] font-extrabold uppercase tracking-widest py-1 px-3 rounded-bl-xl">
               Board / Trustees
             </div>
-            <img
+            <Avatar
               src={management.photo}
-              alt={management.name}
-              className="w-28 h-28 rounded-2xl object-cover shadow-md border-2 border-[#7B2E68]/20 flex-shrink-0"
+              name={management.name}
+              role={management.role}
+              size="3xl"
+              className="shadow-md border-2 border-[#7B2E68]/20 flex-shrink-0"
             />
             <div className="space-y-2 text-center sm:text-left">
               <div>
@@ -65,10 +68,12 @@ export default function TeamShowcase({ allUsers, onSelectIntern }) {
             <div className="absolute top-0 right-0 bg-[#0A643B] text-white text-[10px] font-extrabold uppercase tracking-widest py-1 px-3 rounded-bl-xl">
               Central Authority
             </div>
-            <img
+            <Avatar
               src={seniorSec.photo}
-              alt={seniorSec.name}
-              className="w-28 h-28 rounded-2xl object-cover shadow-md border-2 border-[#0A643B]/20 flex-shrink-0"
+              name={seniorSec.name}
+              role={seniorSec.role}
+              size="3xl"
+              className="shadow-md border-2 border-[#0A643B]/20 flex-shrink-0"
             />
             <div className="space-y-2 text-center sm:text-left">
               <div>
@@ -99,10 +104,12 @@ export default function TeamShowcase({ allUsers, onSelectIntern }) {
             <div key={jsec.id} className="bg-white rounded-2xl border border-slate-200 shadow-xs p-5 flex flex-col justify-between hover:border-[#0A643B]/40 transition-all">
               <div>
                 <div className="flex items-center space-x-4 mb-4">
-                  <img
+                  <Avatar
                     src={jsec.photo}
-                    alt={jsec.name}
-                    className="w-16 h-16 rounded-xl object-cover border-2 border-emerald-100 shadow-xs flex-shrink-0"
+                    name={jsec.name}
+                    role={jsec.role}
+                    size="xl"
+                    className="border-2 border-emerald-100 shadow-xs flex-shrink-0"
                   />
                   <div>
                     <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-[#EBF7F0] text-[#0A643B] border border-[#0A643B]/30">
@@ -144,10 +151,12 @@ export default function TeamShowcase({ allUsers, onSelectIntern }) {
               className="bg-white rounded-2xl border border-slate-200 p-4 shadow-2xs hover:border-[#0A643B] hover:shadow-md transition-all cursor-pointer group flex flex-col justify-between"
             >
               <div className="flex items-center space-x-3 mb-2">
-                <img
+                <Avatar
                   src={intern.photo}
-                  alt={intern.name}
-                  className="w-11 h-11 rounded-xl object-cover border border-slate-200 group-hover:border-[#0A643B] transition-colors flex-shrink-0"
+                  name={intern.name}
+                  role={intern.role || 'intern'}
+                  size="md"
+                  className="border border-slate-200 group-hover:border-[#0A643B] transition-colors flex-shrink-0"
                 />
                 <div className="min-w-0 flex-1">
                   <h4 className="font-extrabold text-slate-900 text-xs truncate group-hover:text-[#0A643B] transition-colors">

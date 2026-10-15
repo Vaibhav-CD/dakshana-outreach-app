@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { FileText, Clock, AlertCircle, CheckCircle, Send, MessageSquare, Calendar } from 'lucide-react'
 import PodiumSpotlight from './PodiumSpotlight'
+import Avatar from './Avatar'
 
 export default function InternView({
   currentUser,
@@ -73,10 +74,12 @@ export default function InternView({
       <div className="bg-gradient-to-r from-[#074D2D] via-[#0A643B] to-[#7B2E68] rounded-2xl p-6 text-white shadow-md">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div className="flex items-center space-x-4">
-            <img
+            <Avatar
               src={currentUser.photo}
-              alt={currentUser.name}
-              className="w-14 h-14 rounded-2xl object-cover border-2 border-white/40 shadow-sm"
+              name={currentUser.name}
+              role={currentUser.role}
+              size="xl"
+              className="border-2 border-white/40 shadow-sm"
             />
             <div>
               <div className="flex items-center space-x-2">

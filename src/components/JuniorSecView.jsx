@@ -17,6 +17,7 @@ import {
 } from 'lucide-react'
 
 import PodiumSpotlight from './PodiumSpotlight'
+import Avatar from './Avatar'
 
 export default function JuniorSecView({
   currentUser,
@@ -276,7 +277,13 @@ export default function JuniorSecView({
                         className="flex items-center space-x-2.5 cursor-pointer group flex-1"
                         title="Click to view scholar visits, progress & graphs"
                       >
-                        <img src={intern.photo} className="w-8 h-8 rounded-lg object-cover group-hover:border-[#0A643B] border transition-colors" alt="" />
+                        <Avatar
+                          src={intern.photo}
+                          name={intern.name}
+                          role={intern.role || 'intern'}
+                          size="sm"
+                          className="group-hover:border-[#0A643B] transition-colors"
+                        />
                         <div>
                           <p className="text-xs font-bold text-slate-900 group-hover:text-[#0A643B] transition-colors">{intern.name}</p>
                           <span className="text-[10px] text-slate-500">{intern.department}</span>
