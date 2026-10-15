@@ -19,6 +19,7 @@ export default function AuthModal({ isOpen, onClose, allUsers, onLogin, onRegist
   const [signUpPhone, setSignUpPhone] = useState('')
   const [signUpSec, setSignUpSec] = useState('user-jsec-1')
   const [signUpSuccess, setSignUpSuccess] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   if (!isOpen) return null
 
@@ -35,7 +36,7 @@ export default function AuthModal({ isOpen, onClose, allUsers, onLogin, onRegist
     }
   }
 
-  const handleCustomSignUp = (e) => {
+  const handleCustomSignUp = async (e) => {
     e.preventDefault()
     if (!signUpName || !signUpEmail) return
 
@@ -46,12 +47,14 @@ export default function AuthModal({ isOpen, onClose, allUsers, onLogin, onRegist
       return
     }
 
+    setIsSubmitting(true)
+    setError('')
+
     const newScholar = {
-      id: `user-intern-${Date.now()}`,
-      name: signUpName,
+      name: signUpName.trim(),
       title: 'Outreach Scholar',
-      email: signUpEmail,
-      phone: signUpPhone,
+      email: signUpEmail.trim().toLowerCase(),
+      phone: signUpPhone.trim(),
       role: 'intern',
       batch: signUpBatch,
       assignedTo: signUpSec,
@@ -60,13 +63,21 @@ export default function AuthModal({ isOpen, onClose, allUsers, onLogin, onRegist
       bio: `${signUpBatch} Scholar • Focus on ${signUpTrack}.`
     }
 
-    setSignUpSuccess(true)
-    setTimeout(() => {
-      onRegisterScholar(newScholar)
-      onLogin(newScholar)
-      setSignUpSuccess(false)
-      onClose()
-    }, 600)
+    try {
+      const createdScholar = await onRegisterScholar(newScholar)
+      const userToLogin = createdScholar || newScholar
+      setSignUpSuccess(true)
+      setTimeout(() => {
+        onLogin(userToLogin)
+        setSignUpSuccess(false)
+        setIsSubmitting(false)
+        onClose()
+      }, 500)
+    } catch (err) {
+      console.error('Registration failed:', err)
+      setError('Registration error: ' + (err.message || 'Please check connection and try again.'))
+      setIsSubmitting(false)
+    }
   }
 
   const handleQuickLogin = (user) => {
@@ -311,9 +322,12 @@ export default function AuthModal({ isOpen, onClose, allUsers, onLogin, onRegist
 
             <button
               type="submit"
-              className="w-full py-2.5 rounded-xl bg-[#0A643B] hover:bg-[#074D2D] text-white font-bold text-xs shadow-xs cursor-pointer flex items-center justify-center mt-2"
+              disabled={isSubmitting}
+              className={`w-full py-2.5 rounded-xl font-bold text-xs shadow-xs flex items-center justify-center mt-2 transition-all ${
+                isSubmitting ? 'bg-slate-400 cursor-not-allowed text-white' : 'bg-[#0A643B] hover:bg-[#074D2D] text-white cursor-pointer'
+              }`}
             >
-              Register & Enter Portal <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
+              {isSubmitting ? 'Saving to Supabase Cloud...' : 'Register & Enter Portal'} <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
             </button>
           </form>
         )}

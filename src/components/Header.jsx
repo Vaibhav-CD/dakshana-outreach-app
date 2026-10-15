@@ -57,6 +57,10 @@ export default function Header({
                 <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-[#F8EDF5] text-[#7B2E68] border border-[#7B2E68]/30">
                   Outreach Internship
                 </span>
+                <span className="hidden md:inline-flex items-center text-[9px] font-semibold text-[#0A643B] bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full" title="Connected to Supabase PostgreSQL Database">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#0A643B] mr-1"></span>
+                  Cloud Synced
+                </span>
               </div>
               <p className="text-[10px] text-slate-500 font-medium tracking-wide uppercase">
                 Honor • Knowledge • Service

@@ -302,14 +302,34 @@ export default function App() {
     dbUpdateProfile(internId, { batch: newBatch }).catch(console.error)
   }
 
-  const handleAddIntern = (newIntern) => {
+  const handleAddIntern = async (newIntern) => {
+    let finalScholar = { ...newIntern }
+
+    // Persist to Supabase
+    try {
+      const { data, error } = await dbCreateProfile(newIntern)
+      if (error) {
+        console.error('Supabase profile insertion error:', error)
+      } else if (data && data.id) {
+        console.log('Profile successfully saved in Supabase with id:', data.id)
+        finalScholar.id = data.id
+      }
+    } catch (err) {
+      console.error('Network error during Supabase sync:', err)
+    }
+
+    if (!finalScholar.id) {
+      finalScholar.id = `user-intern-${Date.now()}`
+    }
+
     setAllUsers(prev => {
-      const updated = [...prev, newIntern]
+      const filtered = prev.filter(u => u.email.toLowerCase() !== finalScholar.email.toLowerCase())
+      const updated = [...filtered, finalScholar]
       localStorage.setItem('dakshana_all_users', JSON.stringify(updated))
       return updated
     })
-    // Persist to Supabase
-    dbCreateProfile(newIntern).catch(console.error)
+
+    return finalScholar
   }
 
   const handleSubmitReport = (newReport) => {
