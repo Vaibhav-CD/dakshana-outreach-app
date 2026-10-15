@@ -71,7 +71,9 @@ export async function dbCreateProfile(user) {
     const payload = {
       full_name: user.name,
       email: user.email.toLowerCase().trim(),
-      role: user.role || 'intern',
+      // Strict Security: All user self-registrations are strictly Outreach Scholars (intern role).
+      // Secretariat, Trustee and Junior Secretary accounts cannot be created via public registration.
+      role: 'intern',
       batch: user.batch || 'Batch 1',
       department: user.department || 'General Outreach',
       phone: user.phone || null,

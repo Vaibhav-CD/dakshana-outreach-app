@@ -45,7 +45,8 @@ export default function App() {
         if (parsed && parsed.id) return parsed
       } catch (e) { }
     }
-    return INITIAL_USERS[0]
+    // Default safe role: Outreach Scholar (never default to Senior Secretary)
+    return INITIAL_USERS.find(u => u.role === 'intern') || INITIAL_USERS[0]
   })
 
   // 2. Active Tab (with localStorage persistence across refresh)
@@ -128,45 +129,9 @@ export default function App() {
     return INITIAL_REIMBURSEMENT_CLAIMS
   })
 
-  // 9. Resources Hub (with localStorage persistence & guaranteed inclusion of official session form and toolkit)
+  // 9. Materials Hub (Strictly the two official Dakshana links provided)
   const [resources, setResources] = useState(() => {
-    const saved = localStorage.getItem('dakshana_resources')
-    let list = INITIAL_RESOURCES
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved)
-        if (Array.isArray(parsed) && parsed.length > 0) list = parsed
-      } catch (e) { }
-    }
-    // Ensure the two essential links are always guaranteed
-    const essentialItems = [
-      {
-        id: 'res-outreach-session-form',
-        targetSpace: 'interns',
-        title: 'Dakshana outreach session form',
-        category: 'Essential Form',
-        url: 'https://tinyurl.com/Outreach-session-form',
-        description: 'Official session logging form to record all school visits, scholar counts, topics covered, and outreach activities.',
-        addedBy: 'Dakshana Secretariat',
-        isPinned: true
-      },
-      {
-        id: 'res-intern-toolkit',
-        targetSpace: 'interns',
-        title: 'Dakshana intern toolkit',
-        category: 'Toolkit 2026–27',
-        url: 'https://tinyurl.com/interntoolkit26-27',
-        description: 'Comprehensive outreach toolkit including session presentations, teaching modules, FAQ guidelines, and handbook.',
-        addedBy: 'Dakshana Secretariat',
-        isPinned: true
-      }
-    ]
-    essentialItems.forEach(item => {
-      if (!list.some(r => r.title.toLowerCase().trim() === item.title.toLowerCase().trim() || r.url === item.url)) {
-        list = [item, ...list]
-      }
-    })
-    return list
+    return INITIAL_RESOURCES
   })
 
   // 10. Broadcasts (with localStorage persistence)
@@ -181,7 +146,8 @@ export default function App() {
     return INITIAL_BROADCASTS
   })
 
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
+  // Prompt portal gateway on first visit if no session is saved
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(() => !localStorage.getItem('dakshana_current_user'))
 
   // Cloud Sync from Supabase on App Mount
   useEffect(() => {
@@ -552,7 +518,7 @@ export default function App() {
           />
         )}
 
-        {/* Tab 3: Monthly Reimbursements & Stipend Portal */}
+        {/* Tab 3: Monthly Reimbursements & Expense Portal */}
         {activeTab === 'reimbursements' && (
           <ReimbursementModule
             currentUser={currentUser}

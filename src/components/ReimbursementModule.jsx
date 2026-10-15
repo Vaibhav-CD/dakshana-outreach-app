@@ -45,7 +45,7 @@ export default function ReimbursementModule({
   const [showInternalForm, setShowInternalForm] = useState(false)
   const [claimAmount, setClaimAmount] = useState('3000')
   const [upiDetails, setUpiDetails] = useState('')
-  const [purpose, setPurpose] = useState('Google Form submitted • Field visits & stipend')
+  const [purpose, setPurpose] = useState('Google Form submitted • Field visits & travel expenses')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitSuccess, setSubmitSuccess] = useState(false)
 
@@ -587,7 +587,7 @@ export default function ReimbursementModule({
             <div>
               <h3 className="font-bold text-slate-900 text-base flex items-center">
                 <ShieldCheck className="w-5 h-5 mr-2 text-[#0A643B]" />
-                Scholar Stipend & Expense Ledger ({claims.length} entries)
+                Scholar Expense Claim & Reimbursement Ledger ({claims.length} entries)
               </h3>
               <p className="text-xs text-slate-500">Cross-verification against Google Form submissions & disbursement pipeline</p>
             </div>

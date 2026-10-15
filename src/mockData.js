@@ -238,7 +238,7 @@ https://bit.ly/Reimbursement_OutreachInternship
 If you have any questions or face any issues while filling out the form, please contact us.
 
 Thank you once again for your dedication and support! 🌟`,
-  stipendStandard: 3000
+  expensePolicy: 'Single monthly submission for all verified school visits'
 }
 
 export const INITIAL_REIMBURSEMENT_CLAIMS = [
@@ -250,7 +250,7 @@ export const INITIAL_REIMBURSEMENT_CLAIMS = [
     monthYear: 'October 2026',
     amount: 3250,
     upiOrBank: 'aarav@okaxis',
-    purpose: 'Monthly stipend (₹3,000) + Bus travel tickets to cluster B (₹250)',
+    purpose: 'Outreach travel expense claim & school visit bus passes (₹3,250)',
     status: 'approved',
     approvedBy: 'Senior Secretary',
     paidAt: null
@@ -263,7 +263,7 @@ export const INITIAL_REIMBURSEMENT_CLAIMS = [
     monthYear: 'October 2026',
     amount: 3000,
     upiOrBank: 'meera.iyer@okhdfcbank',
-    purpose: 'Standard monthly scholar stipend',
+    purpose: 'School outreach travel tickets & verified cash vouchers',
     status: 'pending',
     approvedBy: null,
     paidAt: null
@@ -276,70 +276,30 @@ export const INITIAL_REIMBURSEMENT_CLAIMS = [
     monthYear: 'October 2026',
     amount: 3400,
     upiOrBank: 'kabir.das@sbi',
-    purpose: 'Monthly stipend (₹3,000) + Science kit materials photocopy (₹400)',
+    purpose: 'Outreach travel & science kit materials photocopy (₹3,400)',
     status: 'approved',
     approvedBy: 'Senior Secretary',
     paidAt: '2026-10-12'
   }
 ]
 
-// Resources Hub
+// Materials Hub - Strictly only the two official Dakshana links provided
 export const INITIAL_RESOURCES = [
   {
     id: 'res-outreach-session-form',
-    targetSpace: 'interns',
     title: 'Dakshana outreach session form',
-    category: 'Essential Form',
+    category: 'Mandatory Form',
     url: 'https://tinyurl.com/Outreach-session-form',
-    description: 'Official session logging form to record all school visits, scholar counts, topics covered, and outreach activities.',
-    addedBy: 'Dakshana Secretariat',
+    description: 'Official session logging form to record all school visits, student attendance, and outreach classroom topics.',
     isPinned: true
   },
   {
     id: 'res-intern-toolkit',
-    targetSpace: 'interns',
     title: 'Dakshana intern toolkit',
-    category: 'Toolkit 2026–27',
+    category: 'Official Toolkit',
     url: 'https://tinyurl.com/interntoolkit26-27',
-    description: 'Comprehensive outreach toolkit including session presentations, teaching modules, FAQ guidelines, and handbook.',
-    addedBy: 'Dakshana Secretariat',
+    description: 'Comprehensive 2026–27 teaching resources, presentation decks, curriculum modules, and intern guidelines.',
     isPinned: true
-  },
-  {
-    id: 'res-staff-1',
-    targetSpace: 'staff',
-    title: 'Secretarial Standard Operating Procedures (SOP 2026)',
-    category: 'Governance & SOP',
-    url: 'https://docs.google.com/document/d/sample-sop',
-    description: 'Guidelines for Junior Secretaries on evaluating monthly scholar reports, escalation chains, and dispute resolution.',
-    addedBy: 'Senior Secretary'
-  },
-  {
-    id: 'res-staff-2',
-    targetSpace: 'staff',
-    title: 'Trustee & Board Audit Dashboard Sheet',
-    category: 'Finance & Audits',
-    url: 'https://docs.google.com/spreadsheets/d/sample-audit',
-    description: 'Monthly disbursement ledger, 80G tax compliance records, and annual budget projections.',
-    addedBy: 'Dr. Rajiv Menon'
-  },
-  {
-    id: 'res-intern-1',
-    targetSpace: 'interns',
-    title: 'Monthly Progress Report Template & Guidelines',
-    category: 'Reporting Guide',
-    url: 'https://docs.google.com/document/d/sample-template',
-    description: 'Official template for scholars to document their teaching sessions and achievements before submitting.',
-    addedBy: 'Senior Secretary'
-  },
-  {
-    id: 'res-intern-2',
-    targetSpace: 'interns',
-    title: 'Outreach Curriculum Drive (Batch 1 & Batch 2)',
-    category: 'Study Materials',
-    url: 'https://drive.google.com/drive/folders/sample-curriculum',
-    description: 'Approved worksheets, lesson plans, and experimental learning modules for grassroots classes.',
-    addedBy: 'Rohan Verma (Junior Sec)'
   }
 ]
 
@@ -349,7 +309,7 @@ export const INITIAL_BROADCASTS = [
     id: 'bc-1',
     sender: 'Senior Secretary',
     title: 'Secretariat Notice: Evaluation Deadline for Junior Secretaries',
-    message: 'All 3 Junior Secretaries are requested to complete pending reviews for both Batch 1 and Batch 2 by Friday 5 PM so that monthly stipends can be processed.',
+    message: 'All 3 Junior Secretaries are requested to complete pending reviews for both Batch 1 and Batch 2 by Friday 5 PM so that monthly expense claims can be verified and disbursed.',
     audience: 'junior_secs',
     date: 'Today, 2:30 PM',
     isNew: true
@@ -375,8 +335,8 @@ export const INITIAL_BROADCASTS = [
   {
     id: 'bc-4',
     sender: 'Senior Secretary',
-    title: 'Stipend Portal Activated for All Scholars',
-    message: 'The reimbursement window for October is now active. Please submit your claims in the Reimbursements tab.',
+    title: 'Reimbursement Portal Window Activated for All Scholars',
+    message: 'The reimbursement window for October is now active. Please submit your claims and download the mandatory templates in the Reimbursements tab.',
     audience: 'all_interns',
     date: '2 days ago',
     isNew: false
