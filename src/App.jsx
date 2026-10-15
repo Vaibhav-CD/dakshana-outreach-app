@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import Sidebar from './components/Sidebar'
 import Header from './components/Header'
 import InstallAppBanner from './components/InstallAppBanner'
 import SeniorSecView from './components/SeniorSecView'
@@ -8,8 +9,9 @@ import ManagementView from './components/ManagementView'
 import TeamShowcase from './components/TeamShowcase'
 import ReimbursementModule from './components/ReimbursementModule'
 import ResourceHub from './components/ResourceHub'
-import VisualDataBoard from './components/VisualDataBoard'
 import BroadcastCenter from './components/BroadcastCenter'
+import PostsFeed from './components/PostsFeed'
+import InternDetailModal from './components/InternDetailModal'
 import AuthModal from './components/AuthModal'
 import {
   INITIAL_USERS,
@@ -18,7 +20,8 @@ import {
   INITIAL_REIMBURSEMENT_CYCLE,
   INITIAL_REIMBURSEMENT_CLAIMS,
   INITIAL_RESOURCES,
-  INITIAL_BROADCASTS
+  INITIAL_BROADCASTS,
+  INITIAL_POSTS
 } from './mockData'
 import {
   isSupabaseConfigured,
@@ -36,7 +39,7 @@ import {
 } from './supabase'
 
 export default function App() {
-  // 1. Current logged in user (with localStorage persistence across refresh)
+  // 1. Current logged in user (with localStorage persistence)
   const [currentUser, setCurrentUser] = useState(() => {
     const saved = localStorage.getItem('dakshana_current_user')
     if (saved) {
@@ -45,11 +48,11 @@ export default function App() {
         if (parsed && parsed.id) return parsed
       } catch (e) { }
     }
-    // Default safe role: Outreach Scholar (never default to Senior Secretary)
+    // Default safe role: Outreach Scholar
     return INITIAL_USERS.find(u => u.role === 'intern') || INITIAL_USERS[0]
   })
 
-  // 2. Active Tab (with localStorage persistence across refresh)
+  // 2. Active Tab (Ordered: dashboard, notices, posts, resources, reimbursements, team)
   const [activeTab, setActiveTab] = useState(() => {
     return localStorage.getItem('dakshana_active_tab') || 'dashboard'
   })
@@ -59,7 +62,7 @@ export default function App() {
     localStorage.setItem('dakshana_active_tab', tab)
   }
 
-  // 3. All Users (with localStorage persistence)
+  // 3. All Users
   const [allUsers, setAllUsers] = useState(() => {
     const saved = localStorage.getItem('dakshana_all_users')
     if (saved) {
@@ -71,7 +74,7 @@ export default function App() {
     return INITIAL_USERS
   })
 
-  // 4. Reports (with localStorage persistence)
+  // 4. Reports
   const [reports, setReports] = useState(() => {
     const saved = localStorage.getItem('dakshana_reports')
     if (saved) {
@@ -83,7 +86,7 @@ export default function App() {
     return INITIAL_REPORTS
   })
 
-  // 5. Sessions
+  // 5. Sessions / School Visits
   const [sessions, setSessions] = useState(() => {
     const saved = localStorage.getItem('dakshana_sessions')
     if (saved) {
@@ -94,8 +97,20 @@ export default function App() {
     }
     return INITIAL_SESSIONS
   })
+
+  // 6. Community Posts
+  const [posts, setPosts] = useState(() => {
+    const saved = localStorage.getItem('dakshana_posts')
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved)
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed
+      } catch (e) { }
+    }
+    return INITIAL_POSTS
+  })
   
-  // 6. Reimbursement cycle state (with localStorage persistence)
+  // 7. Reimbursement cycle state
   const [cycle, setCycle] = useState(() => {
     const saved = localStorage.getItem('dakshana_reimbursement_cycle')
     if (saved) {
@@ -104,7 +119,7 @@ export default function App() {
     return INITIAL_REIMBURSEMENT_CYCLE
   })
 
-  // 7. Delegated special powers state: Senior Secretary -> Junior Secretaries
+  // 8. Delegated powers: Senior Sec -> Junior Secs
   const [delegatedPowers, setDelegatedPowers] = useState(() => {
     const saved = localStorage.getItem('dakshana_delegated_powers')
     if (saved) {
@@ -117,7 +132,7 @@ export default function App() {
     }
   })
 
-  // 8. Claims (with localStorage persistence)
+  // 9. Claims
   const [claims, setClaims] = useState(() => {
     const saved = localStorage.getItem('dakshana_claims')
     if (saved) {
@@ -129,12 +144,12 @@ export default function App() {
     return INITIAL_REIMBURSEMENT_CLAIMS
   })
 
-  // 9. Materials Hub (Strictly the two official Dakshana links provided)
+  // 10. Materials Hub
   const [resources, setResources] = useState(() => {
     return INITIAL_RESOURCES
   })
 
-  // 10. Broadcasts (with localStorage persistence)
+  // 11. Broadcasts / Notices
   const [broadcasts, setBroadcasts] = useState(() => {
     const saved = localStorage.getItem('dakshana_broadcasts')
     if (saved) {
@@ -146,8 +161,10 @@ export default function App() {
     return INITIAL_BROADCASTS
   })
 
-  // Prompt portal gateway on first visit if no session is saved
+  // 12. UI States: Modals & Sidebar
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(() => !localStorage.getItem('dakshana_current_user'))
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
+  const [selectedInternForModal, setSelectedInternForModal] = useState(null)
 
   // Cloud Sync from Supabase on App Mount
   useEffect(() => {
@@ -161,7 +178,6 @@ export default function App() {
         ])
 
         if (cloudProfiles && cloudProfiles.length > 0) {
-          // Merge leadership if not present
           setAllUsers(prev => {
             const combined = [...cloudProfiles]
             INITIAL_USERS.slice(0, 5).forEach(lead => {
@@ -171,7 +187,6 @@ export default function App() {
             return combined
           })
 
-          // Keep current logged-in user refreshed with cloud data if available
           setCurrentUser(prevUser => {
             if (!prevUser) return prevUser
             const matching = cloudProfiles.find(p => p.id === prevUser.id || p.email === prevUser.email)
@@ -202,7 +217,58 @@ export default function App() {
     syncFromCloud()
   }, [])
 
-  // Handlers with dual persistence (State + localStorage + Supabase)
+  // Handlers
+  const handleSignOut = () => {
+    localStorage.removeItem('dakshana_current_user')
+    setCurrentUser(null)
+    setIsAuthModalOpen(true)
+  }
+
+  const handleUserLogin = (selectedUser) => {
+    setCurrentUser(selectedUser)
+    localStorage.setItem('dakshana_current_user', JSON.stringify(selectedUser))
+  }
+
+  const handleAddPost = (newPost) => {
+    setPosts(prev => {
+      const updated = [newPost, ...prev]
+      localStorage.setItem('dakshana_posts', JSON.stringify(updated))
+      return updated
+    })
+
+    // If marked as done, increment intern's visits count in sessions
+    if (newPost.isCompleted) {
+      setSessions(prev => {
+        const found = prev.find(s => s.internId === newPost.authorId)
+        let updated
+        if (found) {
+          updated = prev.map(s => {
+            if (s.internId === newPost.authorId) {
+              return {
+                ...s,
+                sessionsCount: (s.sessionsCount || 0) + (newPost.visitsLogged || 1),
+                studentsReached: (s.studentsReached || 0) + (newPost.studentsReached || 0)
+              }
+            }
+            return s
+          })
+        } else {
+          updated = [...prev, {
+            internId: newPost.authorId,
+            internName: newPost.authorName,
+            batch: newPost.batch,
+            sessionsCount: newPost.visitsLogged || 1,
+            studentsReached: newPost.studentsReached || 0,
+            wing: newPost.wing,
+            topic: newPost.title
+          }]
+        }
+        localStorage.setItem('dakshana_sessions', JSON.stringify(updated))
+        return updated
+      })
+    }
+  }
+
   const handleReassignIntern = (internId, newJuniorSecId) => {
     setAllUsers(prev => {
       const updated = prev.map(user => {
@@ -226,7 +292,6 @@ export default function App() {
       return updated
     })
 
-    // Persist to Supabase
     dbUpdateProfile(internId, { assignedTo: newJuniorSecId }).catch(console.error)
   }
 
@@ -264,20 +329,17 @@ export default function App() {
       return updated
     })
 
-    // Persist to Supabase
     dbUpdateProfile(internId, { batch: newBatch }).catch(console.error)
   }
 
   const handleAddIntern = async (newIntern) => {
     let finalScholar = { ...newIntern }
 
-    // Persist to Supabase
     try {
       const { data, error } = await dbCreateProfile(newIntern)
       if (error) {
         console.error('Supabase profile insertion error:', error)
       } else if (data && data.id) {
-        console.log('Profile successfully saved in Supabase with id:', data.id)
         finalScholar.id = data.id
       }
     } catch (err) {
@@ -304,7 +366,6 @@ export default function App() {
       localStorage.setItem('dakshana_reports', JSON.stringify(updated))
       return updated
     })
-    // Persist to Supabase
     dbCreateReport(newReport).catch(console.error)
   }
 
@@ -319,17 +380,15 @@ export default function App() {
       localStorage.setItem('dakshana_reports', JSON.stringify(updated))
       return updated
     })
-    // Persist to Supabase
     dbUpdateReport(reportId, updates).catch(console.error)
   }
 
-  // Reimbursement handlers
   const handleToggleCycle = () => {
     setCycle(prev => {
       const updated = {
         ...prev,
         isActive: !prev.isActive,
-        activatedBy: currentUser.name
+        activatedBy: currentUser?.name || 'Senior Secretary'
       }
       localStorage.setItem('dakshana_reimbursement_cycle', JSON.stringify(updated))
       return updated
@@ -350,7 +409,6 @@ export default function App() {
       localStorage.setItem('dakshana_claims', JSON.stringify(updated))
       return updated
     })
-    // Persist to Supabase
     dbCreateClaim(newClaim).catch(console.error)
   }
 
@@ -370,7 +428,6 @@ export default function App() {
       localStorage.setItem('dakshana_claims', JSON.stringify(updated))
       return updated
     })
-    // Persist to Supabase
     dbUpdateClaim(claimId, {
       status: newStatus,
       approvedBy: approverName,
@@ -378,7 +435,6 @@ export default function App() {
     }).catch(console.error)
   }
 
-  // Privilege delegation handlers
   const handleTogglePrivilege = (juniorSecId, privilegeKey) => {
     setDelegatedPowers(prev => {
       const secPowers = prev[juniorSecId] || {
@@ -415,152 +471,173 @@ export default function App() {
     })
   }
 
-  // Resources handlers
-  const handleAddResource = (newResource) => {
-    setResources(prev => {
-      const updated = [newResource, ...prev]
-      localStorage.setItem('dakshana_resources', JSON.stringify(updated))
-      return updated
-    })
-  }
-
-  // Broadcast handlers
   const handleSendBroadcast = (newBroadcast) => {
     setBroadcasts(prev => {
       const updated = [newBroadcast, ...prev]
       localStorage.setItem('dakshana_broadcasts', JSON.stringify(updated))
       return updated
     })
-    // Persist to Supabase
     dbCreateBroadcast(newBroadcast).catch(console.error)
-  }
-
-  const handleUserLogin = (selectedUser) => {
-    setCurrentUser(selectedUser)
-    localStorage.setItem('dakshana_current_user', JSON.stringify(selectedUser))
-    // Interns cannot view visual stats board directly, fallback to dashboard
-    if (selectedUser.role === 'intern' && activeTab === 'visual_stats') {
-      handleSetActiveTab('dashboard')
-    }
   }
 
   const unreadCount = broadcasts.filter(b => b.isNew).length
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans">
+    <div className="flex min-h-screen bg-slate-50 text-slate-900 font-sans">
       
-      {/* Install App Prompt (PWA Banner) */}
-      <InstallAppBanner />
-
-      {/* Top Header & Navigation */}
-      <Header
-        currentUser={currentUser}
+      {/* 1. Sidebar Navigation (Ordered strictly as requested) */}
+      <Sidebar
         activeTab={activeTab}
         setActiveTab={handleSetActiveTab}
-        onOpenAuth={() => setIsAuthModalOpen(false) || setIsAuthModalOpen(true)}
+        currentUser={currentUser}
         unreadBroadcastsCount={unreadCount}
+        onSignOut={handleSignOut}
+        onSwitchProfile={() => setIsAuthModalOpen(true)}
+        isMobileOpen={isMobileSidebarOpen}
+        setIsMobileOpen={setIsMobileSidebarOpen}
       />
 
-      {/* Main Container */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full flex-1">
+      {/* 2. Main Content Viewport */}
+      <div className="flex-1 flex flex-col min-w-0">
         
-        {/* Tab 1: Role-Based Dashboard */}
-        {activeTab === 'dashboard' && (
-          <>
-            {currentUser.role === 'senior_sec' && (
-              <SeniorSecView
-                allUsers={allUsers}
-                reports={reports}
-                onReassignIntern={handleReassignIntern}
-                onUpdateInternBatch={handleUpdateInternBatch}
-                onAddIntern={handleAddIntern}
-                delegatedPowers={delegatedPowers}
-                onTogglePrivilege={handleTogglePrivilege}
-                onBulkPrivilege={handleBulkPrivilege}
-              />
-            )}
+        {/* PWA App Prompt */}
+        <InstallAppBanner />
 
-            {currentUser.role === 'junior_sec' && (
-              <JuniorSecView
-                currentUser={currentUser}
-                allUsers={allUsers}
-                reports={reports}
-                onUpdateReport={handleUpdateReport}
-                delegatedPowers={delegatedPowers}
-                onReassignIntern={handleReassignIntern}
-                onUpdateInternBatch={handleUpdateInternBatch}
-              />
-            )}
+        {/* Top Navbar */}
+        <Header
+          currentUser={currentUser}
+          activeTab={activeTab}
+          onOpenAuth={() => setIsAuthModalOpen(true)}
+          onSignOut={handleSignOut}
+          onToggleMobileSidebar={() => setIsMobileSidebarOpen(prev => !prev)}
+          unreadBroadcastsCount={unreadCount}
+        />
 
-            {currentUser.role === 'intern' && (
-              <InternView
-                currentUser={currentUser}
-                allUsers={allUsers}
-                reports={reports}
-                onSubmitReport={handleSubmitReport}
-              />
-            )}
+        {/* Dynamic Page Main Content */}
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full flex-1">
+          
+          {/* TAB 1: DASHBOARD */}
+          {activeTab === 'dashboard' && currentUser && (
+            <>
+              {currentUser.role === 'senior_sec' && (
+                <SeniorSecView
+                  allUsers={allUsers}
+                  reports={reports}
+                  sessions={sessions}
+                  onReassignIntern={handleReassignIntern}
+                  onUpdateInternBatch={handleUpdateInternBatch}
+                  onAddIntern={handleAddIntern}
+                  onSelectIntern={(intern) => setSelectedInternForModal(intern)}
+                  delegatedPowers={delegatedPowers}
+                  onTogglePrivilege={handleTogglePrivilege}
+                  onBulkPrivilege={handleBulkPrivilege}
+                />
+              )}
 
-            {currentUser.role === 'management' && (
-              <ManagementView
-                allUsers={allUsers}
-                reports={reports}
-              />
-            )}
-          </>
-        )}
+              {currentUser.role === 'junior_sec' && (
+                <JuniorSecView
+                  currentUser={currentUser}
+                  allUsers={allUsers}
+                  reports={reports}
+                  sessions={sessions}
+                  onUpdateReport={handleUpdateReport}
+                  delegatedPowers={delegatedPowers}
+                  onReassignIntern={handleReassignIntern}
+                  onUpdateInternBatch={handleUpdateInternBatch}
+                  onSelectIntern={(intern) => setSelectedInternForModal(intern)}
+                />
+              )}
 
-        {/* Tab 2: Visual Stats & Sessions Board (Above Interns only) */}
-        {activeTab === 'visual_stats' && (
-          <VisualDataBoard
-            sessions={sessions}
-            allUsers={allUsers}
-          />
-        )}
+              {currentUser.role === 'intern' && (
+                <InternView
+                  currentUser={currentUser}
+                  allUsers={allUsers}
+                  reports={reports}
+                  sessions={sessions}
+                  onSubmitReport={handleSubmitReport}
+                  onSelectIntern={(intern) => setSelectedInternForModal(intern)}
+                />
+              )}
 
-        {/* Tab 3: Monthly Reimbursements & Expense Portal */}
-        {activeTab === 'reimbursements' && (
-          <ReimbursementModule
-            currentUser={currentUser}
-            cycle={cycle}
-            onToggleCycle={handleToggleCycle}
-            onUpdateCycleSettings={handleUpdateCycleSettings}
-            claims={claims}
-            onSubmitClaim={handleSubmitClaim}
-            onUpdateClaimStatus={handleUpdateClaimStatus}
-            delegatedPowers={delegatedPowers}
-          />
-        )}
+              {currentUser.role === 'management' && (
+                <ManagementView
+                  allUsers={allUsers}
+                  reports={reports}
+                />
+              )}
+            </>
+          )}
 
-        {/* Tab 4: Materials & Resource Hub (Staff vs Intern Spaces) */}
-        {activeTab === 'resources' && (
-          <ResourceHub
-            currentUser={currentUser}
-            resources={resources}
-            onAddResource={handleAddResource}
-          />
-        )}
+          {/* TAB 2: NOTICES & CIRCULARS */}
+          {(activeTab === 'notices' || activeTab === 'broadcasts') && (
+            <BroadcastCenter
+              currentUser={currentUser}
+              broadcasts={broadcasts}
+              onSendBroadcast={handleSendBroadcast}
+              delegatedPowers={delegatedPowers}
+            />
+          )}
 
-        {/* Tab 5: Meet Our Leadership Team */}
-        {activeTab === 'team' && (
-          <TeamShowcase
-            allUsers={allUsers}
-          />
-        )}
+          {/* TAB 3: POSTS & ACTIVITY FEED */}
+          {activeTab === 'posts' && (
+            <PostsFeed
+              currentUser={currentUser}
+              posts={posts}
+              onAddPost={handleAddPost}
+              onSelectIntern={(intern) => setSelectedInternForModal(intern)}
+            />
+          )}
 
-        {/* Tab 6: Secretariat Broadcasts & Targeted Notices */}
-        {activeTab === 'broadcasts' && (
-          <BroadcastCenter
-            currentUser={currentUser}
-            broadcasts={broadcasts}
-            onSendBroadcast={handleSendBroadcast}
-            delegatedPowers={delegatedPowers}
-          />
-        )}
+          {/* TAB 4: MATERIALS HUB (Strictly the 2 official links) */}
+          {activeTab === 'resources' && (
+            <ResourceHub />
+          )}
 
-      </main>
+          {/* TAB 5: REIMBURSEMENTS */}
+          {activeTab === 'reimbursements' && (
+            <ReimbursementModule
+              currentUser={currentUser}
+              cycle={cycle}
+              onToggleCycle={handleToggleCycle}
+              onUpdateCycleSettings={handleUpdateCycleSettings}
+              claims={claims}
+              onSubmitClaim={handleSubmitClaim}
+              onUpdateClaimStatus={handleUpdateClaimStatus}
+              delegatedPowers={delegatedPowers}
+            />
+          )}
 
-      {/* Auth / Switch Profile Modal */}
+          {/* TAB 6: TEAM (Kept at the end) */}
+          {activeTab === 'team' && (
+            <TeamShowcase
+              allUsers={allUsers}
+              onSelectIntern={(intern) => setSelectedInternForModal(intern)}
+            />
+          )}
+
+        </main>
+
+        {/* Footer */}
+        <footer className="border-t border-slate-200 bg-white py-4 text-center text-xs text-slate-500">
+          Dakshana Outreach Internship Portal • "Honor. Knowledge. Service" • Batch 1 & Batch 2
+        </footer>
+
+      </div>
+
+      {/* Student Profile Inspection Modal (For Junior Sec & Above) */}
+      <InternDetailModal
+        intern={selectedInternForModal}
+        onClose={() => setSelectedInternForModal(null)}
+        sessions={sessions}
+        reports={reports}
+        posts={posts}
+        allUsers={allUsers}
+        currentUser={currentUser}
+        onReassignIntern={handleReassignIntern}
+        onUpdateInternBatch={handleUpdateInternBatch}
+      />
+
+      {/* Auth / Switch Profile / Login Modal */}
       <AuthModal
         isOpen={isAuthModalOpen}
         onClose={() => setIsAuthModalOpen(false)}
@@ -568,11 +645,6 @@ export default function App() {
         onRegisterScholar={handleAddIntern}
         onLogin={handleUserLogin}
       />
-
-      {/* Footer */}
-      <footer className="border-t border-slate-200 bg-white py-4 text-center text-xs text-slate-500">
-        Dakshana Outreach Internship Portal • "Honor. Knowledge. Service" • PWA Ready (Mobile & Web)
-      </footer>
 
     </div>
   )

@@ -1,7 +1,15 @@
 import React, { useState } from 'react'
 import { FileText, Clock, AlertCircle, CheckCircle, Send, MessageSquare, Calendar } from 'lucide-react'
+import PodiumSpotlight from './PodiumSpotlight'
 
-export default function InternView({ currentUser, allUsers, reports, onSubmitReport }) {
+export default function InternView({
+  currentUser,
+  allUsers,
+  reports,
+  sessions = [],
+  onSubmitReport,
+  onSelectIntern
+}) {
   const [tasks, setTasks] = useState('')
   const [hours, setHours] = useState('')
   const [challenges, setChallenges] = useState('')
@@ -90,6 +98,13 @@ export default function InternView({ currentUser, allUsers, reports, onSubmitRep
           </div>
         </div>
       </div>
+
+      {/* Cohort Excellence Podium - Motivation for Interns */}
+      <PodiumSpotlight
+        allUsers={allUsers}
+        sessions={sessions}
+        onSelectIntern={onSelectIntern}
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         

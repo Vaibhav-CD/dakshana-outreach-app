@@ -342,3 +342,85 @@ export const INITIAL_BROADCASTS = [
     isNew: false
   }
 ]
+
+// Community Posts Feed Data with Photos, Notes, and "Mark as Done" Tracking
+export const INITIAL_POSTS = [
+  {
+    id: 'post-1',
+    authorId: 'user-intern-3',
+    authorName: 'Kabir Das',
+    authorPhoto: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&auto=format&fit=crop&q=80',
+    batch: 'Batch 2',
+    wing: 'Wing 2 (Rohan)',
+    createdAt: '2 hours ago',
+    title: 'Hands-on Robotics & Science Circuits at JNV Pune',
+    content: 'Conducted an interactive science session with 28 grade-7 students today! We built simple LED circuit breadboards. The curiosity and excitement in their eyes was truly inspiring.',
+    photoUrl: 'https://images.unsplash.com/photo-1581092921461-eab62e97a780?w=800&auto=format&fit=crop&q=80',
+    schoolName: 'JNV Pune - Rural Science Hub',
+    isCompleted: true,
+    visitsLogged: 1,
+    studentsReached: 28,
+    cheersCount: 14,
+    comments: [
+      { id: 'c1', authorName: 'Rohan Verma', role: 'junior_sec', text: 'Terrific work Kabir! The circuit kits look very well utilized.', time: '1 hour ago' },
+      { id: 'c2', authorName: 'Aarav Gupta', role: 'intern', text: 'Incredible setup! Can you share the circuit worksheet?', time: '30 mins ago' }
+    ]
+  },
+  {
+    id: 'post-2',
+    authorId: 'user-intern-1',
+    authorName: 'Aarav Gupta',
+    authorPhoto: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400&auto=format&fit=crop&q=80',
+    batch: 'Batch 1',
+    wing: 'Wing 1 (Priya)',
+    createdAt: 'Yesterday at 4:30 PM',
+    title: 'Foundational Math Speed Drills with Grade 5 Scholars',
+    content: 'Completed school visit #16 at Zilla Parishad Primary School. Introduced Vedic multiplication techniques and division flashcards. 22 students participated actively.',
+    photoUrl: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?w=800&auto=format&fit=crop&q=80',
+    schoolName: 'ZP Primary School - Cluster 3',
+    isCompleted: true,
+    visitsLogged: 1,
+    studentsReached: 22,
+    cheersCount: 18,
+    comments: [
+      { id: 'c3', authorName: 'Priya Sharma', role: 'junior_sec', text: 'Great progress Aarav. Keep this consistency for Batch 1.', time: 'Yesterday' }
+    ]
+  },
+  {
+    id: 'post-3',
+    authorId: 'user-intern-2',
+    authorName: 'Meera Iyer',
+    authorPhoto: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&auto=format&fit=crop&q=80',
+    batch: 'Batch 1',
+    wing: 'Wing 1 (Priya)',
+    createdAt: '2 days ago',
+    title: 'Health, Hygiene & Nutrition Awareness Drive',
+    content: 'Distributed hygiene cards and demonstrated proper hand-washing steps to over 40 primary students. Their teachers were very supportive.',
+    photoUrl: 'https://images.unsplash.com/photo-1577896851231-70ef18881754?w=800&auto=format&fit=crop&q=80',
+    schoolName: 'Govt Model Girls School',
+    isCompleted: true,
+    visitsLogged: 1,
+    studentsReached: 40,
+    cheersCount: 11,
+    comments: []
+  },
+  {
+    id: 'post-4',
+    authorId: 'user-intern-4',
+    authorName: 'Ananya Rao',
+    authorPhoto: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400&auto=format&fit=crop&q=80',
+    batch: 'Batch 2',
+    wing: 'Wing 2 (Rohan)',
+    createdAt: '3 days ago',
+    title: 'English Literacy & Reading Circles in Cluster 2',
+    content: 'Completed visit #14. Held guided reading sessions with 18 beginner learners. The phonics flashcards helped immensely with word pronunciation.',
+    photoUrl: 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=800&auto=format&fit=crop&q=80',
+    schoolName: 'Adarsh Vidya Mandir',
+    isCompleted: true,
+    visitsLogged: 1,
+    studentsReached: 18,
+    cheersCount: 9,
+    comments: []
+  }
+]
+

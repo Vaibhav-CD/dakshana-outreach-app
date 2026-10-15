@@ -2,7 +2,7 @@ import React from 'react'
 import { Mail, Shield, Award, Users, Sparkles } from 'lucide-react'
 import logoImg from '../assets/logo.png'
 
-export default function TeamShowcase({ allUsers }) {
+export default function TeamShowcase({ allUsers, onSelectIntern }) {
   const management = allUsers.find(u => u.role === 'management')
   const seniorSec = allUsers.find(u => u.role === 'senior_sec')
   const juniorSecs = allUsers.filter(u => u.role === 'junior_sec')
@@ -120,6 +120,52 @@ export default function TeamShowcase({ allUsers }) {
               <div className="pt-4 mt-4 border-t border-slate-100 flex items-center text-xs text-slate-500">
                 <Mail className="w-3.5 h-3.5 mr-1.5 text-[#0A643B] flex-shrink-0" />
                 <span className="truncate">{jsec.email}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Tier 4: Cohort Outreach Scholars */}
+      <div>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center space-x-2">
+            <Users className="w-5 h-5 text-[#0A643B]" />
+            <h3 className="text-lg font-bold text-slate-900">Outreach Scholars ({allUsers.filter(u => u.role === 'intern').length})</h3>
+          </div>
+          <span className="text-xs text-slate-500 font-medium">Click on any scholar to view visits, activity logs & graphs</span>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {allUsers.filter(u => u.role === 'intern').map((intern) => (
+            <div
+              key={intern.id}
+              onClick={() => onSelectIntern && onSelectIntern(intern)}
+              className="bg-white rounded-2xl border border-slate-200 p-4 shadow-2xs hover:border-[#0A643B] hover:shadow-md transition-all cursor-pointer group flex flex-col justify-between"
+            >
+              <div className="flex items-center space-x-3 mb-2">
+                <img
+                  src={intern.photo}
+                  alt={intern.name}
+                  className="w-11 h-11 rounded-xl object-cover border border-slate-200 group-hover:border-[#0A643B] transition-colors flex-shrink-0"
+                />
+                <div className="min-w-0 flex-1">
+                  <h4 className="font-extrabold text-slate-900 text-xs truncate group-hover:text-[#0A643B] transition-colors">
+                    {intern.name}
+                  </h4>
+                  <span className="text-[10px] font-bold px-2 py-0.2 rounded-full bg-amber-50 text-amber-900 border border-amber-200 inline-block mt-0.5">
+                    {intern.batch || 'Batch 1'}
+                  </span>
+                </div>
+              </div>
+
+              <p className="text-[11px] text-slate-500 truncate mb-2">
+                {intern.department || 'Outreach Track'}
+              </p>
+
+              <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-[#0A643B]">
+                <span>View Visits & Stats</span>
+                <span>→</span>
               </div>
             </div>
           ))}

@@ -16,14 +16,18 @@ import {
   Filter
 } from 'lucide-react'
 
+import PodiumSpotlight from './PodiumSpotlight'
+
 export default function JuniorSecView({
   currentUser,
   allUsers,
   reports,
+  sessions = [],
   onUpdateReport,
   delegatedPowers = {},
   onReassignIntern,
-  onUpdateInternBatch
+  onUpdateInternBatch,
+  onSelectIntern
 }) {
   const [selectedReport, setSelectedReport] = useState(null)
   const [feedbackText, setFeedbackText] = useState('')
@@ -136,6 +140,13 @@ export default function JuniorSecView({
           </div>
         )}
       </div>
+
+      {/* Top Outreach Scholars Podium Spotlight */}
+      <PodiumSpotlight
+        allUsers={allUsers}
+        sessions={sessions}
+        onSelectIntern={onSelectIntern}
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
@@ -260,10 +271,14 @@ export default function JuniorSecView({
                 return (
                   <div key={intern.id} className="p-3 rounded-xl border border-slate-200 bg-slate-50 space-y-2">
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2.5">
-                        <img src={intern.photo} className="w-8 h-8 rounded-lg object-cover" alt="" />
+                      <div
+                        onClick={() => onSelectIntern && onSelectIntern(intern)}
+                        className="flex items-center space-x-2.5 cursor-pointer group flex-1"
+                        title="Click to view scholar visits, progress & graphs"
+                      >
+                        <img src={intern.photo} className="w-8 h-8 rounded-lg object-cover group-hover:border-[#0A643B] border transition-colors" alt="" />
                         <div>
-                          <p className="text-xs font-bold text-slate-900">{intern.name}</p>
+                          <p className="text-xs font-bold text-slate-900 group-hover:text-[#0A643B] transition-colors">{intern.name}</p>
                           <span className="text-[10px] text-slate-500">{intern.department}</span>
                         </div>
                       </div>

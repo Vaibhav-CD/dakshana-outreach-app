@@ -15,12 +15,16 @@ import {
   ToggleRight
 } from 'lucide-react'
 
+import PodiumSpotlight from './PodiumSpotlight'
+
 export default function SeniorSecView({
   allUsers,
   reports,
+  sessions = [],
   onReassignIntern,
   onUpdateInternBatch,
   onAddIntern,
+  onSelectIntern,
   delegatedPowers = {},
   onTogglePrivilege,
   onBulkPrivilege
@@ -240,6 +244,13 @@ export default function SeniorSecView({
         </div>
       </div>
 
+      {/* Top Outreach Scholars Podium Spotlight */}
+      <PodiumSpotlight
+        allUsers={allUsers}
+        sessions={sessions}
+        onSelectIntern={onSelectIntern}
+      />
+
       {/* Tabs */}
       <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-200 bg-slate-50/50 px-6 pt-3 gap-2">
@@ -320,10 +331,13 @@ export default function SeniorSecView({
                     const assignedSec = juniorSecs.find(j => j.id === intern.assignedTo)
                     return (
                       <tr key={intern.id} className="hover:bg-slate-50/80 transition-colors">
-                        <td className="py-3.5 font-bold text-slate-900 flex items-center space-x-2.5">
-                          <img src={intern.photo} className="w-7 h-7 rounded-lg object-cover" alt="" />
+                        <td
+                          onClick={() => onSelectIntern && onSelectIntern(intern)}
+                          className="py-3.5 font-bold text-slate-900 flex items-center space-x-2.5 cursor-pointer group"
+                        >
+                          <img src={intern.photo} className="w-8 h-8 rounded-xl object-cover border border-slate-200 group-hover:border-[#0A643B] transition-colors" alt="" />
                           <div>
-                            <span>{intern.name}</span>
+                            <span className="group-hover:text-[#0A643B] transition-colors">{intern.name}</span>
                             <span className="block text-[11px] font-normal text-slate-500">{intern.email}</span>
                           </div>
                         </td>
