@@ -39,18 +39,36 @@ import {
   dbCreateBroadcast
 } from './supabase'
 
+// 2 Weeks session duration in milliseconds (14 days = 14 * 24 * 60 * 60 * 1000)
+const TWO_WEEKS_MS = 14 * 24 * 60 * 60 * 1000
+
 export default function App() {
-  // 1. Current logged in user (with localStorage persistence)
+  // 1. Current logged in user with 2-week session persistence
+  // App starts from the login page unless a valid session exists within 2 weeks
   const [currentUser, setCurrentUser] = useState(() => {
-    const saved = localStorage.getItem('dakshana_current_user')
-    if (saved) {
+    const sessionStr = localStorage.getItem('dakshana_session')
+    if (sessionStr) {
       try {
-        const parsed = JSON.parse(saved)
-        if (parsed && parsed.id) return parsed
-      } catch (e) { }
+        const session = JSON.parse(sessionStr)
+        if (session && session.user && session.expiresAt) {
+          const now = Date.now()
+          if (now < session.expiresAt) {
+            // Valid session within 2 weeks!
+            return session.user
+          } else {
+            console.log('Session expired after 2 weeks. Redirecting to login page.')
+            localStorage.removeItem('dakshana_session')
+            localStorage.removeItem('dakshana_current_user')
+            return null
+          }
+        }
+      } catch (e) {
+        localStorage.removeItem('dakshana_session')
+        localStorage.removeItem('dakshana_current_user')
+      }
     }
-    // Default safe role: Outreach Scholar
-    return INITIAL_USERS.find(u => u.role === 'intern') || INITIAL_USERS[0]
+    // No active session: Start directly from Login Page
+    return null
   })
 
   // 2. Active Tab (Ordered: dashboard, notices, posts, resources, reimbursements, team)
@@ -163,7 +181,7 @@ export default function App() {
   })
 
   // 12. UI States: Modals & Sidebar
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(() => !localStorage.getItem('dakshana_current_user'))
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false)
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
   const [selectedInternForModal, setSelectedInternForModal] = useState(null)
@@ -194,6 +212,14 @@ export default function App() {
             const matching = cloudProfiles.find(p => p.id === prevUser.id || p.email === prevUser.email)
             if (matching) {
               const updated = { ...prevUser, ...matching }
+              const sessionStr = localStorage.getItem('dakshana_session')
+              if (sessionStr) {
+                try {
+                  const session = JSON.parse(sessionStr)
+                  session.user = updated
+                  localStorage.setItem('dakshana_session', JSON.stringify(session))
+                } catch (e) { }
+              }
               localStorage.setItem('dakshana_current_user', JSON.stringify(updated))
               return updated
             }
@@ -221,20 +247,39 @@ export default function App() {
 
   // Handlers
   const handleSignOut = () => {
+    localStorage.removeItem('dakshana_session')
     localStorage.removeItem('dakshana_current_user')
     setCurrentUser(null)
-    setIsAuthModalOpen(true)
+    setIsAuthModalOpen(false)
   }
 
   const handleUserLogin = (selectedUser) => {
+    const now = Date.now()
+    const sessionData = {
+      user: selectedUser,
+      loggedInAt: now,
+      expiresAt: now + TWO_WEEKS_MS
+    }
     setCurrentUser(selectedUser)
+    localStorage.setItem('dakshana_session', JSON.stringify(sessionData))
     localStorage.setItem('dakshana_current_user', JSON.stringify(selectedUser))
+    setIsAuthModalOpen(false)
   }
 
   const handleUpdatePhoto = async (newPhotoUrl) => {
     if (!currentUser) return
     const updatedUser = { ...currentUser, photo: newPhotoUrl }
     setCurrentUser(updatedUser)
+    
+    // Update persistent 2-week session
+    const sessionStr = localStorage.getItem('dakshana_session')
+    if (sessionStr) {
+      try {
+        const session = JSON.parse(sessionStr)
+        session.user = updatedUser
+        localStorage.setItem('dakshana_session', JSON.stringify(session))
+      } catch (e) { }
+    }
     localStorage.setItem('dakshana_current_user', JSON.stringify(updatedUser))
 
     setAllUsers(prev => {
@@ -503,6 +548,20 @@ export default function App() {
 
   const unreadCount = broadcasts.filter(b => b.isNew).length
 
+  // Start everything from a dedicated full-screen login page if no active user session
+  if (!currentUser) {
+    return (
+      <AuthModal
+        isOpen={true}
+        isFullScreen={true}
+        onClose={() => {}}
+        allUsers={allUsers}
+        onRegisterScholar={handleAddIntern}
+        onLogin={handleUserLogin}
+      />
+    )
+  }
+
   return (
     <div className="flex min-h-screen bg-slate-50 text-slate-900 font-sans">
       
@@ -660,9 +719,10 @@ export default function App() {
         onUpdateInternBatch={handleUpdateInternBatch}
       />
 
-      {/* Auth / Switch Profile / Login Modal */}
+      {/* Auth / Switch Profile / Login Modal (When logged in) */}
       <AuthModal
         isOpen={isAuthModalOpen}
+        isFullScreen={false}
         onClose={() => setIsAuthModalOpen(false)}
         allUsers={allUsers}
         onRegisterScholar={handleAddIntern}

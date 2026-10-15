@@ -14,12 +14,20 @@ import {
   ChevronLeft,
   Camera,
   Upload,
-  Trash2
+  Trash2,
+  Clock
 } from 'lucide-react'
 import logoImg from '../assets/logo.png'
 import Avatar from './Avatar'
 
-export default function AuthModal({ isOpen, onClose, allUsers, onLogin, onRegisterScholar }) {
+export default function AuthModal({
+  isOpen,
+  onClose,
+  allUsers,
+  onLogin,
+  onRegisterScholar,
+  isFullScreen = false
+}) {
   // Step: 'gateway' | 'scholar' | 'leadership'
   const [step, setStep] = useState('gateway')
   const [scholarMode, setScholarMode] = useState('signin') // 'signin' | 'signup'
@@ -174,13 +182,44 @@ export default function AuthModal({ isOpen, onClose, allUsers, onLogin, onRegist
   }
 
   return (
-    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 animate-in fade-in duration-200">
+    <div
+      className={
+        isFullScreen
+          ? 'min-h-screen w-full bg-gradient-to-br from-[#063B22] via-[#0A4D2D] to-slate-950 flex flex-col items-center justify-center p-4 py-8 relative overflow-hidden select-none'
+          : 'fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 select-none'
+      }
+    >
+      {/* Decorative ambient blurred shapes in full-screen mode */}
+      {isFullScreen && (
+        <>
+          <div className="absolute -top-24 -left-24 w-96 h-96 bg-emerald-400/15 rounded-full blur-3xl pointer-events-none"></div>
+          <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-[#7B2E68]/20 rounded-full blur-3xl pointer-events-none"></div>
+
+          {/* Prominent Header Above Login Card */}
+          <div className="text-center mb-6 relative z-10 flex flex-col items-center animate-in fade-in duration-300">
+            <img
+              src={logoImg}
+              alt="Dakshana"
+              className="w-16 h-16 rounded-full object-cover shadow-xl border-3 border-emerald-400/50 mb-3"
+            />
+            <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+              DAKSHANA OUTREACH
+            </h1>
+            <p className="text-xs text-emerald-200 font-extrabold uppercase tracking-widest mt-0.5">
+              Honor • Knowledge • Service • 2026–27
+            </p>
+          </div>
+        </>
+      )}
+
+      <div className="bg-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border border-white/20 animate-in fade-in duration-200 relative z-10">
         
         {/* Header */}
         <div className="flex justify-between items-center pb-3 border-b border-slate-100">
           <div className="flex items-center space-x-2.5">
-            <img src={logoImg} className="w-8 h-8 rounded-full border border-[#0A643B]/30 object-cover" alt="" />
+            {!isFullScreen && (
+              <img src={logoImg} className="w-8 h-8 rounded-full border border-[#0A643B]/30 object-cover" alt="" />
+            )}
             <div>
               <h3 className="font-extrabold text-slate-900 text-sm">Dakshana Outreach Portal</h3>
               <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">
@@ -190,9 +229,20 @@ export default function AuthModal({ isOpen, onClose, allUsers, onLogin, onRegist
               </p>
             </div>
           </div>
-          <button onClick={handleClose} className="text-slate-400 hover:text-slate-600 p-1 cursor-pointer">
-            <X className="w-5 h-5" />
-          </button>
+
+          {!isFullScreen ? (
+            <button
+              onClick={handleClose}
+              className="text-slate-400 hover:text-slate-600 p-1 cursor-pointer"
+              title="Close"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          ) : (
+            <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-50 text-[#0A643B] border border-emerald-200">
+              14-Day Session
+            </span>
+          )}
         </div>
 
         {error && (
@@ -606,7 +656,19 @@ export default function AuthModal({ isOpen, onClose, allUsers, onLogin, onRegist
           </div>
         )}
 
+        {/* Two-Week Session Reassurance Bar */}
+        <div className="mt-5 pt-3.5 border-t border-slate-100 flex items-center justify-center space-x-1.5 text-[11px] text-slate-500 font-medium text-center">
+          <Clock className="w-3.5 h-3.5 text-[#0A643B] flex-shrink-0" />
+          <span>Keeps you signed in securely for 2 weeks on this device</span>
+        </div>
+
       </div>
+
+      {isFullScreen && (
+        <footer className="mt-6 text-center text-xs text-emerald-100/60 relative z-10 font-medium">
+          Dakshana Foundation • Outreach Fieldwork Internship Portal 2026–27
+        </footer>
+      )}
     </div>
   )
 }
