@@ -2,8 +2,9 @@ export const INITIAL_USERS = [
   {
     id: 'user-senior-sec',
     name: 'Senior Secretary',
-    title: 'Senior Secretary & Central Operations Lead',
+    title: 'Senior Secretary',
     email: 'senior.sec@dakshana.org',
+    phone: '+91 98765 43210',
     role: 'senior_sec',
     department: 'Central Coordination',
     photo: null,
@@ -20,36 +21,59 @@ export const INITIAL_USERS = [
     bio: 'Board-level governance, institutional audit oversight, and long-term strategy.'
   },
   {
+    id: 'user-mgmt-2',
+    name: 'Col. Ram Sharma',
+    title: 'Trustee & Senior Advisor',
+    email: 'ram.sharma@dakshana.org',
+    role: 'management',
+    department: 'Governing Board',
+    photo: null,
+    bio: 'Institutional governance, nationwide outreach expansion, and operational audit oversight.'
+  },
+  {
+    id: 'user-mgmt-3',
+    name: 'Dr. Sunita Deshmukh',
+    title: 'Trustee & Academic Director',
+    email: 'sunita.deshmukh@dakshana.org',
+    role: 'management',
+    department: 'Governing Board',
+    photo: null,
+    bio: 'Academic excellence, curriculum pedagogical standards, and scholarship policy governance.'
+  },
+  {
     id: 'user-jsec-1',
     name: 'Priya Sharma',
-    title: 'Junior Secretary - Wing 1',
+    title: 'Junior Secretary',
     email: 'priya.jsec@dakshana.org',
+    phone: '+91 98765 43211',
     role: 'junior_sec',
-    department: 'Outreach Fieldwork Supervision',
+    department: '',
     photo: null,
-    bio: 'Supervisory scope: mentors and reviews monthly reports strictly for her assigned wing scholars.'
+    bio: 'Supervises, mentors, and reviews monthly progress reports for assigned outreach scholars.'
   },
   {
     id: 'user-jsec-2',
     name: 'Rohan Verma',
-    title: 'Junior Secretary - Wing 2',
+    title: 'Junior Secretary',
     email: 'rohan.jsec@dakshana.org',
+    phone: '+91 98765 43212',
     role: 'junior_sec',
-    department: 'Outreach Fieldwork Supervision',
+    department: '',
     photo: null,
-    bio: 'Supervisory scope: mentors and reviews progress reports strictly for his assigned wing scholars.'
+    bio: 'Supervises, mentors, and reviews progress reports for assigned outreach scholars.'
   },
   {
     id: 'user-jsec-3',
     name: 'Sneha Kulkarni',
-    title: 'Junior Secretary - Wing 3',
+    title: 'Junior Secretary',
     email: 'sneha.jsec@dakshana.org',
+    phone: '+91 98765 43213',
     role: 'junior_sec',
-    department: 'Outreach Fieldwork Supervision',
+    department: '',
     photo: null,
-    bio: 'Supervisory scope: mentors and reviews documentation reports for her assigned scholars.'
+    bio: 'Supervises, mentors, and reviews fieldwork documentation for assigned outreach scholars.'
   },
-  // Outreach Scholars (Strictly one internship role across Batch 1 & Batch 2)
+  // Outreach Scholars (Strictly one internship role across Batch 1 & Batch 2 with individual target visits)
   {
     id: 'user-intern-1',
     name: 'Aarav Gupta',
@@ -57,6 +81,7 @@ export const INITIAL_USERS = [
     email: 'aarav.scholar@dakshana.org',
     role: 'intern',
     batch: 'Batch 1',
+    targetVisits: 16,
     assignedTo: 'user-jsec-1',
     department: 'Outreach Fieldwork',
     photo: null,
@@ -69,6 +94,7 @@ export const INITIAL_USERS = [
     email: 'meera.scholar@dakshana.org',
     role: 'intern',
     batch: 'Batch 1',
+    targetVisits: 14,
     assignedTo: 'user-jsec-1',
     department: 'Outreach Fieldwork',
     photo: null,
@@ -81,6 +107,7 @@ export const INITIAL_USERS = [
     email: 'kabir.scholar@dakshana.org',
     role: 'intern',
     batch: 'Batch 2',
+    targetVisits: 18,
     assignedTo: 'user-jsec-2',
     department: 'Outreach Fieldwork',
     photo: null,
@@ -93,6 +120,7 @@ export const INITIAL_USERS = [
     email: 'ananya.scholar@dakshana.org',
     role: 'intern',
     batch: 'Batch 2',
+    targetVisits: 15,
     assignedTo: 'user-jsec-2',
     department: 'Outreach Fieldwork',
     photo: null,
@@ -105,6 +133,7 @@ export const INITIAL_USERS = [
     email: 'vikram.scholar@dakshana.org',
     role: 'intern',
     batch: 'Batch 2',
+    targetVisits: 12,
     assignedTo: 'user-jsec-3',
     department: 'Outreach Fieldwork',
     photo: null,
@@ -308,6 +337,8 @@ export const INITIAL_BROADCASTS = [
   {
     id: 'bc-1',
     sender: 'Senior Secretary',
+    senderRole: 'senior_sec',
+    senderTitle: 'Senior Secretary',
     title: 'Secretariat Notice: Evaluation Deadline for Junior Secretaries',
     message: 'All 3 Junior Secretaries are requested to complete pending reviews for both Batch 1 and Batch 2 by Friday 5 PM so that monthly expense claims can be verified and disbursed.',
     audience: 'junior_secs',
@@ -317,6 +348,8 @@ export const INITIAL_BROADCASTS = [
   {
     id: 'bc-2',
     sender: 'Senior Secretary',
+    senderRole: 'senior_sec',
+    senderTitle: 'Senior Secretary',
     title: 'Batch 1 Scholars: Mid-Tenure Reflection Call',
     message: 'All Batch 1 scholars are invited to the mid-tenure reflection check-in this Saturday at 4:00 PM on Google Meet.',
     audience: 'batch_1',
@@ -326,6 +359,8 @@ export const INITIAL_BROADCASTS = [
   {
     id: 'bc-3',
     sender: 'Senior Secretary',
+    senderRole: 'senior_sec',
+    senderTitle: 'Senior Secretary',
     title: 'Batch 2 Scholars: Classroom Kit Distribution Reminder',
     message: 'Scholars enrolled in Batch 2 can collect their updated teaching kits and math workbooks from their respective wing leads.',
     audience: 'batch_2',
@@ -335,6 +370,8 @@ export const INITIAL_BROADCASTS = [
   {
     id: 'bc-4',
     sender: 'Senior Secretary',
+    senderRole: 'senior_sec',
+    senderTitle: 'Senior Secretary',
     title: 'Reimbursement Portal Window Activated for All Scholars',
     message: 'The reimbursement window for October is now active. Please submit your claims and download the mandatory templates in the Reimbursements tab.',
     audience: 'all_interns',

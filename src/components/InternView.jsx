@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { FileText, Clock, AlertCircle, CheckCircle, Send, MessageSquare, Calendar } from 'lucide-react'
+import { FileText, Clock, AlertCircle, CheckCircle, Send, MessageSquare, Calendar, Phone, TrendingUp } from 'lucide-react'
 import PodiumSpotlight from './PodiumSpotlight'
 import Avatar from './Avatar'
 
@@ -21,6 +21,12 @@ export default function InternView({
 
   const assignedSec = allUsers.find(u => u.id === currentUser.assignedTo)
   const internReports = reports.filter(r => r.internId === currentUser.id)
+
+  // Personal Visit Milestone Tracking
+  const mySession = sessions.find(s => s.internId === currentUser.id) || {}
+  const myVisits = mySession.sessionsCount || 0
+  const myTarget = currentUser.targetVisits || mySession.targetVisits || 15
+  const myProgressPct = Math.min(100, Math.round((myVisits / myTarget) * 100))
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -95,10 +101,48 @@ export default function InternView({
             </div>
           </div>
           <div className="bg-white/15 backdrop-blur-sm px-4 py-2.5 rounded-xl border border-white/20 text-xs">
-            <span className="text-emerald-200 block">Assigned Wing Supervisor:</span>
-            <span className="font-bold text-white text-sm">{assignedSec ? assignedSec.name : 'Junior Secretary'}</span>
-            <span className="text-[11px] text-emerald-100 block">{assignedSec ? assignedSec.email : ''}</span>
+            <span className="text-emerald-200 block text-[11px] font-semibold">Assigned Junior Secretary:</span>
+            <span className="font-bold text-white text-sm block">{assignedSec ? assignedSec.name : 'Junior Secretary'}</span>
+            <div className="flex flex-wrap items-center gap-2 mt-1">
+              {assignedSec && assignedSec.email && (
+                <span className="text-[11px] text-emerald-100">{assignedSec.email}</span>
+              )}
+              {assignedSec && assignedSec.phone && (
+                <a
+                  href={`tel:${assignedSec.phone}`}
+                  className="inline-flex items-center text-[10px] font-bold bg-white text-[#0A643B] px-2 py-0.5 rounded-md hover:bg-emerald-50 transition-colors shadow-2xs"
+                  title="Call Junior Secretary"
+                >
+                  <Phone className="w-3 h-3 mr-1" />
+                  <span>Call {assignedSec.phone}</span>
+                </a>
+              )}
+            </div>
           </div>
+        </div>
+      </div>
+
+      {/* Scholar's Personal Visit Target Progress Card */}
+      <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-2xs space-y-2">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center text-xs font-bold gap-1.5">
+          <span className="text-slate-800 flex items-center">
+            <TrendingUp className="w-4 h-4 mr-1.5 text-[#0A643B]" />
+            Your Semester School Visits Progress:
+            <span className="ml-1.5 text-[#0A643B] font-extrabold">{myVisits} of {myTarget} Visits Completed</span>
+          </span>
+          <span className="text-[#0A643B] font-extrabold bg-[#EBF7F0] px-2.5 py-0.5 rounded-full border border-[#0A643B]/20">
+            {myProgressPct}% Target Achieved
+          </span>
+        </div>
+        <div className="w-full bg-slate-100 rounded-full h-3 overflow-hidden">
+          <div
+            className="bg-gradient-to-r from-[#0A643B] to-emerald-400 h-3 rounded-full transition-all duration-500"
+            style={{ width: `${myProgressPct}%` }}
+          />
+        </div>
+        <div className="flex justify-between text-[10px] text-slate-500 font-medium pt-0.5">
+          <span>0 visits logged</span>
+          <span>Target Milestone: {myTarget} visits</span>
         </div>
       </div>
 
@@ -214,7 +258,7 @@ export default function InternView({
               className="w-full py-3 px-4 rounded-xl bg-[#0A643B] hover:bg-[#074D2D] text-white font-bold text-sm shadow-sm transition-colors flex items-center justify-center cursor-pointer"
             >
               <Send className="w-4 h-4 mr-2" />
-              {isSubmitting ? 'Transmitting Report...' : 'Submit Monthly Report to Wing Lead'}
+              {isSubmitting ? 'Transmitting Report...' : 'Submit Monthly Report to Junior Secretary'}
             </button>
           </form>
         </div>

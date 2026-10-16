@@ -28,20 +28,35 @@ export default function InternDetailModal({
   allUsers = [],
   currentUser = {},
   onReassignIntern,
-  onUpdateInternBatch
+  onUpdateInternBatch,
+  onUpdateInternTargetVisits
 }) {
   if (!intern) return null
 
   const [activeTab, setActiveTab] = useState('overview') // 'overview' | 'visits' | 'reports'
 
   // Look up supervisor
-  const supervisor = allUsers.find(u => u.id === intern.assignedTo) || { name: 'Assigned Junior Secretary', department: 'Supervising Wing' }
+  const supervisor = allUsers.find(u => u.id === intern.assignedTo) || { name: 'Assigned Junior Secretary' }
 
   // Session & Visit Data
   const sessionData = sessions.find(s => s.internId === intern.id) || {}
   const totalVisits = sessionData.sessionsCount || 14
   const studentsReached = sessionData.studentsReached || 45
-  const visitTarget = 20
+  
+  const currentTarget = intern.targetVisits || sessionData.targetVisits || 15
+  const [visitTarget, setVisitTarget] = useState(currentTarget)
+  const [isEditingTarget, setIsEditingTarget] = useState(false)
+  const [targetInput, setTargetInput] = useState(String(currentTarget))
+
+  const handleSaveTarget = () => {
+    const val = Math.max(1, parseInt(targetInput, 10) || 15)
+    setVisitTarget(val)
+    setIsEditingTarget(false)
+    if (onUpdateInternTargetVisits) {
+      onUpdateInternTargetVisits(intern.id, val)
+    }
+  }
+
   const progressPct = Math.min(100, Math.round((totalVisits / visitTarget) * 100))
 
   // Reports
@@ -154,7 +169,18 @@ export default function InternDetailModal({
                     <School className="w-4 h-4 text-[#0A643B]" />
                   </div>
                   <span className="text-2xl font-black text-[#0A643B] block">{totalVisits}</span>
-                  <span className="text-[10px] text-emerald-700 font-medium">Target: {visitTarget} visits</span>
+                  <div className="flex items-center justify-between text-[10px] text-emerald-700 font-medium">
+                    <span>Target: {visitTarget} visits</span>
+                    {isLeadership && (
+                      <button
+                        type="button"
+                        onClick={() => setIsEditingTarget(!isEditingTarget)}
+                        className="underline font-bold text-[#0A643B] hover:text-[#074D2D] cursor-pointer"
+                      >
+                        {isEditingTarget ? 'Cancel' : 'Edit Target'}
+                      </button>
+                    )}
+                  </div>
                 </div>
 
                 <div className="p-3.5 rounded-2xl bg-purple-50/80 border border-purple-200">
@@ -185,6 +211,40 @@ export default function InternDetailModal({
                 </div>
               </div>
 
+              {/* Inline Target Editor for Leadership */}
+              {isEditingTarget && (
+                <div className="p-3.5 rounded-2xl bg-[#EBF7F0] border-2 border-[#0A643B]/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs animate-in fade-in duration-150">
+                  <div>
+                    <span className="font-extrabold text-slate-900 block">Modify Visit Target for {intern.name}</span>
+                    <span className="text-[11px] text-slate-600">Change semester outreach milestone target visits for this scholar</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="number"
+                      min="1"
+                      max="100"
+                      value={targetInput}
+                      onChange={(e) => setTargetInput(e.target.value)}
+                      className="w-16 p-1.5 rounded-xl border border-slate-300 text-xs font-bold text-center bg-white focus:ring-2 focus:ring-[#0A643B] focus:outline-hidden"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleSaveTarget}
+                      className="px-3.5 py-1.5 rounded-xl bg-[#0A643B] text-white font-bold text-xs hover:bg-[#074D2D] transition-colors cursor-pointer shadow-xs"
+                    >
+                      Save Target
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setIsEditingTarget(false)}
+                      className="px-2.5 py-1.5 rounded-xl text-slate-600 hover:bg-slate-200/60 font-semibold cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
+
               {/* Progress Toward Goal Bar */}
               <div className="p-4 rounded-2xl border border-slate-200 bg-white shadow-2xs space-y-2">
                 <div className="flex justify-between items-center text-xs font-bold">
@@ -202,8 +262,8 @@ export default function InternDetailModal({
                 </div>
                 <div className="flex justify-between text-[10px] text-slate-500 font-medium pt-0.5">
                   <span>Start (0 visits)</span>
-                  <span>Minimum Standard (10 visits)</span>
-                  <span>Target Achieved (20 visits)</span>
+                  <span>Midpoint ({Math.round(visitTarget / 2)} visits)</span>
+                  <span>Target Achieved ({visitTarget} visits)</span>
                 </div>
               </div>
 

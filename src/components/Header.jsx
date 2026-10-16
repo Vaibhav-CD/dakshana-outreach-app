@@ -119,7 +119,7 @@ export default function Header({
                         className="fixed inset-0 z-40"
                         onClick={() => setShowNotifMenu(false)}
                       />
-                      <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-2xl shadow-xl border border-slate-200 z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+                      <div className="fixed inset-x-2.5 top-16 sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2 w-auto sm:w-96 max-w-md bg-white rounded-2xl shadow-2xl border border-slate-200 z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
                         <div className="p-3.5 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
                           <div className="flex items-center space-x-2">
                             <Radio className="w-4 h-4 text-[#0A643B] animate-pulse" />
@@ -143,8 +143,9 @@ export default function Header({
                         <div className="max-h-80 overflow-y-auto divide-y divide-slate-100">
                           {broadcasts && broadcasts.length > 0 ? (
                             broadcasts.slice(0, 6).map((bc) => {
-                              const isFromJuniorSec = bc.senderRole === 'junior_sec' || bc.senderTitle === 'Junior Secretary'
-                              const isFromSeniorSec = bc.senderRole === 'senior_sec' || bc.senderTitle === 'Senior Secretary'
+                              const isFromJuniorSec = bc.senderRole === 'junior_sec' || bc.senderTitle === 'Junior Secretary' || (bc.sender && bc.sender.toLowerCase().includes('junior'))
+                              const isFromSeniorSec = bc.senderRole === 'senior_sec' || bc.senderTitle === 'Senior Secretary' || (bc.sender && bc.sender.toLowerCase().includes('senior'))
+                              const senderBadgeLabel = isFromJuniorSec ? 'Junior Secretary' : isFromSeniorSec ? 'Senior Secretary' : 'Secretariat'
                               
                               return (
                                 <div
@@ -158,14 +159,14 @@ export default function Header({
                                   }`}
                                 >
                                   <div className="flex items-center justify-between mb-1">
-                                    <span className={`text-[10px] font-bold px-1.5 py-0.2 rounded-full border ${
+                                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
                                       isFromJuniorSec
                                         ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
                                         : isFromSeniorSec
                                         ? 'bg-[#EBF7F0] text-[#0A643B] border-[#0A643B]/30'
                                         : 'bg-purple-50 text-purple-800 border-purple-200'
                                     }`}>
-                                      {bc.senderTitle || (isFromJuniorSec ? 'Junior Secretary' : 'Leadership')}
+                                      {senderBadgeLabel}
                                     </span>
                                     <span className="text-[10px] text-slate-400 font-medium">
                                       {bc.date || 'Recent'}

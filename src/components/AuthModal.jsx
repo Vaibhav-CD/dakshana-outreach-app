@@ -516,14 +516,14 @@ export default function AuthModal({
                 </div>
 
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">Supervising Wing Lead *</label>
+                  <label className="block font-bold text-slate-700 mb-1">Assigned Junior Secretary *</label>
                   <select
                     value={signUpSec}
                     onChange={(e) => setSignUpSec(e.target.value)}
                     className="w-full text-xs rounded-xl border border-slate-300 p-2.5 bg-white focus:ring-2 focus:ring-[#0A643B] focus:outline-hidden"
                   >
                     {juniorSecs.map(j => (
-                      <option key={j.id} value={j.id}>{j.name} ({j.department})</option>
+                      <option key={j.id} value={j.id}>{j.name} — Junior Secretary</option>
                     ))}
                   </select>
                 </div>

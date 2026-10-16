@@ -446,6 +446,38 @@ export default function App() {
     dbUpdateProfile(internId, { batch: newBatch }).catch(console.error)
   }
 
+  const handleUpdateInternTargetVisits = (internId, newTarget) => {
+    const parsedTarget = Math.max(1, parseInt(newTarget, 10) || 15)
+
+    setAllUsers(prev => {
+      const updated = prev.map(user => {
+        if (user.id === internId) {
+          return { ...user, targetVisits: parsedTarget }
+        }
+        return user
+      })
+      localStorage.setItem('dakshana_all_users', JSON.stringify(updated))
+      return updated
+    })
+
+    if (currentUser && currentUser.id === internId) {
+      setCurrentUser(prev => ({ ...prev, targetVisits: parsedTarget }))
+    }
+
+    setSessions(prev => {
+      const updated = prev.map(s => {
+        if (s.internId === internId) {
+          return { ...s, targetVisits: parsedTarget }
+        }
+        return s
+      })
+      localStorage.setItem('dakshana_sessions', JSON.stringify(updated))
+      return updated
+    })
+
+    dbUpdateProfile(internId, { target_visits: parsedTarget }).catch(console.error)
+  }
+
   const handleAddIntern = async (newIntern) => {
     let finalScholar = { ...newIntern }
 
@@ -754,6 +786,7 @@ export default function App() {
                   sessions={sessions}
                   onReassignIntern={handleReassignIntern}
                   onUpdateInternBatch={handleUpdateInternBatch}
+                  onUpdateInternTargetVisits={handleUpdateInternTargetVisits}
                   onAddIntern={handleAddIntern}
                   onSelectIntern={(intern) => setSelectedInternForModal(intern)}
                   delegatedPowers={delegatedPowers}
@@ -772,6 +805,7 @@ export default function App() {
                   delegatedPowers={delegatedPowers}
                   onReassignIntern={handleReassignIntern}
                   onUpdateInternBatch={handleUpdateInternBatch}
+                  onUpdateInternTargetVisits={handleUpdateInternTargetVisits}
                   onSelectIntern={(intern) => setSelectedInternForModal(intern)}
                 />
               )}
@@ -828,9 +862,9 @@ export default function App() {
             />
           )}
 
-          {/* TAB 5: MATERIALS HUB (Strictly the 2 official links) */}
+          {/* TAB 5: MATERIALS HUB (Strictly the 2 official links + Extra resources) */}
           {activeTab === 'resources' && (
-            <ResourceHub />
+            <ResourceHub currentUser={currentUser} />
           )}
 
           {/* TAB 6: REIMBURSEMENTS */}
@@ -920,6 +954,7 @@ export default function App() {
         currentUser={currentUser}
         onReassignIntern={handleReassignIntern}
         onUpdateInternBatch={handleUpdateInternBatch}
+        onUpdateInternTargetVisits={handleUpdateInternTargetVisits}
       />
 
       {/* Auth / Switch Profile / Login Modal (When logged in) */}

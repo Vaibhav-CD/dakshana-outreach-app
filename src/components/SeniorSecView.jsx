@@ -12,7 +12,8 @@ import {
   Layers,
   Sparkles,
   ToggleLeft,
-  ToggleRight
+  ToggleRight,
+  Phone
 } from 'lucide-react'
 
 import PodiumSpotlight from './PodiumSpotlight'
@@ -24,6 +25,7 @@ export default function SeniorSecView({
   sessions = [],
   onReassignIntern,
   onUpdateInternBatch,
+  onUpdateInternTargetVisits,
   onAddIntern,
   onSelectIntern,
   delegatedPowers = {},
@@ -37,6 +39,7 @@ export default function SeniorSecView({
   const [newInternEmail, setNewInternEmail] = useState('')
   const [newInternSec, setNewInternSec] = useState('user-jsec-1')
   const [newInternBatch, setNewInternBatch] = useState('Batch 1')
+  const [newInternTargetVisits, setNewInternTargetVisits] = useState('15')
   const [newInternDept, setNewInternDept] = useState('Field Outreach')
 
   const juniorSecs = allUsers.filter(u => u.role === 'junior_sec')
@@ -66,6 +69,7 @@ export default function SeniorSecView({
       role: 'intern',
       batch: newInternBatch,
       assignedTo: newInternSec,
+      targetVisits: parseInt(newInternTargetVisits, 10) || 15,
       department: 'Outreach Fieldwork',
       photo: null,
       title: 'Outreach Scholar'
@@ -73,6 +77,7 @@ export default function SeniorSecView({
 
     setNewInternName('')
     setNewInternEmail('')
+    setNewInternTargetVisits('15')
     setShowAddModal(false)
   }
 
@@ -172,7 +177,7 @@ export default function SeniorSecView({
         <div className="flex justify-between items-center mb-3">
           <h3 className="font-bold text-slate-900 text-base flex items-center">
             <Users className="w-4 h-4 mr-2 text-[#0A643B]" />
-            Junior Secretaries & Subordinate Wings
+            Junior Secretaries
           </h3>
           <button
             onClick={() => setActiveTab('delegation')}
@@ -208,7 +213,15 @@ export default function SeniorSecView({
                       />
                       <div>
                         <h4 className="font-bold text-slate-900 text-sm">{jsec.name}</h4>
-                        <p className="text-[11px] text-slate-500">{jsec.department}</p>
+                        <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-full bg-[#EBF7F0] text-[#0A643B] border border-[#0A643B]/30 inline-block mt-0.5">
+                          Junior Secretary
+                        </span>
+                        {jsec.phone && (
+                          <a href={`tel:${jsec.phone}`} className="text-[11px] text-slate-600 flex items-center mt-1 hover:text-[#0A643B] font-medium">
+                            <Phone className="w-3 h-3 mr-1 text-[#0A643B]" />
+                            <span>{jsec.phone}</span>
+                          </a>
+                        )}
                       </div>
                     </div>
 
@@ -324,6 +337,7 @@ export default function SeniorSecView({
                   <tr className="border-b border-slate-200 text-slate-500 uppercase tracking-wider">
                     <th className="pb-3 font-semibold">Scholar Name</th>
                     <th className="pb-3 font-semibold">Batch</th>
+                    <th className="pb-3 font-semibold">Target Visits</th>
                     <th className="pb-3 font-semibold">Assigned Junior Secretary</th>
                     <th className="pb-3 font-semibold text-right">Senior Sec Authority</th>
                   </tr>
@@ -363,6 +377,26 @@ export default function SeniorSecView({
                             <option value="Batch 1">Batch 1</option>
                             <option value="Batch 2">Batch 2</option>
                           </select>
+                        </td>
+                        <td className="py-3.5">
+                          <div className="flex items-center space-x-1.5">
+                            <input
+                              type="number"
+                              min="1"
+                              max="100"
+                              defaultValue={intern.targetVisits || 15}
+                              key={`${intern.id}-${intern.targetVisits || 15}`}
+                              onBlur={(e) => {
+                                const val = parseInt(e.target.value, 10)
+                                if (val && onUpdateInternTargetVisits) {
+                                  onUpdateInternTargetVisits(intern.id, val)
+                                }
+                              }}
+                              className="w-14 text-xs font-bold text-center py-1 rounded-lg border border-slate-300 bg-white focus:ring-2 focus:ring-[#0A643B] focus:outline-hidden"
+                              title="Click to modify this scholar's visit target"
+                            />
+                            <span className="text-[11px] text-slate-400 font-medium">visits</span>
+                          </div>
                         </td>
                         <td className="py-3.5">
                           <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-[#EBF7F0] text-[#0A643B] border border-[#0A643B]/30">
@@ -472,8 +506,8 @@ export default function SeniorSecView({
                         <div>
                           <div className="flex items-center space-x-2">
                             <h4 className="font-bold text-slate-900 text-base">{jsec.name}</h4>
-                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700">
-                              {jsec.department}
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-[#0A643B] border border-emerald-200">
+                              Junior Secretary
                             </span>
                           </div>
                           <p className="text-xs text-slate-500">
@@ -613,9 +647,23 @@ export default function SeniorSecView({
                   className="w-full text-sm rounded-xl border border-slate-300 p-2.5 bg-white focus:ring-2 focus:ring-[#0A643B] focus:outline-hidden cursor-pointer"
                 >
                   {juniorSecs.map((j) => (
-                    <option key={j.id} value={j.id}>{j.name} ({j.department})</option>
+                    <option key={j.id} value={j.id}>{j.name}</option>
                   ))}
                 </select>
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Target Visits (School Outreach Sessions) *</label>
+                <input
+                  type="number"
+                  min="1"
+                  max="100"
+                  value={newInternTargetVisits}
+                  onChange={(e) => setNewInternTargetVisits(e.target.value)}
+                  placeholder="e.g. 15"
+                  className="w-full text-sm rounded-xl border border-slate-300 p-2.5 focus:ring-2 focus:ring-[#0A643B] focus:outline-hidden"
+                />
+                <span className="text-[11px] text-slate-500 mt-0.5 block">Customized target visits milestone for this scholar</span>
               </div>
 
               <div className="flex justify-end space-x-2 pt-3">
