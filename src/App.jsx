@@ -42,7 +42,10 @@ import {
   dbCreateClaim,
   dbUpdateClaim,
   dbFetchBroadcasts,
-  dbCreateBroadcast
+  dbCreateBroadcast,
+  dbFetchPosts,
+  dbCreatePost,
+  dbAddCommentToPost
 } from './supabase'
 
 // 2 Weeks session duration in milliseconds (14 days = 14 * 24 * 60 * 60 * 1000)
@@ -266,11 +269,12 @@ export default function App() {
   useEffect(() => {
     async function syncFromCloud() {
       try {
-        const [cloudProfiles, cloudReports, cloudClaims, cloudBroadcasts] = await Promise.all([
+        const [cloudProfiles, cloudReports, cloudClaims, cloudBroadcasts, cloudPosts] = await Promise.all([
           dbFetchProfiles(),
           dbFetchReports(),
           dbFetchClaims(),
-          dbFetchBroadcasts()
+          dbFetchBroadcasts(),
+          dbFetchPosts()
         ])
 
         if (cloudProfiles && cloudProfiles.length > 0) {
@@ -313,6 +317,18 @@ export default function App() {
         if (cloudBroadcasts && cloudBroadcasts.length > 0) {
           setBroadcasts(cloudBroadcasts)
           localStorage.setItem('dakshana_broadcasts', JSON.stringify(cloudBroadcasts))
+        }
+        if (cloudPosts && cloudPosts.length > 0) {
+          setPosts(prev => {
+            const combined = [...cloudPosts]
+            prev.forEach(localPost => {
+              if (!combined.some(cp => cp.id === localPost.id)) {
+                combined.unshift(localPost)
+              }
+            })
+            localStorage.setItem('dakshana_posts', JSON.stringify(combined))
+            return combined
+          })
         }
       } catch (err) {
         console.warn('Running in offline/prototype mode:', err)
@@ -371,7 +387,7 @@ export default function App() {
     }
   }
 
-  const handleAddPost = (newPost) => {
+  const handleAddPost = async (newPost) => {
     setPosts(prev => {
       const updated = [newPost, ...prev]
       localStorage.setItem('dakshana_posts', JSON.stringify(updated))
@@ -408,6 +424,32 @@ export default function App() {
         localStorage.setItem('dakshana_sessions', JSON.stringify(updated))
         return updated
       })
+    }
+
+    try {
+      await dbCreatePost(newPost)
+    } catch (err) {
+      console.warn('Could not sync new post to Supabase:', err)
+    }
+  }
+
+  const handleAddComment = async (postId, newComment) => {
+    setPosts(prev => {
+      const updated = prev.map(p => {
+        if (p.id === postId) {
+          const comments = [...(p.comments || []), newComment]
+          return { ...p, comments }
+        }
+        return p
+      })
+      localStorage.setItem('dakshana_posts', JSON.stringify(updated))
+      return updated
+    })
+
+    try {
+      await dbAddCommentToPost(postId, newComment)
+    } catch (err) {
+      console.warn('Could not sync comment to Supabase:', err)
     }
   }
 
@@ -947,6 +989,7 @@ export default function App() {
               currentUser={currentUser}
               posts={posts}
               onAddPost={handleAddPost}
+              onAddComment={handleAddComment}
               onSelectIntern={(intern) => setSelectedInternForModal(intern)}
             />
           )}

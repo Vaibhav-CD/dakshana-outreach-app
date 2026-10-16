@@ -285,3 +285,100 @@ export async function dbCreateBroadcast(b) {
     return { data: null, error: err }
   }
 }
+
+// ==========================================
+// Community Outreach Posts & Notes
+// ==========================================
+export async function dbFetchPosts() {
+  if (!supabase) return null
+  try {
+    const { data, error } = await supabase
+      .from('posts')
+      .select('*')
+      .order('created_at', { ascending: false })
+    if (error) {
+      // Table may not yet be created in schema
+      return null
+    }
+    if (!data || data.length === 0) return null
+    return data.map(p => ({
+      id: p.id,
+      authorId: p.author_id,
+      authorName: p.author_name,
+      authorPhoto: p.author_photo,
+      batch: p.batch || 'Batch 1',
+      wing: p.wing,
+      title: p.title,
+      content: p.content,
+      photoUrl: p.photo_url,
+      schoolName: p.school_name,
+      isCompleted: Boolean(p.is_completed),
+      visitsLogged: p.visits_logged || 0,
+      studentsReached: p.students_reached || 0,
+      cheersCount: p.cheers_count || 0,
+      comments: Array.isArray(p.comments) ? p.comments : [],
+      createdAt: p.created_at
+    }))
+  } catch (err) {
+    console.warn('Network error fetching posts from Supabase:', err)
+    return null
+  }
+}
+
+export async function dbCreatePost(post) {
+  if (!supabase) return null
+  try {
+    const payload = {
+      id: post.id || undefined,
+      author_id: String(post.authorId),
+      author_name: post.authorName,
+      author_photo: post.authorPhoto || null,
+      batch: post.batch || 'Batch 1',
+      wing: post.wing || 'Outreach Wing',
+      title: post.title || 'Outreach Milestone Update',
+      content: post.content || '',
+      photo_url: post.photoUrl || null,
+      school_name: post.schoolName || null,
+      is_completed: Boolean(post.isCompleted),
+      visits_logged: post.visitsLogged || (post.isCompleted ? 1 : 0),
+      students_reached: post.studentsReached || 0,
+      cheers_count: post.cheersCount || 1,
+      comments: Array.isArray(post.comments) ? post.comments : []
+    }
+    const { data, error } = await supabase.from('posts').insert([payload]).select().single()
+    if (error) {
+      console.warn('Supabase post insert notification:', error.message)
+      return null
+    }
+    return data
+  } catch (err) {
+    console.warn('Error during dbCreatePost:', err)
+    return null
+  }
+}
+
+export async function dbAddCommentToPost(postId, comment) {
+  if (!supabase) return null
+  try {
+    const { data: post, error: fetchErr } = await supabase
+      .from('posts')
+      .select('comments')
+      .eq('id', postId)
+      .single()
+    if (fetchErr || !post) return null
+
+    const existingComments = Array.isArray(post.comments) ? post.comments : []
+    const updatedComments = [...existingComments, comment]
+
+    const { data, error } = await supabase
+      .from('posts')
+      .update({ comments: updatedComments })
+      .eq('id', postId)
+      .select()
+      .single()
+    return { data, error }
+  } catch (err) {
+    console.warn('Error adding comment to post:', err)
+    return null
+  }
+}

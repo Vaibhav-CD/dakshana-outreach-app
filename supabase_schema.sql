@@ -173,3 +173,78 @@ DO $$ BEGIN
     CREATE POLICY "Allow public select on broadcast_messages" ON public.broadcast_messages FOR SELECT USING (true);
     CREATE POLICY "Allow public insert on broadcast_messages" ON public.broadcast_messages FOR INSERT WITH CHECK (true);
 EXCEPTION WHEN duplicate_object THEN null; END $$;
+
+-- 8. Community Outreach Posts Table
+CREATE TABLE IF NOT EXISTS public.posts (
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+    author_id TEXT NOT NULL,
+    author_name TEXT NOT NULL,
+    author_photo TEXT,
+    batch TEXT NOT NULL DEFAULT 'Batch 1',
+    wing TEXT,
+    title TEXT NOT NULL,
+    content TEXT NOT NULL,
+    photo_url TEXT,
+    school_name TEXT,
+    is_completed BOOLEAN NOT NULL DEFAULT false,
+    visits_logged INTEGER NOT NULL DEFAULT 0,
+    students_reached INTEGER NOT NULL DEFAULT 0,
+    cheers_count INTEGER NOT NULL DEFAULT 0,
+    comments JSONB DEFAULT '[]'::jsonb,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+ALTER TABLE public.posts ENABLE ROW LEVEL SECURITY;
+
+DO $$ BEGIN
+    CREATE POLICY "Allow public select on posts" ON public.posts FOR SELECT USING (true);
+    CREATE POLICY "Allow public insert on posts" ON public.posts FOR INSERT WITH CHECK (true);
+    CREATE POLICY "Allow public update on posts" ON public.posts FOR UPDATE USING (true);
+    CREATE POLICY "Allow public delete on posts" ON public.posts FOR DELETE USING (true);
+EXCEPTION WHEN duplicate_object THEN null; END $$;
+
+-- 9. Queries & Doubts Discussion Hub
+CREATE TABLE IF NOT EXISTS public.queries (
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+    author_id TEXT NOT NULL,
+    author_name TEXT NOT NULL,
+    author_role TEXT NOT NULL DEFAULT 'intern',
+    batch TEXT NOT NULL DEFAULT 'All Batches',
+    title TEXT NOT NULL,
+    question TEXT NOT NULL,
+    category TEXT DEFAULT 'General',
+    status TEXT NOT NULL DEFAULT 'open',
+    answers JSONB DEFAULT '[]'::jsonb,
+    upvotes INTEGER NOT NULL DEFAULT 0,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+ALTER TABLE public.queries ENABLE ROW LEVEL SECURITY;
+
+DO $$ BEGIN
+    CREATE POLICY "Allow public select on queries" ON public.queries FOR SELECT USING (true);
+    CREATE POLICY "Allow public insert on queries" ON public.queries FOR INSERT WITH CHECK (true);
+    CREATE POLICY "Allow public update on queries" ON public.queries FOR UPDATE USING (true);
+EXCEPTION WHEN duplicate_object THEN null; END $$;
+
+-- 10. Suggestions & Bug Feedback Desk
+CREATE TABLE IF NOT EXISTS public.feedback (
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+    author_id TEXT NOT NULL,
+    author_name TEXT NOT NULL,
+    author_role TEXT NOT NULL DEFAULT 'intern',
+    title TEXT NOT NULL,
+    description TEXT NOT NULL,
+    type TEXT NOT NULL DEFAULT 'bug',
+    priority TEXT NOT NULL DEFAULT 'medium',
+    status TEXT NOT NULL DEFAULT 'pending',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+ALTER TABLE public.feedback ENABLE ROW LEVEL SECURITY;
+
+DO $$ BEGIN
+    CREATE POLICY "Allow public select on feedback" ON public.feedback FOR SELECT USING (true);
+    CREATE POLICY "Allow public insert on feedback" ON public.feedback FOR INSERT WITH CHECK (true);
+    CREATE POLICY "Allow public update on feedback" ON public.feedback FOR UPDATE USING (true);
+EXCEPTION WHEN duplicate_object THEN null; END $$;

@@ -24,6 +24,7 @@ export default function PostsFeed({
   currentUser,
   posts = [],
   onAddPost,
+  onAddComment,
   onSelectIntern
 }) {
   const [filter, setFilter] = useState('all') // 'all' | 'completed' | 'batch_1' | 'batch_2'
@@ -116,6 +117,10 @@ export default function PostsFeed({
       role: currentUser.role,
       text: newCommentText.trim(),
       time: 'Just now'
+    }
+
+    if (onAddComment) {
+      onAddComment(postId, newComm)
     }
 
     setLocalComments(prev => ({
@@ -349,8 +354,12 @@ export default function PostsFeed({
         ) : (
           filteredPosts.map((post) => {
             const isCheered = cheeredPosts[post.id]
-            const totalCheers = (post.cheersCount || 0) + (isCheered ? 1 : 0)
-            const commentsList = [...(post.comments || []), ...(localComments[post.id] || [])]
+            const postComments = post.comments || []
+            const addedLocal = localComments[post.id] || []
+            const commentsList = [
+              ...postComments,
+              ...addedLocal.filter(lc => !postComments.some(pc => pc.id === lc.id))
+            ]
             const showComments = activeCommentsPostId === post.id
 
             return (
