@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Menu, LogOut, LogIn, Bell, CheckCircle2, Camera, Radio } from 'lucide-react'
+import { Menu, LogOut, LogIn, Bell, CheckCircle2, Camera, Radio, Bug } from 'lucide-react'
 import logoImg from '../assets/logo.png'
 import Avatar from './Avatar'
 import { formatDateWithRelative } from '../utils/dateUtils'
@@ -14,7 +14,8 @@ export default function Header({
   broadcasts = [],
   onSelectNotice,
   onMarkAllNoticesRead,
-  onOpenPhotoModal
+  onOpenPhotoModal,
+  onOpenFeedback
 }) {
   const [showNotifMenu, setShowNotifMenu] = useState(false)
   const getRoleBadge = (role) => {
@@ -208,6 +209,16 @@ export default function Header({
                     </>
                   )}
                 </div>
+
+                {/* Report Bug / Feedback Quick Button */}
+                <button
+                  onClick={onOpenFeedback}
+                  className="px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl border border-slate-200 hover:bg-rose-50 hover:border-rose-200 text-slate-700 hover:text-rose-700 transition-colors flex items-center space-x-1.5 cursor-pointer shadow-2xs text-xs font-bold"
+                  title="Report a bug, glitch, or submit operational feedback to Senior Secretary"
+                >
+                  <Bug className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-rose-600" />
+                  <span className="hidden md:inline">Report Bug</span>
+                </button>
 
                 {/* User Pill Button (Click avatar to change photo, click text to switch profile) */}
                 <div className="flex items-center space-x-1.5 p-1 sm:p-1.5 rounded-xl border border-slate-200 bg-white shadow-2xs">

@@ -14,7 +14,8 @@ import PostsFeed from './components/PostsFeed'
 import InternDetailModal from './components/InternDetailModal'
 import EditProfilePhotoModal from './components/EditProfilePhotoModal'
 import AuthModal from './components/AuthModal'
-import { Radio, X, Bell } from 'lucide-react'
+import FeedbackModal from './components/FeedbackModal'
+import { Radio, X, Bell, Bug } from 'lucide-react'
 import QueriesHub from './components/QueriesHub'
 import {
   INITIAL_USERS,
@@ -258,6 +259,7 @@ export default function App() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false)
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
+  const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false)
   const [selectedInternForModal, setSelectedInternForModal] = useState(null)
 
   // Cloud Sync from Supabase on App Mount
@@ -830,6 +832,7 @@ export default function App() {
         onSignOut={handleSignOut}
         onSwitchProfile={() => setIsAuthModalOpen(true)}
         onOpenPhotoModal={() => setIsPhotoModalOpen(true)}
+        onOpenFeedback={() => setIsFeedbackModalOpen(true)}
         isMobileOpen={isMobileSidebarOpen}
         setIsMobileOpen={setIsMobileSidebarOpen}
       />
@@ -847,6 +850,7 @@ export default function App() {
           onOpenAuth={() => setIsAuthModalOpen(true)}
           onSignOut={handleSignOut}
           onOpenPhotoModal={() => setIsPhotoModalOpen(true)}
+          onOpenFeedback={() => setIsFeedbackModalOpen(true)}
           onToggleMobileSidebar={() => setIsMobileSidebarOpen(prev => !prev)}
           unreadBroadcastsCount={unreadCount}
           broadcasts={visibleBroadcasts}
@@ -1071,6 +1075,26 @@ export default function App() {
         currentUser={currentUser}
         onUpdatePhoto={handleUpdatePhoto}
       />
+
+      {/* Global Feedback & Bug Report Desk Modal */}
+      <FeedbackModal
+        isOpen={isFeedbackModalOpen}
+        onClose={() => setIsFeedbackModalOpen(false)}
+        currentUser={currentUser}
+        activeTab={activeTab}
+        onSubmitFeedback={handleAddSuggestion}
+        onNavigateToMaintenance={() => handleSetActiveTab('dashboard')}
+      />
+
+      {/* Floating 1-Click Bug / Feedback Desk Button */}
+      <button
+        onClick={() => setIsFeedbackModalOpen(true)}
+        className="fixed bottom-5 right-5 z-40 bg-[#0A643B] hover:bg-[#074D2D] text-white py-2.5 px-3.5 sm:px-4 rounded-2xl shadow-2xl flex items-center space-x-2 text-xs font-bold border-2 border-white/80 transition-all hover:scale-105 cursor-pointer group"
+        title="Report any bug, glitch, or share feedback directly with Senior Secretary"
+      >
+        <Bug className="w-4 h-4 text-rose-300 group-hover:rotate-12 transition-transform" />
+        <span className="hidden sm:inline">Report Bug / Feedback</span>
+      </button>
 
     </div>
   )

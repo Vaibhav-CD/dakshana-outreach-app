@@ -11,7 +11,8 @@ import {
   ChevronRight,
   ShieldCheck,
   Camera,
-  HelpCircle
+  HelpCircle,
+  Bug
 } from 'lucide-react'
 import logoImg from '../assets/logo.png'
 import Avatar from './Avatar'
@@ -24,6 +25,7 @@ export default function Sidebar({
   onSignOut,
   onSwitchProfile,
   onOpenPhotoModal,
+  onOpenFeedback,
   isMobileOpen,
   setIsMobileOpen
 }) {
@@ -179,6 +181,18 @@ export default function Sidebar({
 
       {/* Bottom Footer Section with Permanent Sign Out */}
       <div className="p-3 border-t border-slate-100 bg-slate-50/50 space-y-2">
+        <button
+          onClick={() => {
+            if (onOpenFeedback) onOpenFeedback()
+            if (setIsMobileOpen) setIsMobileOpen(false)
+          }}
+          className="w-full flex items-center justify-center space-x-2 py-2 px-3 rounded-2xl text-slate-700 bg-white hover:bg-rose-50 hover:border-rose-200 border border-slate-200 text-xs font-bold transition-all cursor-pointer shadow-2xs hover:text-rose-700"
+          title="Report any technical bug or give feedback to Senior Secretary"
+        >
+          <Bug className="w-3.5 h-3.5 text-rose-600" />
+          <span>Report Bug / Feedback</span>
+        </button>
+
         <button
           onClick={onSignOut}
           className="w-full flex items-center justify-center space-x-2 py-2.5 px-3 rounded-2xl text-rose-700 bg-rose-50/80 hover:bg-rose-100 border border-rose-200 text-xs font-bold transition-all cursor-pointer shadow-2xs"
