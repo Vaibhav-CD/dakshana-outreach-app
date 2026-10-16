@@ -1,10 +1,11 @@
 import React, { useState } from 'react'
 import { Megaphone, Send, CheckCircle2, Bell, Radio } from 'lucide-react'
+import { formatDateWithRelative } from '../utils/dateUtils'
 
 export default function BroadcastCenter({ currentUser, broadcasts, onSendBroadcast, delegatedPowers = {} }) {
-  // Senior Secretary, Management & Delegated Junior Secretaries have broadcast dispatching powers
+  // Senior Secretary, Management & Delegated Junior Secretaries (with canBroadcast) have broadcast dispatching powers
   const userPowers = currentUser.role === 'junior_sec' ? (delegatedPowers[currentUser.id] || {}) : {}
-  const isAuthority = currentUser.role === 'senior_sec' || currentUser.role === 'management' || currentUser.role === 'junior_sec' || Boolean(userPowers.canBroadcast)
+  const isAuthority = currentUser.role === 'senior_sec' || currentUser.role === 'management' || Boolean(userPowers.canBroadcast)
   
   const [targetAudience, setTargetAudience] = useState('batch_1')
   const [broadcastTitle, setBroadcastTitle] = useState('')
@@ -207,7 +208,9 @@ export default function BroadcastCenter({ currentUser, broadcasts, onSendBroadca
                           </span>
                         )}
                       </div>
-                      <span className="text-[11px] text-slate-400">{b.date} • by {b.sender}</span>
+                      <span className="text-[11px] text-slate-500 font-medium">
+                        {formatDateWithRelative(b.date)} • From: <strong className="text-slate-800">{b.sender}</strong>
+                      </span>
                     </div>
 
                     <h4 className="font-bold text-slate-900 text-sm">{b.title}</h4>

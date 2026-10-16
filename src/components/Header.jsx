@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Menu, LogOut, LogIn, Bell, CheckCircle2, Camera, Radio } from 'lucide-react'
 import logoImg from '../assets/logo.png'
 import Avatar from './Avatar'
+import { formatDateWithRelative } from '../utils/dateUtils'
 
 export default function Header({
   currentUser,
@@ -48,7 +49,7 @@ export default function Header({
       case 'reimbursements':
         return 'Expense Claims & Reimbursements'
       case 'team':
-        return 'Our Leadership Team'
+        return 'Meet the Outreach Team'
       default:
         return 'Dashboard'
     }
@@ -168,8 +169,8 @@ export default function Header({
                                     }`}>
                                       {senderBadgeLabel}
                                     </span>
-                                    <span className="text-[10px] text-slate-400 font-medium">
-                                      {bc.date || 'Recent'}
+                                    <span className="text-[10px] text-slate-500 font-medium">
+                                      {formatDateWithRelative(bc.date)}
                                     </span>
                                   </div>
                                   <h5 className="font-bold text-xs text-slate-900 leading-snug line-clamp-1">

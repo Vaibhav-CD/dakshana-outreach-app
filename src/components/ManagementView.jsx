@@ -1,18 +1,22 @@
 import React from 'react'
-import { Award, BarChart, FileCheck, Users, TrendingUp, Download } from 'lucide-react'
+import { Award, BarChart, FileCheck, Users, TrendingUp, Download, CheckCircle2, Clock, ClipboardList } from 'lucide-react'
 
-export default function ManagementView({ allUsers, reports }) {
+export default function ManagementView({ allUsers, reports, sessions = [], assignedTasks = [] }) {
   const interns = allUsers.filter(u => u.role === 'intern')
   const juniorSecs = allUsers.filter(u => u.role === 'junior_sec')
   const seniorSec = allUsers.find(u => u.role === 'senior_sec')
 
-  const totalHours = reports.reduce((acc, curr) => acc + (curr.hoursContributed || 0), 0)
+  const totalSessions = sessions.reduce((acc, curr) => acc + (curr.sessionsCount || 1), 0)
   const reviewedCount = reports.filter(r => r.status === 'reviewed').length
+
+  // Directives assigned to Senior Sec by Management
+  const managementDirectives = assignedTasks.filter(t => t.assignedToRole === 'senior_sec' || t.assignedToId === 'user-senior-sec')
+  const completedDirectives = managementDirectives.filter(t => t.isCompleted).length
 
   const handleExportCSV = () => {
     const csvContent = "data:text/csv;charset=utf-8," 
-      + ["Intern Name,Month,Hours,Status,Reviewer,Feedback"].join(",") + "\n"
-      + reports.map(r => `"${r.internName}","${r.monthYear}",${r.hoursContributed},"${r.status}","${r.reviewedBy || ''}","${(r.reviewerFeedback || '').replace(/"/g, '""')}"`).join("\n")
+      + ["Intern Name,Month,Status,Reviewer,Feedback"].join(",") + "\n"
+      + reports.map(r => `"${r.internName}","${r.monthYear}","${r.status}","${r.reviewedBy || ''}","${(r.reviewerFeedback || '').replace(/"/g, '""')}"`).join("\n")
 
     const encodedUri = encodeURI(csvContent)
     const link = document.createElement("a")
@@ -50,8 +54,8 @@ export default function ManagementView({ allUsers, reports }) {
         {/* Impact Numbers */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-6 border-t border-purple-500/30">
           <div className="bg-white/10 rounded-xl p-3 border border-white/10">
-            <span className="text-xs text-purple-200 block">Total Volunteer Hours Clocked</span>
-            <span className="text-2xl font-extrabold text-white mt-1 block">{totalHours} hrs</span>
+            <span className="text-xs text-purple-200 block">Total School Visits Logged</span>
+            <span className="text-2xl font-extrabold text-white mt-1 block">{totalSessions} sessions</span>
           </div>
           <div className="bg-white/10 rounded-xl p-3 border border-white/10">
             <span className="text-xs text-purple-200 block">Intern Cohort Size</span>
@@ -62,8 +66,8 @@ export default function ManagementView({ allUsers, reports }) {
             <span className="text-2xl font-extrabold text-white mt-1 block">1 Senior + {juniorSecs.length} Juniors</span>
           </div>
           <div className="bg-white/10 rounded-xl p-3 border border-white/10">
-            <span className="text-xs text-purple-200 block">Reports Evaluated</span>
-            <span className="text-2xl font-extrabold text-emerald-400 mt-1 block">{reviewedCount} completed</span>
+            <span className="text-xs text-purple-200 block">Executive Directives</span>
+            <span className="text-2xl font-extrabold text-emerald-400 mt-1 block">{completedDirectives} / {managementDirectives.length} done</span>
           </div>
         </div>
       </div>

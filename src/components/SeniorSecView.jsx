@@ -13,13 +13,28 @@ import {
   Sparkles,
   ToggleLeft,
   ToggleRight,
-  Phone
+  Phone,
+  CheckCircle2,
+  Clock,
+  AlertCircle,
+  Wrench,
+  Plus,
+  CheckSquare,
+  Square,
+  CheckCheck,
+  FileText,
+  Send,
+  X,
+  Archive,
+  ClipboardList
 } from 'lucide-react'
 
 import PodiumSpotlight from './PodiumSpotlight'
 import Avatar from './Avatar'
+import { formatDateWithRelative } from '../utils/dateUtils'
 
 export default function SeniorSecView({
+  currentUser,
   allUsers,
   reports,
   sessions = [],
@@ -30,9 +45,15 @@ export default function SeniorSecView({
   onSelectIntern,
   delegatedPowers = {},
   onTogglePrivilege,
-  onBulkPrivilege
+  onBulkPrivilege,
+  assignedTasks = [],
+  onToggleTaskDone,
+  onAssignTask,
+  suggestions = [],
+  onRectifySuggestion,
+  onAddSuggestion
 }) {
-  const [activeTab, setActiveTab] = useState('assignments') // 'assignments' | 'reports' | 'delegation'
+  const [activeTab, setActiveTab] = useState('assignments') // 'assignments' | 'directives' | 'reports' | 'maintenance' | 'delegation'
   const [selectedBatchFilter, setSelectedBatchFilter] = useState('all') // 'all' | 'Batch 1' | 'Batch 2'
   const [showAddModal, setShowAddModal] = useState(false)
   const [newInternName, setNewInternName] = useState('')
@@ -41,6 +62,27 @@ export default function SeniorSecView({
   const [newInternBatch, setNewInternBatch] = useState('Batch 1')
   const [newInternTargetVisits, setNewInternTargetVisits] = useState('15')
   const [newInternDept, setNewInternDept] = useState('Field Outreach')
+
+  // Directives & Assigned Tasks states
+  const [directivesViewScope, setDirectivesViewScope] = useState('my_tasks') // 'my_tasks' | 'junior_sec_tasks'
+  const [showAssignTaskModal, setShowAssignTaskModal] = useState(false)
+  const [newTaskTitle, setNewTaskTitle] = useState('')
+  const [newTaskDesc, setNewTaskDesc] = useState('')
+  const [newTaskJsecId, setNewTaskJsecId] = useState('user-jsec-1')
+  const [newTaskPriority, setNewTaskPriority] = useState('high')
+
+  // Improvement & Maintenance Tracker states (Senior Secretary Exclusive)
+  const [maintenanceTab, setMaintenanceTab] = useState('pending') // 'pending' | 'rectified'
+  const [maintenanceCategoryFilter, setMaintenanceCategoryFilter] = useState('all')
+  const [rectifyingIssue, setRectifyingIssue] = useState(null)
+  const [rectificationNote, setRectificationNote] = useState('')
+  const [showNewSuggestionModal, setShowNewSuggestionModal] = useState(false)
+  const [newSugTitle, setNewSugTitle] = useState('')
+  const [newSugDesc, setNewSugDesc] = useState('')
+  const [newSugCategory, setNewSugCategory] = useState('Materials Hub')
+  const [newSugPriority, setNewSugPriority] = useState('medium')
+  const [actionSuccessNotice, setActionSuccessNotice] = useState(null)
+  const [privilegeToast, setPrivilegeToast] = useState(null)
 
   const juniorSecs = allUsers.filter(u => u.role === 'junior_sec')
   const interns = allUsers.filter(u => u.role === 'intern')
@@ -79,6 +121,89 @@ export default function SeniorSecView({
     setNewInternEmail('')
     setNewInternTargetVisits('15')
     setShowAddModal(false)
+  }
+
+  // Directives metrics & filtering
+  const seniorSecDirectives = assignedTasks.filter(t => t.assignedToId === 'user-senior-sec' || t.assignedToRole === 'senior_sec')
+  const pendingSeniorSecDirectives = seniorSecDirectives.filter(t => !t.isCompleted).length
+  const completedSeniorSecDirectives = seniorSecDirectives.filter(t => t.isCompleted).length
+
+  const juniorSecDirectives = assignedTasks.filter(t => t.assignedToRole === 'junior_sec')
+  const pendingJuniorSecDirectives = juniorSecDirectives.filter(t => !t.isCompleted).length
+
+  // Maintenance & Suggestions metrics & filtering
+  const pendingSuggestions = suggestions.filter(s => s.status === 'pending')
+  const rectifiedSuggestions = suggestions.filter(s => s.status === 'rectified')
+  const activeSuggestionsList = maintenanceTab === 'pending' ? pendingSuggestions : rectifiedSuggestions
+  const filteredSuggestions = activeSuggestionsList.filter(s => {
+    if (maintenanceCategoryFilter === 'all') return true
+    return s.category === maintenanceCategoryFilter
+  })
+
+  const handleAssignDirectiveSubmit = (e) => {
+    e.preventDefault()
+    if (!newTaskTitle.trim()) return
+
+    const targetJsec = juniorSecs.find(j => j.id === newTaskJsecId) || juniorSecs[0]
+    const newTask = {
+      id: `task-jsec-${Date.now()}`,
+      title: newTaskTitle.trim(),
+      description: newTaskDesc.trim() || 'Directive assigned for immediate execution.',
+      assignedToId: targetJsec ? targetJsec.id : 'user-jsec-1',
+      assignedToName: targetJsec ? targetJsec.name : 'Junior Secretary',
+      assignedToRole: 'junior_sec',
+      assignedBy: currentUser?.name ? `${currentUser.name} (Senior Secretary)` : 'Senior Secretary',
+      priority: newTaskPriority,
+      isCompleted: false,
+      completedAt: null,
+      createdAt: new Date().toISOString().split('T')[0]
+    }
+
+    if (onAssignTask) onAssignTask(newTask)
+    setNewTaskTitle('')
+    setNewTaskDesc('')
+    setShowAssignTaskModal(false)
+    setActionSuccessNotice(`Directive assigned successfully to ${targetJsec ? targetJsec.name : 'Junior Secretary'}.`)
+    setTimeout(() => setActionSuccessNotice(null), 4000)
+  }
+
+  const handleConfirmRectification = (e) => {
+    e.preventDefault()
+    if (!rectifyingIssue) return
+
+    if (onRectifySuggestion) {
+      onRectifySuggestion(rectifyingIssue.id, rectificationNote.trim() || 'Issue rectified and updated in system.')
+    }
+    setActionSuccessNotice(`Issue "${rectifyingIssue.title}" has been rectified and moved to archive!`)
+    setRectifyingIssue(null)
+    setRectificationNote('')
+    setTimeout(() => setActionSuccessNotice(null), 4000)
+  }
+
+  const handleCreateSuggestionSubmit = (e) => {
+    e.preventDefault()
+    if (!newSugTitle.trim()) return
+
+    const newSug = {
+      id: `sug-${Date.now()}`,
+      title: newSugTitle.trim(),
+      description: newSugDesc.trim(),
+      submittedBy: currentUser?.name ? `${currentUser.name} (Senior Secretary)` : 'Senior Secretary',
+      submittedRole: 'senior_sec',
+      category: newSugCategory,
+      status: 'pending',
+      priority: newSugPriority,
+      createdAt: new Date().toISOString().split('T')[0],
+      rectifiedAt: null,
+      rectifiedNote: null
+    }
+
+    if (onAddSuggestion) onAddSuggestion(newSug)
+    setNewSugTitle('')
+    setNewSugDesc('')
+    setShowNewSuggestionModal(false)
+    setActionSuccessNotice('Maintenance issue logged successfully in pending queue.')
+    setTimeout(() => setActionSuccessNotice(null), 4000)
   }
 
   const privilegeDefinitions = [
@@ -270,25 +395,49 @@ export default function SeniorSecView({
       {/* Tabs */}
       <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-200 bg-slate-50/50 px-6 pt-3 gap-2">
-          <div className="flex space-x-6 text-xs font-bold">
+          <div className="flex space-x-6 text-xs font-bold overflow-x-auto pb-1 max-w-full">
             <button
               onClick={() => setActiveTab('assignments')}
-              className={`pb-3 border-b-2 cursor-pointer transition-colors ${activeTab === 'assignments' ? 'border-[#0A643B] text-[#0A643B]' : 'border-transparent text-slate-500 hover:text-slate-800'}`}
+              className={`pb-3 border-b-2 cursor-pointer transition-colors whitespace-nowrap ${activeTab === 'assignments' ? 'border-[#0A643B] text-[#0A643B]' : 'border-transparent text-slate-500 hover:text-slate-800'}`}
             >
-              Batch & Wing Supervision Mapping ({filteredInterns.length})
+              Batch Supervision ({filteredInterns.length})
+            </button>
+            <button
+              onClick={() => setActiveTab('directives')}
+              className={`pb-3 border-b-2 cursor-pointer transition-colors whitespace-nowrap flex items-center space-x-1.5 ${activeTab === 'directives' ? 'border-[#0A643B] text-[#0A643B]' : 'border-transparent text-slate-500 hover:text-slate-800'}`}
+            >
+              <ClipboardList className="w-3.5 h-3.5" />
+              <span>Directives & Tasks</span>
+              {pendingSeniorSecDirectives > 0 && (
+                <span className="px-1.5 py-0.2 rounded-full bg-amber-100 text-amber-800 text-[10px] font-extrabold">
+                  {pendingSeniorSecDirectives} pending
+                </span>
+              )}
             </button>
             <button
               onClick={() => setActiveTab('reports')}
-              className={`pb-3 border-b-2 cursor-pointer transition-colors ${activeTab === 'reports' ? 'border-[#0A643B] text-[#0A643B]' : 'border-transparent text-slate-500 hover:text-slate-800'}`}
+              className={`pb-3 border-b-2 cursor-pointer transition-colors whitespace-nowrap ${activeTab === 'reports' ? 'border-[#0A643B] text-[#0A643B]' : 'border-transparent text-slate-500 hover:text-slate-800'}`}
             >
-              All Monthly Reports ({reports.length})
+              Monthly Reports ({reports.length})
+            </button>
+            <button
+              onClick={() => setActiveTab('maintenance')}
+              className={`pb-3 border-b-2 cursor-pointer transition-colors whitespace-nowrap flex items-center space-x-1.5 ${activeTab === 'maintenance' ? 'border-[#7B2E68] text-[#7B2E68]' : 'border-transparent text-slate-500 hover:text-slate-800'}`}
+            >
+              <Wrench className="w-3.5 h-3.5" />
+              <span>Maintenance & Suggestions</span>
+              {pendingSuggestions.length > 0 && (
+                <span className="px-1.5 py-0.2 rounded-full bg-rose-100 text-rose-800 text-[10px] font-extrabold">
+                  {pendingSuggestions.length} pending
+                </span>
+              )}
             </button>
             <button
               onClick={() => setActiveTab('delegation')}
-              className={`pb-3 border-b-2 cursor-pointer transition-colors flex items-center space-x-1.5 ${activeTab === 'delegation' ? 'border-[#7B2E68] text-[#7B2E68]' : 'border-transparent text-slate-500 hover:text-slate-800'}`}
+              className={`pb-3 border-b-2 cursor-pointer transition-colors whitespace-nowrap flex items-center space-x-1.5 ${activeTab === 'delegation' ? 'border-[#7B2E68] text-[#7B2E68]' : 'border-transparent text-slate-500 hover:text-slate-800'}`}
             >
               <Key className="w-3.5 h-3.5" />
-              <span>Special Privilege Delegation (Senior Sec Exclusive)</span>
+              <span>Delegation Privileges</span>
             </button>
           </div>
 
@@ -426,6 +575,203 @@ export default function SeniorSecView({
           </div>
         )}
 
+        {/* Tab: Assigned Directives & Tasks with "Done or Not" update tracking */}
+        {activeTab === 'directives' && (
+          <div className="p-6 space-y-6">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
+              <div>
+                <h4 className="font-bold text-slate-900 text-sm">Directives & Task Tracking Center</h4>
+                <p className="text-xs text-slate-500">Track executive mandates from Management and supervise task completion across Junior Secretaries.</p>
+              </div>
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={() => setDirectivesViewScope('my_tasks')}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${directivesViewScope === 'my_tasks' ? 'bg-[#0A643B] text-white shadow-2xs' : 'bg-white text-slate-600 border border-slate-200'}`}
+                >
+                  My Directives ({seniorSecDirectives.length})
+                </button>
+                <button
+                  onClick={() => setDirectivesViewScope('junior_sec_tasks')}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${directivesViewScope === 'junior_sec_tasks' ? 'bg-[#0A643B] text-white shadow-2xs' : 'bg-white text-slate-600 border border-slate-200'}`}
+                >
+                  Junior Sec Tasks ({juniorSecDirectives.length})
+                </button>
+                <button
+                  onClick={() => setShowAssignTaskModal(true)}
+                  className="px-3.5 py-1.5 rounded-lg bg-[#7B2E68] hover:bg-[#602351] text-white text-xs font-bold flex items-center shadow-xs cursor-pointer ml-2"
+                >
+                  <Plus className="w-3.5 h-3.5 mr-1" />
+                  Assign Directive
+                </button>
+              </div>
+            </div>
+
+            {/* Scope 1: My Tasks (Assigned to Senior Secretary by Management) */}
+            {directivesViewScope === 'my_tasks' && (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                      Executive Directives from Management for Senior Secretary:
+                    </span>
+                    <span className="text-xs text-slate-500">
+                      ({completedSeniorSecDirectives} of {seniorSecDirectives.length} completed)
+                    </span>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 gap-3.5">
+                  {seniorSecDirectives.map((task) => (
+                    <div
+                      key={task.id}
+                      className={`p-4 rounded-xl border transition-all ${
+                        task.isCompleted
+                          ? 'bg-emerald-50/40 border-emerald-200'
+                          : 'bg-white border-slate-200 shadow-xs'
+                      }`}
+                    >
+                      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                        <div className="space-y-1 flex-1">
+                          <div className="flex items-center space-x-2 flex-wrap">
+                            <h5 className={`font-bold text-sm ${task.isCompleted ? 'text-slate-700 line-through' : 'text-slate-900'}`}>
+                              {task.title}
+                            </h5>
+                            <span className={`text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full ${
+                              task.priority === 'urgent'
+                                ? 'bg-rose-100 text-rose-800'
+                                : task.priority === 'high'
+                                ? 'bg-amber-100 text-amber-800'
+                                : 'bg-blue-100 text-blue-800'
+                            }`}>
+                              {task.priority} Priority
+                            </span>
+                            {task.isCompleted ? (
+                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 inline-flex items-center">
+                                <CheckCircle2 className="w-3 h-3 mr-1 text-emerald-700" />
+                                Completed
+                              </span>
+                            ) : (
+                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200 inline-flex items-center">
+                                <Clock className="w-3 h-3 mr-1" />
+                                Pending Action
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-xs text-slate-600 leading-relaxed">
+                            {task.description}
+                          </p>
+                          <div className="flex items-center space-x-4 pt-1 text-[11px] text-slate-500">
+                            <span>From: <strong className="text-slate-700">{task.assignedBy}</strong></span>
+                            <span>Assigned: {formatDateWithRelative(task.createdAt)}</span>
+                            {task.completedAt && (
+                              <span className="text-emerald-700 font-semibold">Done: {formatDateWithRelative(task.completedAt)}</span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Interactive "Done or Not" Toggle Button */}
+                        <div className="flex-shrink-0">
+                          <button
+                            onClick={() => onToggleTaskDone && onToggleTaskDone(task.id)}
+                            className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center transition-all cursor-pointer shadow-xs ${
+                              task.isCompleted
+                                ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                                : 'bg-slate-900 hover:bg-[#0A643B] text-white'
+                            }`}
+                            title="Click to toggle Done / Not Done status"
+                          >
+                            {task.isCompleted ? (
+                              <>
+                                <CheckCheck className="w-4 h-4 mr-1.5" />
+                                Completed ✓
+                              </>
+                            ) : (
+                              <>
+                                <Square className="w-4 h-4 mr-1.5" />
+                                Mark as Done
+                              </>
+                            )}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Scope 2: Junior Sec Tasks */}
+            {directivesViewScope === 'junior_sec_tasks' && (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                    Work Delegated to Junior Secretaries ({juniorSecDirectives.length}):
+                  </span>
+                  <span className="text-xs text-slate-500">
+                    {juniorSecDirectives.filter(t => t.isCompleted).length} of {juniorSecDirectives.length} completed
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 gap-3.5">
+                  {juniorSecDirectives.map((task) => (
+                    <div
+                      key={task.id}
+                      className={`p-4 rounded-xl border transition-all ${
+                        task.isCompleted
+                          ? 'bg-emerald-50/30 border-emerald-200'
+                          : 'bg-white border-slate-200'
+                      }`}
+                    >
+                      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                        <div className="space-y-1 flex-1">
+                          <div className="flex items-center space-x-2 flex-wrap">
+                            <h5 className={`font-bold text-sm ${task.isCompleted ? 'text-slate-600 line-through' : 'text-slate-900'}`}>
+                              {task.title}
+                            </h5>
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-50 text-[#7B2E68] border border-purple-200">
+                              Assigned to: {task.assignedToName || 'Junior Sec'}
+                            </span>
+                            {task.isCompleted ? (
+                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                                Completed ✓
+                              </span>
+                            ) : (
+                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">
+                                In Progress
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-xs text-slate-600 leading-relaxed">
+                            {task.description}
+                          </p>
+                          <div className="flex items-center space-x-4 pt-1 text-[11px] text-slate-500">
+                            <span>Assigned by: <strong className="text-slate-700">{task.assignedBy}</strong></span>
+                            <span>Assigned: {formatDateWithRelative(task.createdAt)}</span>
+                          </div>
+                        </div>
+
+                        {/* Senior Sec can also update completion */}
+                        <div className="flex-shrink-0">
+                          <button
+                            onClick={() => onToggleTaskDone && onToggleTaskDone(task.id)}
+                            className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold border transition-colors cursor-pointer ${
+                              task.isCompleted
+                                ? 'bg-emerald-50 text-emerald-800 border-emerald-200 hover:bg-emerald-100'
+                                : 'bg-slate-100 text-slate-700 border-slate-300 hover:bg-slate-200'
+                            }`}
+                          >
+                            {task.isCompleted ? 'Mark Incomplete' : 'Mark as Done ✓'}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Tab 2: All Reports across organization */}
         {activeTab === 'reports' && (
           <div className="p-6">
@@ -438,7 +784,7 @@ export default function SeniorSecView({
                       <span className="ml-2 px-2 py-0.5 rounded-md font-bold text-[10px] bg-white border border-slate-200 text-slate-700">
                         {rep.batch || 'Batch 1'}
                       </span>
-                      <span className="text-slate-500 ml-2">({rep.monthYear}) • {rep.hoursContributed} hrs clocked</span>
+                      <span className="text-slate-500 ml-2">({rep.monthYear})</span>
                     </div>
                     <span className={`px-2.5 py-0.5 rounded-full font-semibold ${
                       rep.status === 'reviewed' 
@@ -461,6 +807,182 @@ export default function SeniorSecView({
                 </div>
               ))}
             </div>
+          </div>
+        )}
+
+        {/* Tab: System Improvement & Maintenance Suggestions (Senior Secretary Exclusive) */}
+        {activeTab === 'maintenance' && (
+          <div className="p-6 space-y-6">
+            <div className="bg-gradient-to-r from-slate-900 to-[#0A643B] p-5 rounded-2xl text-white">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                  <div className="inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-full bg-white/20 text-xs font-semibold mb-2">
+                    <Wrench className="w-3.5 h-3.5 text-amber-300" />
+                    <span>Senior Secretary Maintenance Desk</span>
+                  </div>
+                  <h4 className="font-extrabold text-xl text-white">
+                    Platform Improvement & Issue Rectification Hub
+                  </h4>
+                  <p className="text-xs text-emerald-100 mt-1 max-w-2xl leading-relaxed">
+                    Exclusively managed by the Senior Secretary to maintain operational integrity. Review feedback and issues submitted by Scholars, Junior Secretaries, and Leadership. When you click <strong>Rectify Issue</strong>, it immediately leaves the pending queue and archives with your resolution note.
+                  </p>
+                </div>
+
+                <button
+                  onClick={() => setShowNewSuggestionModal(true)}
+                  className="px-4 py-2 rounded-xl bg-white text-slate-900 hover:bg-emerald-50 font-bold text-xs flex items-center shadow-xs cursor-pointer flex-shrink-0"
+                >
+                  <Plus className="w-3.5 h-3.5 mr-1 text-[#0A643B]" />
+                  Log Maintenance Issue
+                </button>
+              </div>
+
+              {/* Sub-tabs: Pending vs Rectified Archive */}
+              <div className="flex items-center space-x-2 mt-5 pt-4 border-t border-white/20">
+                <button
+                  onClick={() => setMaintenanceTab('pending')}
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    maintenanceTab === 'pending'
+                      ? 'bg-white text-slate-900 shadow-xs'
+                      : 'bg-white/10 text-white hover:bg-white/20'
+                  }`}
+                >
+                  Pending Issues ({pendingSuggestions.length})
+                </button>
+                <button
+                  onClick={() => setMaintenanceTab('rectified')}
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center ${
+                    maintenanceTab === 'rectified'
+                      ? 'bg-white text-slate-900 shadow-xs'
+                      : 'bg-white/10 text-white hover:bg-white/20'
+                  }`}
+                >
+                  <Archive className="w-3.5 h-3.5 mr-1" />
+                  Rectified Archive ({rectifiedSuggestions.length})
+                </button>
+              </div>
+            </div>
+
+            {/* Category Filter Pills */}
+            <div className="flex flex-wrap items-center gap-2 text-xs">
+              <span className="font-semibold text-slate-500 mr-1">Filter Category:</span>
+              {['all', 'Materials Hub', 'Reimbursements', 'Curriculum', 'Operations', 'Technical'].map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setMaintenanceCategoryFilter(cat)}
+                  className={`px-3 py-1 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
+                    maintenanceCategoryFilter === cat
+                      ? 'bg-[#0A643B] text-white shadow-2xs'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  }`}
+                >
+                  {cat === 'all' ? 'All Categories' : cat}
+                </button>
+              ))}
+            </div>
+
+            {/* Suggestions List */}
+            {filteredSuggestions.length === 0 ? (
+              <div className="p-8 text-center bg-slate-50 rounded-2xl border border-slate-200 text-slate-500 text-xs">
+                <CheckCircle2 className="w-8 h-8 mx-auto text-emerald-600 mb-2" />
+                <p className="font-bold text-sm text-slate-800">
+                  {maintenanceTab === 'pending'
+                    ? 'All Caught Up! No Pending Issues'
+                    : 'No Rectified Issues In This Filter'}
+                </p>
+                <p className="text-slate-500 mt-1">
+                  {maintenanceTab === 'pending'
+                    ? 'All reported issues and improvement suggestions have been rectified.'
+                    : 'Rectified issues will appear here with resolution notes once addressed.'}
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 gap-4">
+                {filteredSuggestions.map((item) => (
+                  <div
+                    key={item.id}
+                    className={`p-5 rounded-2xl border transition-all ${
+                      item.status === 'rectified'
+                        ? 'bg-slate-50/70 border-slate-200'
+                        : 'bg-white border-slate-200 shadow-xs hover:border-[#0A643B]/40'
+                    }`}
+                  >
+                    <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
+                      <div className="space-y-2 flex-1">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
+                            {item.category}
+                          </span>
+                          <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${
+                            item.priority === 'high'
+                              ? 'bg-rose-100 text-rose-800'
+                              : item.priority === 'medium'
+                              ? 'bg-amber-100 text-amber-800'
+                              : 'bg-slate-100 text-slate-700'
+                          }`}>
+                            {item.priority} Priority
+                          </span>
+                          <span className="text-xs text-slate-400">
+                            • Submitted {formatDateWithRelative(item.createdAt)}
+                          </span>
+                        </div>
+
+                        <h5 className="font-bold text-slate-900 text-base">
+                          {item.title}
+                        </h5>
+
+                        <p className="text-xs text-slate-600 leading-relaxed bg-slate-50 p-3 rounded-xl border border-slate-100">
+                          {item.description}
+                        </p>
+
+                        <div className="flex items-center space-x-2 text-xs text-slate-500 pt-1">
+                          <span>Reported by:</span>
+                          <span className="font-bold text-slate-800">{item.submittedBy}</span>
+                          <span className="text-[10px] px-2 py-0.2 rounded-full bg-purple-50 text-[#7B2E68] font-bold">
+                            {item.submittedRole === 'intern' ? 'Outreach Scholar' : item.submittedRole === 'junior_sec' ? 'Junior Secretary' : 'Leadership'}
+                          </span>
+                        </div>
+
+                        {/* If Rectified: Show Resolution Details */}
+                        {item.status === 'rectified' && (
+                          <div className="mt-3 p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-950 space-y-1">
+                            <div className="flex items-center justify-between font-bold text-emerald-900">
+                              <span className="flex items-center">
+                                <CheckCircle2 className="w-3.5 h-3.5 mr-1 text-[#0A643B]" />
+                                Rectified by {item.rectifiedBy || 'Senior Secretary'}
+                              </span>
+                              <span className="text-[11px] text-emerald-700 font-semibold">
+                                {formatDateWithRelative(item.rectifiedAt)}
+                              </span>
+                            </div>
+                            <p className="text-emerald-800">
+                              <strong>Resolution Action:</strong> {item.rectifiedNote || 'Rectified and verified in maintenance update.'}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Action Button: Only visible if pending */}
+                      {item.status === 'pending' && (
+                        <div className="flex-shrink-0 self-start sm:self-center">
+                          <button
+                            onClick={() => {
+                              setRectifyingIssue(item)
+                              setRectificationNote('')
+                            }}
+                            className="px-4 py-2.5 rounded-xl bg-[#0A643B] hover:bg-[#074D2D] text-white font-bold text-xs flex items-center shadow-xs transition-colors cursor-pointer"
+                            title="Rectify this issue to remove it from pending list and archive"
+                          >
+                            <Wrench className="w-3.5 h-3.5 mr-1.5" />
+                            Rectify Issue
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 
@@ -547,10 +1069,17 @@ export default function SeniorSecView({
                         return (
                           <div
                             key={priv.key}
-                            onClick={() => onTogglePrivilege(jsec.id, priv.key)}
+                            onClick={() => {
+                              onTogglePrivilege(jsec.id, priv.key)
+                              setPrivilegeToast({
+                                message: `${isGranted ? 'Revoked' : 'Granted'} "${priv.title}" for ${jsec.name}`,
+                                type: isGranted ? 'revoke' : 'grant'
+                              })
+                              setTimeout(() => setPrivilegeToast(null), 3500)
+                            }}
                             className={`p-4 rounded-xl border transition-all cursor-pointer flex items-start justify-between gap-3 ${
                               isGranted
-                                ? 'bg-emerald-50/50 border-[#0A643B]/40 shadow-xs ring-1 ring-[#0A643B]/20'
+                                ? 'bg-emerald-50/70 border-[#0A643B] shadow-xs ring-1 ring-[#0A643B]/20'
                                 : 'bg-slate-50/70 border-slate-200 hover:border-slate-300'
                             }`}
                           >
@@ -565,6 +1094,16 @@ export default function SeniorSecView({
                                   <h5 className={`font-bold text-xs ${isGranted ? 'text-slate-900' : 'text-slate-700'}`}>
                                     {priv.title}
                                   </h5>
+                                  {isGranted ? (
+                                    <span className="text-[10px] font-extrabold px-1.5 py-0.2 rounded-md bg-emerald-100 text-emerald-800 border border-emerald-300 inline-flex items-center">
+                                      <Check className="w-2.5 h-2.5 mr-0.5 text-emerald-700" />
+                                      Active
+                                    </span>
+                                  ) : (
+                                    <span className="text-[10px] font-semibold px-1.5 py-0.2 rounded-md bg-slate-200 text-slate-600">
+                                      Standard
+                                    </span>
+                                  )}
                                 </div>
                                 <p className="text-[11px] text-slate-500 mt-1 leading-relaxed">
                                   {priv.desc}
@@ -574,8 +1113,17 @@ export default function SeniorSecView({
 
                             <button
                               type="button"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                onTogglePrivilege(jsec.id, priv.key)
+                                setPrivilegeToast({
+                                  message: `${isGranted ? 'Revoked' : 'Granted'} "${priv.title}" for ${jsec.name}`,
+                                  type: isGranted ? 'revoke' : 'grant'
+                                })
+                                setTimeout(() => setPrivilegeToast(null), 3500)
+                              }}
                               aria-label={`Toggle ${priv.title}`}
-                              className={`p-1 rounded-full transition-colors flex-shrink-0 ${
+                              className={`p-1 rounded-full transition-colors flex-shrink-0 cursor-pointer ${
                                 isGranted ? 'text-[#0A643B]' : 'text-slate-300'
                               }`}
                             >
@@ -594,6 +1142,279 @@ export default function SeniorSecView({
         )}
 
       </div>
+
+      {/* Privilege Feedback Toast */}
+      {privilegeToast && (
+        <div className="fixed bottom-6 right-6 z-50 animate-in slide-in-from-bottom-3 duration-200">
+          <div className={`p-4 rounded-xl shadow-xl flex items-center space-x-3 text-xs font-bold text-white border ${
+            privilegeToast.type === 'grant' ? 'bg-[#0A643B] border-emerald-400' : 'bg-slate-900 border-slate-700'
+          }`}>
+            <Sparkles className="w-4 h-4 text-amber-300" />
+            <span>{privilegeToast.message}</span>
+            <button onClick={() => setPrivilegeToast(null)} className="ml-2 hover:opacity-80 cursor-pointer">
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Action Success Notice Toast */}
+      {actionSuccessNotice && (
+        <div className="fixed top-20 right-6 z-50 animate-in slide-in-from-top-3 duration-200">
+          <div className="bg-[#0A643B] text-white p-3.5 px-4 rounded-xl shadow-xl flex items-center space-x-2.5 text-xs font-bold border border-emerald-400">
+            <CheckCircle2 className="w-4 h-4 text-emerald-200" />
+            <span>{actionSuccessNotice}</span>
+            <button onClick={() => setActionSuccessNotice(null)} className="ml-2 hover:opacity-80 cursor-pointer">
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Modal 1: Assign Directive to Junior Secretary */}
+      {showAssignTaskModal && (
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="font-bold text-slate-900 text-lg flex items-center">
+                <ClipboardList className="w-5 h-5 mr-2 text-[#0A643B]" />
+                Assign Directive to Junior Secretary
+              </h3>
+              <button onClick={() => setShowAssignTaskModal(false)} className="text-slate-400 hover:text-slate-600 cursor-pointer">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <p className="text-xs text-slate-500 mb-4">
+              Direct an official operational assignment to a Junior Secretary. It will appear on their dashboard with Done or Not update buttons.
+            </p>
+
+            <form onSubmit={handleAssignDirectiveSubmit} className="space-y-4 text-xs">
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Directive / Task Title *</label>
+                <input
+                  required
+                  type="text"
+                  value={newTaskTitle}
+                  onChange={(e) => setNewTaskTitle(e.target.value)}
+                  placeholder="e.g. Audit school attendance logs for Pune cluster schools"
+                  className="w-full text-sm rounded-xl border border-slate-300 p-2.5 focus:ring-2 focus:ring-[#0A643B] focus:outline-hidden"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Detailed Instructions *</label>
+                <textarea
+                  rows={3}
+                  value={newTaskDesc}
+                  onChange={(e) => setNewTaskDesc(e.target.value)}
+                  placeholder="Specific requirements, deliverables, or guidance for the Junior Secretary..."
+                  className="w-full text-sm rounded-xl border border-slate-300 p-2.5 focus:ring-2 focus:ring-[#0A643B] focus:outline-hidden resize-none"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Assign To *</label>
+                  <select
+                    value={newTaskJsecId}
+                    onChange={(e) => setNewTaskJsecId(e.target.value)}
+                    className="w-full text-sm rounded-xl border border-slate-300 p-2.5 bg-white focus:ring-2 focus:ring-[#0A643B] focus:outline-hidden cursor-pointer"
+                  >
+                    {juniorSecs.map(j => (
+                      <option key={j.id} value={j.id}>{j.name} (Junior Sec)</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Priority Level *</label>
+                  <select
+                    value={newTaskPriority}
+                    onChange={(e) => setNewTaskPriority(e.target.value)}
+                    className="w-full text-sm rounded-xl border border-slate-300 p-2.5 bg-white focus:ring-2 focus:ring-[#0A643B] focus:outline-hidden cursor-pointer"
+                  >
+                    <option value="high">High Priority</option>
+                    <option value="urgent">Urgent</option>
+                    <option value="medium">Medium Priority</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex justify-end space-x-2 pt-3">
+                <button
+                  type="button"
+                  onClick={() => setShowAssignTaskModal(false)}
+                  className="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 font-semibold cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-xl bg-[#0A643B] hover:bg-[#074D2D] text-white font-bold shadow-xs cursor-pointer"
+                >
+                  Confirm & Assign Directive
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal 2: Rectify Issue (Senior Secretary Exclusive) */}
+      {rectifyingIssue && (
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="font-bold text-slate-900 text-lg flex items-center">
+                <Wrench className="w-5 h-5 mr-2 text-[#0A643B]" />
+                Rectify & Resolve Issue
+              </h3>
+              <button onClick={() => setRectifyingIssue(null)} className="text-slate-400 hover:text-slate-600 cursor-pointer">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <p className="text-xs text-slate-500 mb-4">
+              Enter your resolution note. Once rectified, this issue will <strong>immediately leave the Pending Issues list</strong> and move to the Rectified Archive.
+            </p>
+
+            <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 mb-4 text-xs space-y-1">
+              <p className="font-bold text-slate-900">{rectifyingIssue.title}</p>
+              <p className="text-slate-600">{rectifyingIssue.description}</p>
+              <p className="text-slate-400 text-[11px] pt-1">
+                Submitted by: <strong>{rectifyingIssue.submittedBy}</strong> • Category: {rectifyingIssue.category}
+              </p>
+            </div>
+
+            <form onSubmit={handleConfirmRectification} className="space-y-4 text-xs">
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">
+                  Rectification Action & Maintenance Note *
+                </label>
+                <textarea
+                  required
+                  rows={3}
+                  value={rectificationNote}
+                  onChange={(e) => setRectificationNote(e.target.value)}
+                  placeholder="e.g. Added offline PDF sheet to Materials Hub, updated cluster link, and verified mobile download."
+                  className="w-full text-sm rounded-xl border border-slate-300 p-2.5 focus:ring-2 focus:ring-[#0A643B] focus:outline-hidden resize-none"
+                />
+                <span className="text-[11px] text-slate-400 mt-1 block">
+                  This note will be recorded permanently in the Rectified Archive.
+                </span>
+              </div>
+
+              <div className="flex justify-end space-x-2 pt-3">
+                <button
+                  type="button"
+                  onClick={() => setRectifyingIssue(null)}
+                  className="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 font-semibold cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-xl bg-[#0A643B] hover:bg-[#074D2D] text-white font-bold shadow-xs cursor-pointer flex items-center"
+                >
+                  <CheckCircle2 className="w-4 h-4 mr-1.5" />
+                  Mark Rectified & Archive
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal 3: Log New Maintenance Issue (Senior Secretary Direct Note) */}
+      {showNewSuggestionModal && (
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="font-bold text-slate-900 text-lg flex items-center">
+                <Wrench className="w-5 h-5 mr-2 text-[#0A643B]" />
+                Log Platform Maintenance Issue
+              </h3>
+              <button onClick={() => setShowNewSuggestionModal(false)} className="text-slate-400 hover:text-slate-600 cursor-pointer">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <p className="text-xs text-slate-500 mb-4">
+              Log an operational bottleneck, technical bug, or improvement suggestion in the pending maintenance tracker.
+            </p>
+
+            <form onSubmit={handleCreateSuggestionSubmit} className="space-y-4 text-xs">
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Issue / Suggestion Title *</label>
+                <input
+                  required
+                  type="text"
+                  value={newSugTitle}
+                  onChange={(e) => setNewSugTitle(e.target.value)}
+                  placeholder="e.g. Update curriculum presentation slide numbers"
+                  className="w-full text-sm rounded-xl border border-slate-300 p-2.5 focus:ring-2 focus:ring-[#0A643B] focus:outline-hidden"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Category *</label>
+                  <select
+                    value={newSugCategory}
+                    onChange={(e) => setNewSugCategory(e.target.value)}
+                    className="w-full text-sm rounded-xl border border-slate-300 p-2.5 bg-white focus:ring-2 focus:ring-[#0A643B] focus:outline-hidden cursor-pointer"
+                  >
+                    <option value="Materials Hub">Materials Hub</option>
+                    <option value="Reimbursements">Reimbursements</option>
+                    <option value="Curriculum">Curriculum</option>
+                    <option value="Operations">Operations</option>
+                    <option value="Technical">Technical</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Priority Level *</label>
+                  <select
+                    value={newSugPriority}
+                    onChange={(e) => setNewSugPriority(e.target.value)}
+                    className="w-full text-sm rounded-xl border border-slate-300 p-2.5 bg-white focus:ring-2 focus:ring-[#0A643B] focus:outline-hidden cursor-pointer"
+                  >
+                    <option value="high">High Priority</option>
+                    <option value="medium">Medium Priority</option>
+                    <option value="low">Low Priority</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Issue Description & Context *</label>
+                <textarea
+                  required
+                  rows={3}
+                  value={newSugDesc}
+                  onChange={(e) => setNewSugDesc(e.target.value)}
+                  placeholder="Explain what needs to be improved or repaired..."
+                  className="w-full text-sm rounded-xl border border-slate-300 p-2.5 focus:ring-2 focus:ring-[#0A643B] focus:outline-hidden resize-none"
+                />
+              </div>
+
+              <div className="flex justify-end space-x-2 pt-3">
+                <button
+                  type="button"
+                  onClick={() => setShowNewSuggestionModal(false)}
+                  className="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 font-semibold cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-xl bg-[#0A643B] hover:bg-[#074D2D] text-white font-bold shadow-xs cursor-pointer"
+                >
+                  Log In Pending Queue
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Onboard Scholar Modal */}
       {showAddModal && (

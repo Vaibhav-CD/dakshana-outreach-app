@@ -13,11 +13,19 @@ import {
   Layers,
   CreditCard,
   Radio,
-  Filter
+  Filter,
+  ClipboardList,
+  Square,
+  CheckCheck,
+  Wrench,
+  MessageSquarePlus,
+  Send,
+  Plus
 } from 'lucide-react'
 
 import PodiumSpotlight from './PodiumSpotlight'
 import Avatar from './Avatar'
+import { formatDateWithRelative } from '../utils/dateUtils'
 
 export default function JuniorSecView({
   currentUser,
@@ -29,15 +37,59 @@ export default function JuniorSecView({
   onReassignIntern,
   onUpdateInternBatch,
   onUpdateInternTargetVisits,
-  onSelectIntern
+  onSelectIntern,
+  assignedTasks = [],
+  onToggleTaskDone,
+  onAddSuggestion
 }) {
   const [selectedReport, setSelectedReport] = useState(null)
   const [feedbackText, setFeedbackText] = useState('')
   const [newStatus, setNewStatus] = useState('reviewed')
   const [reportScope, setReportScope] = useState('my_wing') // 'my_wing' | 'all_wings'
 
+  // Suggestion modal state (submit to Senior Secretary)
+  const [showSuggestionModal, setShowSuggestionModal] = useState(false)
+  const [sugTitle, setSugTitle] = useState('')
+  const [sugDesc, setSugDesc] = useState('')
+  const [sugCategory, setSugCategory] = useState('Operations')
+  const [sugPriority, setSugPriority] = useState('medium')
+  const [sugSuccessNotice, setSugSuccessNotice] = useState(null)
+
   const myPowers = delegatedPowers?.[currentUser.id] || {}
   const hasAnyPower = Object.values(myPowers).some(Boolean)
+
+  // Directives assigned to this Junior Secretary
+  const myDirectives = assignedTasks.filter(t => 
+    t.assignedToId === currentUser.id || 
+    (t.assignedToRole === 'junior_sec' && (!t.assignedToId || t.assignedToId === currentUser.id))
+  )
+  const pendingDirectivesCount = myDirectives.filter(t => !t.isCompleted).length
+
+  const handleSubmitSuggestion = (e) => {
+    e.preventDefault()
+    if (!sugTitle.trim()) return
+
+    const newSug = {
+      id: `sug-${Date.now()}`,
+      title: sugTitle.trim(),
+      description: sugDesc.trim(),
+      submittedBy: `${currentUser.name} (Junior Secretary)`,
+      submittedRole: 'junior_sec',
+      category: sugCategory,
+      status: 'pending',
+      priority: sugPriority,
+      createdAt: new Date().toISOString().split('T')[0],
+      rectifiedAt: null,
+      rectifiedNote: null
+    }
+
+    if (onAddSuggestion) onAddSuggestion(newSug)
+    setSugTitle('')
+    setSugDesc('')
+    setShowSuggestionModal(false)
+    setSugSuccessNotice('Improvement suggestion submitted to Senior Secretary successfully.')
+    setTimeout(() => setSugSuccessNotice(null), 4000)
+  }
 
   const juniorSecs = allUsers.filter(u => u.role === 'junior_sec')
   const allInterns = allUsers.filter(u => u.role === 'intern')
@@ -92,15 +144,26 @@ export default function JuniorSecView({
             <h2 className="text-2xl font-bold">Welcome, {currentUser.name}</h2>
             <p className="text-emerald-100 text-sm mt-1">Junior Secretary • Outreach Operations</p>
           </div>
-          <div className="flex space-x-3 text-center">
-            <div className="bg-white/15 px-4 py-2 rounded-xl backdrop-blur-xs border border-white/20">
-              <span className="block text-xl font-bold">{assignedInterns.length}</span>
-              <span className="text-xs text-emerald-100">Supervised Scholars</span>
+          <div className="flex flex-col sm:flex-row items-center gap-3">
+            <div className="flex space-x-3 text-center">
+              <div className="bg-white/15 px-4 py-2 rounded-xl backdrop-blur-xs border border-white/20">
+                <span className="block text-xl font-bold">{assignedInterns.length}</span>
+                <span className="text-xs text-emerald-100">Supervised Scholars</span>
+              </div>
+              <div className="bg-white/15 px-4 py-2 rounded-xl backdrop-blur-xs border border-white/20">
+                <span className="block text-xl font-bold text-amber-200">{pendingReports.length}</span>
+                <span className="text-xs text-emerald-100">Pending Review</span>
+              </div>
             </div>
-            <div className="bg-white/15 px-4 py-2 rounded-xl backdrop-blur-xs border border-white/20">
-              <span className="block text-xl font-bold text-amber-200">{pendingReports.length}</span>
-              <span className="text-xs text-emerald-100">Pending Review</span>
-            </div>
+
+            <button
+              onClick={() => setShowSuggestionModal(true)}
+              className="px-3.5 py-2 rounded-xl bg-white text-slate-900 hover:bg-emerald-50 text-xs font-bold transition-all shadow-xs flex items-center cursor-pointer whitespace-nowrap"
+              title="Submit a maintenance or improvement suggestion to Senior Secretary"
+            >
+              <MessageSquarePlus className="w-3.5 h-3.5 mr-1.5 text-[#0A643B]" />
+              Suggest Improvement
+            </button>
           </div>
         </div>
 
@@ -143,12 +206,135 @@ export default function JuniorSecView({
         )}
       </div>
 
+      {/* Suggestion Success Toast */}
+      {sugSuccessNotice && (
+        <div className="bg-[#0A643B] text-white p-3.5 px-4 rounded-xl shadow-lg flex items-center justify-between text-xs font-bold animate-in slide-in-from-top-2 border border-emerald-400">
+          <span className="flex items-center">
+            <CheckCircle2 className="w-4 h-4 mr-2 text-emerald-200" />
+            {sugSuccessNotice}
+          </span>
+          <button onClick={() => setSugSuccessNotice(null)} className="hover:opacity-80 cursor-pointer">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+
       {/* Top Outreach Scholars Podium Spotlight */}
       <PodiumSpotlight
         allUsers={allUsers}
         sessions={sessions}
         onSelectIntern={onSelectIntern}
       />
+
+      {/* Assigned Directives & Operational Tasks for this Junior Secretary */}
+      <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-3 border-b border-slate-100 gap-2 mb-4">
+          <div>
+            <h3 className="font-bold text-slate-900 text-base flex items-center">
+              <ClipboardList className="w-5 h-5 mr-2 text-[#0A643B]" />
+              Assigned Directives & Tasks ({myDirectives.length})
+            </h3>
+            <p className="text-xs text-slate-500">
+              Work assigned to you by Senior Secretary and Management. Use the toggle button to update completion status.
+            </p>
+          </div>
+          <div className="flex items-center space-x-2">
+            {pendingDirectivesCount > 0 ? (
+              <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200">
+                {pendingDirectivesCount} Incomplete
+              </span>
+            ) : (
+              <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200 flex items-center">
+                <CheckCircle2 className="w-3.5 h-3.5 mr-1" /> All Tasks Done
+              </span>
+            )}
+          </div>
+        </div>
+
+        {myDirectives.length === 0 ? (
+          <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 text-center text-xs text-slate-500">
+            No pending directives currently assigned to your wing.
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {myDirectives.map((task) => (
+              <div
+                key={task.id}
+                className={`p-4 rounded-xl border transition-all ${
+                  task.isCompleted
+                    ? 'bg-emerald-50/40 border-emerald-200'
+                    : 'bg-white border-slate-200 shadow-xs'
+                }`}
+              >
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                  <div className="space-y-1 flex-1">
+                    <div className="flex items-center space-x-2 flex-wrap">
+                      <h4 className={`font-bold text-sm ${task.isCompleted ? 'text-slate-600 line-through' : 'text-slate-900'}`}>
+                        {task.title}
+                      </h4>
+                      <span className={`text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full ${
+                        task.priority === 'urgent'
+                          ? 'bg-rose-100 text-rose-800'
+                          : task.priority === 'high'
+                          ? 'bg-amber-100 text-amber-800'
+                          : 'bg-blue-100 text-blue-800'
+                      }`}>
+                        {task.priority} Priority
+                      </span>
+                      {task.isCompleted ? (
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 inline-flex items-center">
+                          <CheckCircle2 className="w-3 h-3 mr-1 text-emerald-700" />
+                          Completed
+                        </span>
+                      ) : (
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200 inline-flex items-center">
+                          <Clock className="w-3 h-3 mr-1" />
+                          In Progress
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs text-slate-600 leading-relaxed">
+                      {task.description}
+                    </p>
+                    <div className="flex items-center space-x-4 pt-1 text-[11px] text-slate-500">
+                      <span>Delegated by: <strong className="text-slate-700">{task.assignedBy}</strong></span>
+                      <span>Assigned: {formatDateWithRelative(task.createdAt)}</span>
+                      {task.completedAt && (
+                        <span className="text-emerald-700 font-semibold">Done: {formatDateWithRelative(task.completedAt)}</span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Interactive "Done or Not" Update Button for Junior Secretary */}
+                  <div className="flex-shrink-0">
+                    <button
+                      onClick={() => onToggleTaskDone && onToggleTaskDone(task.id)}
+                      className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center transition-all cursor-pointer shadow-xs ${
+                        task.isCompleted
+                          ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                          : 'bg-slate-900 hover:bg-[#0A643B] text-white'
+                      }`}
+                      title="Click to update task status"
+                    >
+                      {task.isCompleted ? (
+                        <>
+                          <CheckCheck className="w-4 h-4 mr-1.5" />
+                          Completed ✓
+                        </>
+                      ) : (
+                        <>
+                          <Square className="w-4 h-4 mr-1.5" />
+                          Mark as Done
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
@@ -209,7 +395,7 @@ export default function JuniorSecView({
                             {rep.batch || 'Batch 1'}
                           </span>
                         </div>
-                        <span className="text-xs text-slate-500">{rep.monthYear} • {rep.hoursContributed} hrs clocked</span>
+                        <span className="text-xs text-slate-500">{rep.monthYear}</span>
                       </div>
                       <button
                         onClick={() => handleOpenReview(rep)}
@@ -371,7 +557,7 @@ export default function JuniorSecView({
 
             <div className="my-4 space-y-3 max-h-96 overflow-y-auto pr-1 text-xs">
               <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
-                <span className="font-bold text-slate-700 block mb-1">Grassroots Activities ({selectedReport.hoursContributed} hrs):</span>
+                <span className="font-bold text-slate-700 block mb-1">Grassroots Activities & Progress:</span>
                 <p className="text-slate-800 leading-relaxed">{selectedReport.tasksCompleted}</p>
               </div>
 
@@ -439,6 +625,99 @@ export default function JuniorSecView({
                 Save Review
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Submit Improvement Suggestion to Senior Secretary Modal */}
+      {showSuggestionModal && (
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="font-bold text-slate-900 text-lg flex items-center">
+                <MessageSquarePlus className="w-5 h-5 mr-2 text-[#0A643B]" />
+                Submit Improvement Suggestion
+              </h3>
+              <button onClick={() => setShowSuggestionModal(false)} className="text-slate-400 hover:text-slate-600 cursor-pointer">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <p className="text-xs text-slate-500 mb-4">
+              Submit an operational suggestion or report a bug directly to the Senior Secretary. He handles all system maintenance and rectification.
+            </p>
+
+            <form onSubmit={handleSubmitSuggestion} className="space-y-4 text-xs">
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Title / Brief Summary *</label>
+                <input
+                  required
+                  type="text"
+                  value={sugTitle}
+                  onChange={(e) => setSugTitle(e.target.value)}
+                  placeholder="e.g. Standardize attendance reporting format across clusters"
+                  className="w-full text-sm rounded-xl border border-slate-300 p-2.5 focus:ring-2 focus:ring-[#0A643B] focus:outline-hidden"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Category *</label>
+                  <select
+                    value={sugCategory}
+                    onChange={(e) => setSugCategory(e.target.value)}
+                    className="w-full text-sm rounded-xl border border-slate-300 p-2.5 bg-white focus:ring-2 focus:ring-[#0A643B] focus:outline-hidden cursor-pointer"
+                  >
+                    <option value="Operations">Operations</option>
+                    <option value="Materials Hub">Materials Hub</option>
+                    <option value="Reimbursements">Reimbursements</option>
+                    <option value="Curriculum">Curriculum</option>
+                    <option value="Technical">Technical</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Priority *</label>
+                  <select
+                    value={sugPriority}
+                    onChange={(e) => setSugPriority(e.target.value)}
+                    className="w-full text-sm rounded-xl border border-slate-300 p-2.5 bg-white focus:ring-2 focus:ring-[#0A643B] focus:outline-hidden cursor-pointer"
+                  >
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                    <option value="low">Low</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Detailed Description *</label>
+                <textarea
+                  required
+                  rows={3}
+                  value={sugDesc}
+                  onChange={(e) => setSugDesc(e.target.value)}
+                  placeholder="Describe the issue, operational friction, or proposed improvement in detail..."
+                  className="w-full text-sm rounded-xl border border-slate-300 p-2.5 focus:ring-2 focus:ring-[#0A643B] focus:outline-hidden resize-none"
+                />
+              </div>
+
+              <div className="flex justify-end space-x-2 pt-3">
+                <button
+                  type="button"
+                  onClick={() => setShowSuggestionModal(false)}
+                  className="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 font-semibold cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-xl bg-[#0A643B] hover:bg-[#074D2D] text-white font-bold shadow-xs cursor-pointer flex items-center"
+                >
+                  <Send className="w-3.5 h-3.5 mr-1.5" />
+                  Submit to Senior Secretary
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

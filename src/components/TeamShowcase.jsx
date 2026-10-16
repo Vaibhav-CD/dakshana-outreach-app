@@ -7,6 +7,7 @@ export default function TeamShowcase({ allUsers, onSelectIntern }) {
   const managementMembers = allUsers.filter(u => u.role === 'management')
   const seniorSec = allUsers.find(u => u.role === 'senior_sec')
   const juniorSecs = allUsers.filter(u => u.role === 'junior_sec')
+  const outreachInterns = allUsers.filter(u => u.role === 'intern')
 
   return (
     <div className="space-y-8">
@@ -15,32 +16,90 @@ export default function TeamShowcase({ allUsers, onSelectIntern }) {
         <div className="flex items-center space-x-5">
           <img
             src={logoImg}
-            alt="Dakshana Outreach Internship Official Seal"
+            alt="Dakshana Outreach Seal"
             className="w-24 h-24 rounded-full object-cover shadow-md border-3 border-[#0A643B] flex-shrink-0"
           />
           <div>
             <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-[#EBF7F0] border border-[#0A643B]/30 text-[#0A643B] text-xs font-bold mb-1.5">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>Dakshana Outreach Internship Leadership</span>
+              <span>Dakshana Outreach Program</span>
             </div>
-            <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight">Secretariat & Governance Structure</h2>
+            <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight">Meet the Outreach Team</h2>
             <p className="text-slate-500 text-xs mt-1">
-              "Honor. Knowledge. Service." • Governing authority, central operations, and junior secretaries coordinating outreach scholars.
+              "Honor. Knowledge. Service." • Executive leadership, operations coordination, and outreach interns working together to expand educational opportunities.
             </p>
           </div>
         </div>
       </div>
 
-      {/* Tier 1: Central Operations Authority (Senior Secretary) */}
+      {/* ========================================================= */}
+      {/* 1. MANAGEMENT TEAM (Board of Trustees & Executive Leadership) */}
+      {/* ========================================================= */}
+      <div>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center space-x-2">
+            <Award className="w-5 h-5 text-[#7B2E68]" />
+            <h3 className="text-lg font-bold text-slate-900">Management Team</h3>
+          </div>
+          <span className="text-xs text-slate-500 font-medium">Board of Trustees & Institutional Governance</span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {managementMembers.map((mgmt) => (
+            <div
+              key={mgmt.id}
+              className="bg-white rounded-2xl border border-slate-200 shadow-xs p-5 relative overflow-hidden flex flex-col justify-between hover:border-[#7B2E68]/40 transition-all"
+            >
+              <div className="absolute top-0 right-0 bg-[#7B2E68] text-white text-[9px] font-extrabold uppercase tracking-widest py-0.5 px-2.5 rounded-bl-lg">
+                Management
+              </div>
+              <div>
+                <div className="flex items-center space-x-3.5 mb-3">
+                  <Avatar
+                    src={mgmt.photo}
+                    name={mgmt.name}
+                    role={mgmt.role}
+                    size="xl"
+                    className="shadow-xs border-2 border-[#7B2E68]/20 flex-shrink-0"
+                  />
+                  <div>
+                    <h4 className="text-base font-bold text-slate-900 leading-snug">{mgmt.name}</h4>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#F8EDF5] text-[#7B2E68] border border-[#7B2E68]/30 inline-block mt-0.5">
+                      {mgmt.title}
+                    </span>
+                  </div>
+                </div>
+                <p className="text-xs text-slate-600 leading-relaxed mb-3">{mgmt.bio}</p>
+              </div>
+
+              {/* Email Only - Strictly No Phone Number for Management */}
+              <div className="pt-3 border-t border-slate-100 flex items-center text-xs text-slate-500">
+                <Mail className="w-3.5 h-3.5 mr-1.5 text-[#7B2E68] flex-shrink-0" />
+                <a href={`mailto:${mgmt.email}`} className="truncate hover:underline text-slate-600">
+                  {mgmt.email}
+                </a>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ========================================================= */}
+      {/* 2. SENIOR SECRETARY (Central Operations Leadership)        */}
+      {/* ========================================================= */}
       {seniorSec && (
         <div>
-          <div className="flex items-center space-x-2 mb-3">
-            <Shield className="w-5 h-5 text-[#0A643B]" />
-            <h3 className="text-lg font-bold text-slate-900">Central Operational Leadership</h3>
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center space-x-2">
+              <Shield className="w-5 h-5 text-[#0A643B]" />
+              <h3 className="text-lg font-bold text-slate-900">Senior Secretary</h3>
+            </div>
+            <span className="text-xs text-slate-500 font-medium">Central Operations Leadership</span>
           </div>
+
           <div className="bg-white rounded-2xl border-2 border-[#0A643B]/30 shadow-sm p-6 relative overflow-hidden flex flex-col sm:flex-row gap-5 items-center sm:items-start">
             <div className="absolute top-0 right-0 bg-[#0A643B] text-white text-[10px] font-extrabold uppercase tracking-widest py-1 px-3 rounded-bl-xl">
-              Central Authority
+              Operations Lead
             </div>
             <Avatar
               src={seniorSec.photo}
@@ -76,58 +135,16 @@ export default function TeamShowcase({ allUsers, onSelectIntern }) {
         </div>
       )}
 
-      {/* Tier 2: Board of Trustees & Executive Management (3 Members, No Phone Numbers) */}
+      {/* ========================================================= */}
+      {/* 3. JUNIOR SECRETARIES (Field Supervision & Mentorship)     */}
+      {/* ========================================================= */}
       <div>
-        <div className="flex items-center space-x-2 mb-4">
-          <Award className="w-5 h-5 text-[#7B2E68]" />
-          <h3 className="text-lg font-bold text-slate-900">Board of Trustees & Executive Management</h3>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {managementMembers.map((mgmt) => (
-            <div
-              key={mgmt.id}
-              className="bg-white rounded-2xl border border-slate-200 shadow-xs p-5 relative overflow-hidden flex flex-col justify-between hover:border-[#7B2E68]/40 transition-all"
-            >
-              <div className="absolute top-0 right-0 bg-[#7B2E68] text-white text-[9px] font-extrabold uppercase tracking-widest py-0.5 px-2.5 rounded-bl-lg">
-                Board / Trustee
-              </div>
-              <div>
-                <div className="flex items-center space-x-3.5 mb-3">
-                  <Avatar
-                    src={mgmt.photo}
-                    name={mgmt.name}
-                    role={mgmt.role}
-                    size="xl"
-                    className="shadow-xs border-2 border-[#7B2E68]/20 flex-shrink-0"
-                  />
-                  <div>
-                    <h4 className="text-base font-bold text-slate-900 leading-snug">{mgmt.name}</h4>
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#F8EDF5] text-[#7B2E68] border border-[#7B2E68]/30 inline-block mt-0.5">
-                      {mgmt.title}
-                    </span>
-                  </div>
-                </div>
-                <p className="text-xs text-slate-600 leading-relaxed mb-3">{mgmt.bio}</p>
-              </div>
-
-              {/* Email Only - Strictly No Phone Number for Management */}
-              <div className="pt-3 border-t border-slate-100 flex items-center text-xs text-slate-500">
-                <Mail className="w-3.5 h-3.5 mr-1.5 text-[#7B2E68] flex-shrink-0" />
-                <a href={`mailto:${mgmt.email}`} className="truncate hover:underline text-slate-600">
-                  {mgmt.email}
-                </a>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Tier 3: Junior Secretaries (No specialized sub-roles or departments mentioned) */}
-      <div>
-        <div className="flex items-center space-x-2 mb-4">
-          <Users className="w-5 h-5 text-[#0A643B]" />
-          <h3 className="text-lg font-bold text-slate-900">Junior Secretaries</h3>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center space-x-2">
+            <Users className="w-5 h-5 text-[#0A643B]" />
+            <h3 className="text-lg font-bold text-slate-900">Junior Secretaries</h3>
+          </div>
+          <span className="text-xs text-slate-500 font-medium">Fieldwork Supervisors & Scholar Mentors</span>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -170,18 +187,20 @@ export default function TeamShowcase({ allUsers, onSelectIntern }) {
         </div>
       </div>
 
-      {/* Tier 4: Cohort Outreach Scholars */}
+      {/* ========================================================= */}
+      {/* 4. OUTREACH INTERNS (Grassroots Fieldwork Scholars)        */}
+      {/* ========================================================= */}
       <div>
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-2">
             <Users className="w-5 h-5 text-[#0A643B]" />
-            <h3 className="text-lg font-bold text-slate-900">Outreach Scholars ({allUsers.filter(u => u.role === 'intern').length})</h3>
+            <h3 className="text-lg font-bold text-slate-900">Outreach Interns ({outreachInterns.length})</h3>
           </div>
-          <span className="text-xs text-slate-500 font-medium">Click on any scholar to view visits, activity logs & graphs</span>
+          <span className="text-xs text-slate-500 font-medium">Click on any intern to view school visits & activity logs</span>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {allUsers.filter(u => u.role === 'intern').map((intern) => (
+          {outreachInterns.map((intern) => (
             <div
               key={intern.id}
               onClick={() => onSelectIntern && onSelectIntern(intern)}
@@ -206,7 +225,7 @@ export default function TeamShowcase({ allUsers, onSelectIntern }) {
               </div>
 
               <p className="text-[11px] text-slate-500 truncate mb-2">
-                Outreach Scholar
+                Outreach Intern
               </p>
 
               <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-[#0A643B]">

@@ -41,7 +41,6 @@ export default function InternDetailModal({
   // Session & Visit Data
   const sessionData = sessions.find(s => s.internId === intern.id) || {}
   const totalVisits = sessionData.sessionsCount || 14
-  const studentsReached = sessionData.studentsReached || 45
   
   const currentTarget = intern.targetVisits || sessionData.targetVisits || 15
   const [visitTarget, setVisitTarget] = useState(currentTarget)
@@ -62,7 +61,6 @@ export default function InternDetailModal({
   // Reports
   const internReports = reports.filter(r => r.internId === intern.id)
   const completedReportsCount = internReports.filter(r => r.status === 'reviewed').length
-  const totalHours = internReports.reduce((sum, r) => sum + Number(r.hoursContributed || 0), 0) || 36
 
   // Completed Posts
   const internPosts = posts.filter(p => p.authorId === intern.id)
@@ -161,15 +159,18 @@ export default function InternDetailModal({
           {/* TAB 1: OVERVIEW & PROGRESS GRAPHS */}
           {activeTab === 'overview' && (
             <>
-              {/* 4 Key Metrics Cards */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <div className="p-3.5 rounded-2xl bg-emerald-50/80 border border-emerald-200">
+              {/* Key Metrics Cards (Strictly School Visits & Monthly Reports) */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="p-4 rounded-2xl bg-emerald-50/80 border border-emerald-200">
                   <div className="flex items-center justify-between text-emerald-800 mb-1">
-                    <span className="text-[10px] font-bold uppercase tracking-wider">School Visits</span>
-                    <School className="w-4 h-4 text-[#0A643B]" />
+                    <span className="text-[10px] font-bold uppercase tracking-wider">School Visits Completed</span>
+                    <School className="w-5 h-5 text-[#0A643B]" />
                   </div>
-                  <span className="text-2xl font-black text-[#0A643B] block">{totalVisits}</span>
-                  <div className="flex items-center justify-between text-[10px] text-emerald-700 font-medium">
+                  <div className="flex items-baseline space-x-2">
+                    <span className="text-3xl font-black text-[#0A643B]">{totalVisits}</span>
+                    <span className="text-xs text-emerald-700 font-bold">/ {visitTarget} target</span>
+                  </div>
+                  <div className="flex items-center justify-between text-[11px] text-emerald-700 font-medium mt-1 pt-1.5 border-t border-emerald-200/60">
                     <span>Target: {visitTarget} visits</span>
                     {isLeadership && (
                       <button
@@ -183,31 +184,19 @@ export default function InternDetailModal({
                   </div>
                 </div>
 
-                <div className="p-3.5 rounded-2xl bg-purple-50/80 border border-purple-200">
-                  <div className="flex items-center justify-between text-purple-800 mb-1">
-                    <span className="text-[10px] font-bold uppercase tracking-wider">Students</span>
-                    <Users className="w-4 h-4 text-[#7B2E68]" />
-                  </div>
-                  <span className="text-2xl font-black text-[#7B2E68] block">{studentsReached}</span>
-                  <span className="text-[10px] text-purple-700 font-medium">Scholars impacted</span>
-                </div>
-
-                <div className="p-3.5 rounded-2xl bg-blue-50/80 border border-blue-200">
+                <div className="p-4 rounded-2xl bg-blue-50/80 border border-blue-200">
                   <div className="flex items-center justify-between text-blue-800 mb-1">
-                    <span className="text-[10px] font-bold uppercase tracking-wider">Reports</span>
-                    <CheckCircle2 className="w-4 h-4 text-blue-600" />
+                    <span className="text-[10px] font-bold uppercase tracking-wider">Monthly Progress Reports</span>
+                    <CheckCircle2 className="w-5 h-5 text-blue-600" />
                   </div>
-                  <span className="text-2xl font-black text-blue-900 block">{internReports.length}</span>
-                  <span className="text-[10px] text-blue-700 font-medium">{completedReportsCount} reviewed</span>
-                </div>
-
-                <div className="p-3.5 rounded-2xl bg-amber-50/80 border border-amber-200">
-                  <div className="flex items-center justify-between text-amber-800 mb-1">
-                    <span className="text-[10px] font-bold uppercase tracking-wider">Field Hours</span>
-                    <Clock className="w-4 h-4 text-amber-600" />
+                  <div className="flex items-baseline space-x-2">
+                    <span className="text-3xl font-black text-blue-900">{internReports.length}</span>
+                    <span className="text-xs text-blue-700 font-bold">submitted</span>
                   </div>
-                  <span className="text-2xl font-black text-amber-900 block">{totalHours}h</span>
-                  <span className="text-[10px] text-amber-700 font-medium">Classroom time</span>
+                  <div className="flex items-center justify-between text-[11px] text-blue-700 font-medium mt-1 pt-1.5 border-t border-blue-200/60">
+                    <span>{completedReportsCount} reviewed by Junior Sec</span>
+                    <span className="font-bold">{internReports.length - completedReportsCount} pending</span>
+                  </div>
                 </div>
               </div>
 
@@ -345,7 +334,6 @@ export default function InternDetailModal({
                     <div className="flex justify-between items-start">
                       <div>
                         <span className="font-bold text-slate-900 text-sm">{rep.monthYear}</span>
-                        <span className="text-[10px] text-slate-500 block">Logged: {rep.hoursContributed} hours</span>
                       </div>
                       <span className={`text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full ${
                         rep.status === 'reviewed' ? 'bg-[#EBF7F0] text-[#0A643B]' : 'bg-amber-100 text-amber-800'

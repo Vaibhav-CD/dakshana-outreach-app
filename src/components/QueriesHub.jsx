@@ -17,6 +17,7 @@ import {
   BookOpen
 } from 'lucide-react'
 import Avatar from './Avatar'
+import { formatDateWithRelative } from '../utils/dateUtils'
 
 export default function QueriesHub({
   currentUser,
@@ -336,7 +337,9 @@ export default function QueriesHub({
                           {query.batch}
                         </span>
                       </div>
-                      <span className="text-[11px] text-slate-400 block">{query.createdAt}</span>
+                      <span className="text-[11px] text-slate-500 font-medium block">
+                        {formatDateWithRelative(query.createdAt)}
+                      </span>
                     </div>
                   </div>
 
@@ -444,11 +447,11 @@ export default function QueriesHub({
                                 {ans.isOfficial && (
                                   <span className="inline-flex items-center text-[10px] font-bold px-2 py-0.2 rounded-full bg-[#0A643B] text-white">
                                     <ShieldCheck className="w-3 h-3 mr-1" />
-                                    Secretariat Guidance
+                                    Leadership Guidance
                                   </span>
                                 )}
                               </div>
-                              <span className="text-[10px] text-slate-400">{ans.createdAt}</span>
+                              <span className="text-[10px] text-slate-500 font-medium">{formatDateWithRelative(ans.createdAt)}</span>
                             </div>
 
                             <p className="text-slate-700 leading-relaxed">

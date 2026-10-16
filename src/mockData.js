@@ -565,3 +565,200 @@ export const INITIAL_QUERIES = [
   }
 ]
 
+// Assigned Tasks with "Done or Not" toggle tracking
+// Junior Secretaries receive work from Senior Secretary / Management
+// Senior Secretary receives executive directives from Management
+export const INITIAL_ASSIGNED_TASKS = [
+  // --- Tasks for Junior Secretaries (From Senior Secretary & Management) ---
+  {
+    id: 'task-jsec-1',
+    title: 'Verify October School Visit Logs for assigned Outreach Scholars',
+    description: 'Check conducted school visit submissions against session attendance forms before the 20th of this month.',
+    assignedToId: 'user-jsec-1',
+    assignedToName: 'Priya Sharma',
+    assignedToRole: 'junior_sec',
+    assignedBy: 'Senior Secretary',
+    priority: 'high',
+    isCompleted: false,
+    completedAt: null,
+    createdAt: '2026-10-15'
+  },
+  {
+    id: 'task-jsec-2',
+    title: 'Distribute updated 2026–27 teaching kits and math modules',
+    description: 'Ensure all assigned Batch 1 scholars have received physical workbooks and flashcards for rural visits.',
+    assignedToId: 'user-jsec-1',
+    assignedToName: 'Priya Sharma',
+    assignedToRole: 'junior_sec',
+    assignedBy: 'Senior Secretary',
+    priority: 'medium',
+    isCompleted: true,
+    completedAt: '2026-10-16',
+    createdAt: '2026-10-14'
+  },
+  {
+    id: 'task-jsec-3',
+    title: 'Conduct mid-semester check-in call with scholars having <8 visits',
+    description: 'Reach out to scholars behind on their semester milestone to identify transportation or school permission hurdles.',
+    assignedToId: 'user-jsec-2',
+    assignedToName: 'Rohan Verma',
+    assignedToRole: 'junior_sec',
+    assignedBy: 'Senior Secretary',
+    priority: 'high',
+    isCompleted: false,
+    completedAt: null,
+    createdAt: '2026-10-15'
+  },
+  {
+    id: 'task-jsec-4',
+    title: 'Review travel ticket PDFs before submitting claims to Senior Sec',
+    description: 'Audit bus tickets and cash voucher receipts submitted by assigned scholars to ensure seamless approvals.',
+    assignedToId: 'user-jsec-2',
+    assignedToName: 'Rohan Verma',
+    assignedToRole: 'junior_sec',
+    assignedBy: 'Senior Secretary',
+    priority: 'medium',
+    isCompleted: true,
+    completedAt: '2026-10-16',
+    createdAt: '2026-10-13'
+  },
+  {
+    id: 'task-jsec-5',
+    title: 'Coordinate Batch 2 school outreach scheduling for rural talukas',
+    description: 'Align high school permission letters for scheduled visits in upcoming cluster sessions.',
+    assignedToId: 'user-jsec-3',
+    assignedToName: 'Sneha Kulkarni',
+    assignedToRole: 'junior_sec',
+    assignedBy: 'Senior Secretary',
+    priority: 'high',
+    isCompleted: false,
+    completedAt: null,
+    createdAt: '2026-10-15'
+  },
+  {
+    id: 'task-jsec-6',
+    title: 'Compile regional grassroots feedback summary for Governing Board',
+    description: 'Consolidate classroom feedback and student response notes for presentation to Trustees.',
+    assignedToId: 'user-jsec-3',
+    assignedToName: 'Sneha Kulkarni',
+    assignedToRole: 'junior_sec',
+    assignedBy: 'Dr. Rajiv Menon (Management)',
+    priority: 'medium',
+    isCompleted: false,
+    completedAt: null,
+    createdAt: '2026-10-14'
+  },
+
+  // --- Tasks for Senior Secretary (From Management) ---
+  {
+    id: 'task-ssec-1',
+    title: 'Activate October Reimbursement Window and issue official guidelines',
+    description: 'Configure active claim cycle and ensure official Google Form URL and guidelines are accessible to all scholars.',
+    assignedToId: 'user-senior-sec',
+    assignedToName: 'Senior Secretary',
+    assignedToRole: 'senior_sec',
+    assignedBy: 'Dr. Rajiv Menon (Management)',
+    priority: 'high',
+    isCompleted: true,
+    completedAt: '2026-10-14',
+    createdAt: '2026-10-12'
+  },
+  {
+    id: 'task-ssec-2',
+    title: 'Audit Batch 1 vs Batch 2 scholar allocation balance and mentor workload',
+    description: 'Review assigned scholar distribution across the 3 Junior Secretaries to ensure balanced oversight.',
+    assignedToId: 'user-senior-sec',
+    assignedToName: 'Senior Secretary',
+    assignedToRole: 'senior_sec',
+    assignedBy: 'Col. Ram Sharma (Management)',
+    priority: 'high',
+    isCompleted: false,
+    completedAt: null,
+    createdAt: '2026-10-15'
+  },
+  {
+    id: 'task-ssec-3',
+    title: 'Review academic curriculum alignment and toolkit downloads',
+    description: 'Confirm that all intern teaching modules match 2026–27 pedagogical standards.',
+    assignedToId: 'user-senior-sec',
+    assignedToName: 'Senior Secretary',
+    assignedToRole: 'senior_sec',
+    assignedBy: 'Dr. Sunita Deshmukh (Management)',
+    priority: 'medium',
+    isCompleted: false,
+    completedAt: null,
+    createdAt: '2026-10-14'
+  },
+  {
+    id: 'task-ssec-4',
+    title: 'Conduct monthly operations review meeting with all 3 Junior Secretaries',
+    description: 'Review pending reports, delegation privileges, and school visit milestone pacing.',
+    assignedToId: 'user-senior-sec',
+    assignedToName: 'Senior Secretary',
+    assignedToRole: 'senior_sec',
+    assignedBy: 'Dr. Rajiv Menon (Management)',
+    priority: 'high',
+    isCompleted: false,
+    completedAt: null,
+    createdAt: '2026-10-15'
+  }
+]
+
+// Improvement & Maintenance Issues Tracker (Exclusively for Senior Secretary)
+// Once Senior Secretary rectifies an issue, it leaves the "Pending Issues" view
+export const INITIAL_SUGGESTIONS = [
+  {
+    id: 'sug-1',
+    title: 'Downloadable 1-Page Offline School Visit Log Sheet',
+    description: 'Schools in deep rural areas often have poor 4G connectivity. Providing a 1-page printable blank attendance sheet in Materials Hub would help interns record attendance on paper and upload later.',
+    submittedBy: 'Kabir Das (Outreach Scholar, Batch 2)',
+    submittedRole: 'intern',
+    category: 'Materials Hub',
+    status: 'pending', // 'pending' | 'rectified'
+    priority: 'high',
+    createdAt: '2026-10-15',
+    rectifiedAt: null,
+    rectifiedNote: null
+  },
+  {
+    id: 'sug-2',
+    title: 'Clarify Reimbursement Voucher limit for Auto Rickshaw sharing',
+    description: 'Multiple interns from Pune cluster requested written clarification on whether two scholars taking the same auto can each claim ₹250 or only one claim per trip.',
+    submittedBy: 'Priya Sharma (Junior Secretary)',
+    submittedRole: 'junior_sec',
+    category: 'Reimbursements',
+    status: 'pending',
+    priority: 'medium',
+    createdAt: '2026-10-14',
+    rectifiedAt: null,
+    rectifiedNote: null
+  },
+  {
+    id: 'sug-3',
+    title: 'Add cluster filter in Materials Hub for regional language kits',
+    description: 'Interns conducting sessions in rural Marathi-medium schools requested quick filtering for regional language PDFs.',
+    submittedBy: 'Ananya Rao (Outreach Scholar, Batch 2)',
+    submittedRole: 'intern',
+    category: 'Curriculum',
+    status: 'pending',
+    priority: 'low',
+    createdAt: '2026-10-13',
+    rectifiedAt: null,
+    rectifiedNote: null
+  },
+  {
+    id: 'sug-4',
+    title: 'Direct WhatsApp intimation template for urgent schedule adjustments',
+    description: 'Junior secretaries need a standardized notice format when schools shift timing unexpectedly.',
+    submittedBy: 'Rohan Verma (Junior Secretary)',
+    submittedRole: 'junior_sec',
+    category: 'Operations',
+    status: 'rectified',
+    priority: 'medium',
+    createdAt: '2026-10-12',
+    rectifiedAt: '2026-10-14',
+    rectifiedNote: 'Added direct WhatsApp group links in circular attachments.'
+  }
+]
+
+

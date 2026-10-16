@@ -25,7 +25,9 @@ import {
   INITIAL_RESOURCES,
   INITIAL_BROADCASTS,
   INITIAL_POSTS,
-  INITIAL_QUERIES
+  INITIAL_QUERIES,
+  INITIAL_ASSIGNED_TASKS,
+  INITIAL_SUGGESTIONS
 } from './mockData'
 import {
   isSupabaseConfigured,
@@ -218,7 +220,31 @@ export default function App() {
     return INITIAL_QUERIES
   })
 
-  // 13. Read Broadcasts tracking & Active Toast for real-time alerts
+  // 13. Assigned Tasks with "Done or Not" tracking (Junior Secs and Senior Sec)
+  const [assignedTasks, setAssignedTasks] = useState(() => {
+    const saved = localStorage.getItem('dakshana_assigned_tasks')
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved)
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed
+      } catch (e) { }
+    }
+    return INITIAL_ASSIGNED_TASKS
+  })
+
+  // 14. Suggestions & Maintenance Issues Tracker (For Senior Secretary)
+  const [suggestions, setSuggestions] = useState(() => {
+    const saved = localStorage.getItem('dakshana_suggestions')
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved)
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed
+      } catch (e) { }
+    }
+    return INITIAL_SUGGESTIONS
+  })
+
+  // 15. Read Broadcasts tracking & Active Toast for real-time alerts
   const [readBroadcastIds, setReadBroadcastIds] = useState(() => {
     const saved = localStorage.getItem('dakshana_read_broadcasts')
     if (saved) {
@@ -673,6 +699,61 @@ export default function App() {
     })
   }
 
+  // Assigned Directives & Tasks Handlers ("Done or Not" update tracking)
+  const handleToggleTaskDone = (taskId) => {
+    setAssignedTasks(prev => {
+      const updated = prev.map(t => {
+        if (t.id === taskId) {
+          const nextCompleted = !t.isCompleted
+          return {
+            ...t,
+            isCompleted: nextCompleted,
+            completedAt: nextCompleted ? new Date().toISOString() : null
+          }
+        }
+        return t
+      })
+      localStorage.setItem('dakshana_assigned_tasks', JSON.stringify(updated))
+      return updated
+    })
+  }
+
+  const handleAssignTask = (newTask) => {
+    setAssignedTasks(prev => {
+      const updated = [newTask, ...prev]
+      localStorage.setItem('dakshana_assigned_tasks', JSON.stringify(updated))
+      return updated
+    })
+  }
+
+  // System Improvement & Maintenance Handlers (Senior Secretary Exclusive)
+  const handleRectifySuggestion = (suggestionId, rectificationNote) => {
+    setSuggestions(prev => {
+      const updated = prev.map(s => {
+        if (s.id === suggestionId) {
+          return {
+            ...s,
+            status: 'rectified',
+            rectifiedAt: new Date().toISOString(),
+            rectifiedBy: currentUser?.name || 'Senior Secretary',
+            rectifiedNote: rectificationNote || 'Rectified and verified in maintenance update.'
+          }
+        }
+        return s
+      })
+      localStorage.setItem('dakshana_suggestions', JSON.stringify(updated))
+      return updated
+    })
+  }
+
+  const handleAddSuggestion = (newSug) => {
+    setSuggestions(prev => {
+      const updated = [newSug, ...prev]
+      localStorage.setItem('dakshana_suggestions', JSON.stringify(updated))
+      return updated
+    })
+  }
+
   // Circulars / Notices Visibility & Notification Dispatcher
   const visibleBroadcasts = broadcasts.filter(b => {
     if (!currentUser) return true
@@ -781,6 +862,7 @@ export default function App() {
             <>
               {currentUser.role === 'senior_sec' && (
                 <SeniorSecView
+                  currentUser={currentUser}
                   allUsers={allUsers}
                   reports={reports}
                   sessions={sessions}
@@ -792,6 +874,12 @@ export default function App() {
                   delegatedPowers={delegatedPowers}
                   onTogglePrivilege={handleTogglePrivilege}
                   onBulkPrivilege={handleBulkPrivilege}
+                  assignedTasks={assignedTasks}
+                  onToggleTaskDone={handleToggleTaskDone}
+                  onAssignTask={handleAssignTask}
+                  suggestions={suggestions}
+                  onRectifySuggestion={handleRectifySuggestion}
+                  onAddSuggestion={handleAddSuggestion}
                 />
               )}
 
@@ -807,6 +895,9 @@ export default function App() {
                   onUpdateInternBatch={handleUpdateInternBatch}
                   onUpdateInternTargetVisits={handleUpdateInternTargetVisits}
                   onSelectIntern={(intern) => setSelectedInternForModal(intern)}
+                  assignedTasks={assignedTasks}
+                  onToggleTaskDone={handleToggleTaskDone}
+                  onAddSuggestion={handleAddSuggestion}
                 />
               )}
 
@@ -818,6 +909,7 @@ export default function App() {
                   sessions={sessions}
                   onSubmitReport={handleSubmitReport}
                   onSelectIntern={(intern) => setSelectedInternForModal(intern)}
+                  onAddSuggestion={handleAddSuggestion}
                 />
               )}
 
@@ -825,6 +917,11 @@ export default function App() {
                 <ManagementView
                   allUsers={allUsers}
                   reports={reports}
+                  sessions={sessions}
+                  assignedTasks={assignedTasks}
+                  onToggleTaskDone={handleToggleTaskDone}
+                  onAssignTask={handleAssignTask}
+                  suggestions={suggestions}
                 />
               )}
             </>

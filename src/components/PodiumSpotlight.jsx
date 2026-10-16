@@ -179,10 +179,7 @@ export default function PodiumSpotlight({ allUsers = [], sessions = [], onSelect
                 <div className="pb-1">
                   <span className="text-2xl sm:text-3xl font-black text-slate-950">{first.visitsCount}</span>
                   <span className="text-[11px] text-slate-900 block uppercase font-extrabold tracking-wider">
-                    School Visits
-                  </span>
-                  <span className="text-[10px] text-slate-900/80 font-bold block mt-0.5">
-                    {first.studentsReached} Scholars Reached
+                    School Visits Completed
                   </span>
                 </div>
               </div>
@@ -257,7 +254,7 @@ export default function PodiumSpotlight({ allUsers = [], sessions = [], onSelect
                   {topBatch1.name}
                 </span>
                 <span className="text-[11px] text-emerald-200 block">
-                  {topBatch1.visitsCount} school visits • {topBatch1.studentsReached} students
+                  {topBatch1.visitsCount} school visits completed
                 </span>
               </div>
             </div>
@@ -287,7 +284,7 @@ export default function PodiumSpotlight({ allUsers = [], sessions = [], onSelect
                   {topBatch2.name}
                 </span>
                 <span className="text-[11px] text-emerald-200 block">
-                  {topBatch2.visitsCount} school visits • {topBatch2.studentsReached} students
+                  {topBatch2.visitsCount} school visits completed
                 </span>
               </div>
             </div>

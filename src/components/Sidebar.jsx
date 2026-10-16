@@ -53,7 +53,7 @@ export default function Sidebar({
     { id: 'queries', label: 'Queries & Doubts', icon: HelpCircle },
     { id: 'resources', label: 'Materials Hub', icon: BookOpen },
     { id: 'reimbursements', label: 'Reimbursements', icon: CreditCard },
-    { id: 'team', label: 'Team', icon: Users }
+    { id: 'team', label: 'Meet the Team', icon: Users }
   ]
 
   const handleNavClick = (tabId) => {

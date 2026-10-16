@@ -18,6 +18,7 @@ import {
   Calendar
 } from 'lucide-react'
 import Avatar from './Avatar'
+import { formatDateWithRelative } from '../utils/dateUtils'
 
 export default function PostsFeed({
   currentUser,
@@ -34,7 +35,6 @@ export default function PostsFeed({
   const [photoUrl, setPhotoUrl] = useState('')
   const [isCompleted, setIsCompleted] = useState(false)
   const [schoolName, setSchoolName] = useState('')
-  const [studentsReached, setStudentsReached] = useState('25')
   const [selectedPresetPhoto, setSelectedPresetPhoto] = useState('')
   const [localImagePreview, setLocalImagePreview] = useState('')
 
@@ -74,14 +74,14 @@ export default function PostsFeed({
       authorPhoto: currentUser.photo,
       batch: currentUser.batch || 'Batch 1',
       wing: currentUser.department || 'Outreach Wing',
-      createdAt: 'Just now',
+      createdAt: new Date().toISOString().split('T')[0],
       title: title.trim() || 'Outreach Milestone Update',
       content: content.trim(),
       photoUrl: photoUrl || localImagePreview || selectedPresetPhoto || null,
       schoolName: isCompleted ? schoolName.trim() : null,
       isCompleted: Boolean(isCompleted),
       visitsLogged: isCompleted ? 1 : 0,
-      studentsReached: isCompleted ? parseInt(studentsReached || '0', 10) : 0,
+      studentsReached: 0,
       cheersCount: 1,
       comments: []
     }
@@ -267,29 +267,16 @@ export default function PostsFeed({
               </label>
 
               {isCompleted && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-emerald-200/60">
-                  <div>
-                    <label className="block font-bold text-slate-700 text-[11px] mb-1">School / Center Name *</label>
-                    <input
-                      required
-                      type="text"
-                      value={schoolName}
-                      onChange={(e) => setSchoolName(e.target.value)}
-                      placeholder="e.g. ZP High School, Taluka Haveli"
-                      className="w-full text-xs rounded-xl border border-slate-300 p-2 bg-white focus:ring-2 focus:ring-[#0A643B] focus:outline-hidden"
-                    />
-                  </div>
-                  <div>
-                    <label className="block font-bold text-slate-700 text-[11px] mb-1">Students Attended *</label>
-                    <input
-                      required
-                      type="number"
-                      value={studentsReached}
-                      onChange={(e) => setStudentsReached(e.target.value)}
-                      placeholder="25"
-                      className="w-full text-xs rounded-xl border border-slate-300 p-2 bg-white focus:ring-2 focus:ring-[#0A643B] focus:outline-hidden"
-                    />
-                  </div>
+                <div className="pt-2 border-t border-emerald-200/60">
+                  <label className="block font-bold text-slate-700 text-[11px] mb-1">School / Center Name *</label>
+                  <input
+                    required
+                    type="text"
+                    value={schoolName}
+                    onChange={(e) => setSchoolName(e.target.value)}
+                    placeholder="e.g. ZP High School, Taluka Haveli"
+                    className="w-full text-xs rounded-xl border border-slate-300 p-2 bg-white focus:ring-2 focus:ring-[#0A643B] focus:outline-hidden"
+                  />
                 </div>
               )}
             </div>
@@ -393,7 +380,9 @@ export default function PostsFeed({
                           {post.batch}
                         </span>
                       </div>
-                      <span className="text-[11px] text-slate-400 block">{post.createdAt}</span>
+                      <span className="text-[11px] text-slate-500 font-medium block">
+                        {formatDateWithRelative(post.createdAt)}
+                      </span>
                     </div>
                   </div>
 
@@ -422,10 +411,7 @@ export default function PostsFeed({
                 {post.schoolName && (
                   <div className="inline-flex items-center space-x-2 px-3 py-1.5 rounded-xl bg-emerald-50 text-[#0A643B] border border-emerald-200 text-xs font-semibold">
                     <School className="w-4 h-4 text-[#0A643B]" />
-                    <span>School: <strong>{post.schoolName}</strong></span>
-                    {post.studentsReached > 0 && (
-                      <span className="text-slate-500 font-normal">• {post.studentsReached} students attended</span>
-                    )}
+                    <span>School Visited: <strong>{post.schoolName}</strong></span>
                   </div>
                 )}
 
@@ -478,7 +464,7 @@ export default function PostsFeed({
                           <div key={c.id} className="bg-white p-2.5 rounded-xl border border-slate-200 text-xs">
                             <div className="flex justify-between items-center mb-0.5">
                               <span className="font-bold text-slate-900">{c.authorName}</span>
-                              <span className="text-[10px] text-slate-400">{c.time}</span>
+                              <span className="text-[10px] text-slate-500 font-medium">{formatDateWithRelative(c.time || c.createdAt)}</span>
                             </div>
                             <p className="text-slate-600">{c.text}</p>
                           </div>

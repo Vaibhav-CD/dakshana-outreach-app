@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { FileText, Clock, AlertCircle, CheckCircle, Send, MessageSquare, Calendar, Phone, TrendingUp } from 'lucide-react'
+import { FileText, Clock, AlertCircle, CheckCircle, Send, MessageSquare, Calendar, Phone, TrendingUp, MessageSquarePlus, X, CheckCircle2 } from 'lucide-react'
 import PodiumSpotlight from './PodiumSpotlight'
 import Avatar from './Avatar'
 
@@ -9,15 +9,48 @@ export default function InternView({
   reports,
   sessions = [],
   onSubmitReport,
-  onSelectIntern
+  onSelectIntern,
+  onAddSuggestion
 }) {
   const [tasks, setTasks] = useState('')
-  const [hours, setHours] = useState('')
   const [challenges, setChallenges] = useState('')
   const [nextGoals, setNextGoals] = useState('')
   const [month, setMonth] = useState('October 2026')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitSuccess, setSubmitSuccess] = useState(false)
+
+  // Suggestion Modal state
+  const [showSuggestionModal, setShowSuggestionModal] = useState(false)
+  const [sugTitle, setSugTitle] = useState('')
+  const [sugDesc, setSugDesc] = useState('')
+  const [sugCategory, setSugCategory] = useState('Materials Hub')
+  const [sugSuccessNotice, setSugSuccessNotice] = useState(null)
+
+  const handleSendSuggestion = (e) => {
+    e.preventDefault()
+    if (!sugTitle.trim()) return
+
+    const newSug = {
+      id: `sug-${Date.now()}`,
+      title: sugTitle.trim(),
+      description: sugDesc.trim(),
+      submittedBy: `${currentUser.name} (Outreach Scholar, ${currentUser.batch || 'Batch 1'})`,
+      submittedRole: 'intern',
+      category: sugCategory,
+      status: 'pending',
+      priority: 'medium',
+      createdAt: new Date().toISOString().split('T')[0],
+      rectifiedAt: null,
+      rectifiedNote: null
+    }
+
+    if (onAddSuggestion) onAddSuggestion(newSug)
+    setSugTitle('')
+    setSugDesc('')
+    setShowSuggestionModal(false)
+    setSugSuccessNotice('Feedback/suggestion submitted to Leadership successfully.')
+    setTimeout(() => setSugSuccessNotice(null), 4000)
+  }
 
   const assignedSec = allUsers.find(u => u.id === currentUser.assignedTo)
   const internReports = reports.filter(r => r.internId === currentUser.id)
@@ -30,7 +63,7 @@ export default function InternView({
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    if (!tasks || !hours) return
+    if (!tasks) return
 
     setIsSubmitting(true)
     const newReport = {
@@ -41,7 +74,7 @@ export default function InternView({
       juniorSecId: currentUser.assignedTo || 'user-jsec-1',
       monthYear: month,
       tasksCompleted: tasks,
-      hoursContributed: parseInt(hours, 10) || 0,
+      hoursContributed: 0,
       challengesFaced: challenges,
       nextMonthGoals: nextGoals,
       status: 'submitted',
@@ -55,7 +88,6 @@ export default function InternView({
       setIsSubmitting(false)
       setSubmitSuccess(true)
       setTasks('')
-      setHours('')
       setChallenges('')
       setNextGoals('')
       setTimeout(() => setSubmitSuccess(false), 4000)
@@ -100,27 +132,51 @@ export default function InternView({
               <p className="text-emerald-100 text-xs">Outreach Scholar • Field Operations</p>
             </div>
           </div>
-          <div className="bg-white/15 backdrop-blur-sm px-4 py-2.5 rounded-xl border border-white/20 text-xs">
-            <span className="text-emerald-200 block text-[11px] font-semibold">Assigned Junior Secretary:</span>
-            <span className="font-bold text-white text-sm block">{assignedSec ? assignedSec.name : 'Junior Secretary'}</span>
-            <div className="flex flex-wrap items-center gap-2 mt-1">
-              {assignedSec && assignedSec.email && (
-                <span className="text-[11px] text-emerald-100">{assignedSec.email}</span>
-              )}
-              {assignedSec && assignedSec.phone && (
-                <a
-                  href={`tel:${assignedSec.phone}`}
-                  className="inline-flex items-center text-[10px] font-bold bg-white text-[#0A643B] px-2 py-0.5 rounded-md hover:bg-emerald-50 transition-colors shadow-2xs"
-                  title="Call Junior Secretary"
-                >
-                  <Phone className="w-3 h-3 mr-1" />
-                  <span>Call {assignedSec.phone}</span>
-                </a>
-              )}
+          <div className="flex flex-col sm:flex-row items-center gap-3">
+            <div className="bg-white/15 backdrop-blur-sm px-4 py-2.5 rounded-xl border border-white/20 text-xs">
+              <span className="text-emerald-200 block text-[11px] font-semibold">Assigned Junior Secretary:</span>
+              <span className="font-bold text-white text-sm block">{assignedSec ? assignedSec.name : 'Junior Secretary'}</span>
+              <div className="flex flex-wrap items-center gap-2 mt-1">
+                {assignedSec && assignedSec.email && (
+                  <span className="text-[11px] text-emerald-100">{assignedSec.email}</span>
+                )}
+                {assignedSec && assignedSec.phone && (
+                  <a
+                    href={`tel:${assignedSec.phone}`}
+                    className="inline-flex items-center text-[10px] font-bold bg-white text-[#0A643B] px-2 py-0.5 rounded-md hover:bg-emerald-50 transition-colors shadow-2xs"
+                    title="Call Junior Secretary"
+                  >
+                    <Phone className="w-3 h-3 mr-1" />
+                    <span>Call {assignedSec.phone}</span>
+                  </a>
+                )}
+              </div>
             </div>
+
+            <button
+              onClick={() => setShowSuggestionModal(true)}
+              className="px-3.5 py-2.5 rounded-xl bg-white text-slate-900 hover:bg-emerald-50 text-xs font-bold transition-all shadow-xs flex items-center cursor-pointer whitespace-nowrap"
+              title="Share an improvement suggestion or feedback with leadership"
+            >
+              <MessageSquarePlus className="w-3.5 h-3.5 mr-1.5 text-[#0A643B]" />
+              Suggest Improvement
+            </button>
           </div>
         </div>
       </div>
+
+      {/* Suggestion Success Notice */}
+      {sugSuccessNotice && (
+        <div className="bg-[#0A643B] text-white p-3.5 px-4 rounded-xl shadow-lg flex items-center justify-between text-xs font-bold animate-in slide-in-from-top-2 border border-emerald-400">
+          <span className="flex items-center">
+            <CheckCircle2 className="w-4 h-4 mr-2 text-emerald-200" />
+            {sugSuccessNotice}
+          </span>
+          <button onClick={() => setSugSuccessNotice(null)} className="hover:opacity-80 cursor-pointer">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
 
       {/* Scholar's Personal Visit Target Progress Card */}
       <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-2xs space-y-2">
@@ -193,37 +249,19 @@ export default function InternView({
               />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
-                  Field Hours Contributed *
-                </label>
-                <input
-                  type="number"
-                  required
-                  min="1"
-                  max="300"
-                  value={hours}
-                  onChange={(e) => setHours(e.target.value)}
-                  placeholder="e.g. 35"
-                  className="w-full text-sm rounded-xl border border-slate-300 p-2.5 focus:outline-hidden focus:ring-2 focus:ring-[#0A643B]"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
-                  Reporting Cycle
-                </label>
-                <select
-                  value={month}
-                  onChange={(e) => setMonth(e.target.value)}
-                  className="w-full text-sm rounded-xl border border-slate-300 p-2.5 bg-white focus:outline-hidden focus:ring-2 focus:ring-[#0A643B]"
-                >
-                  <option value="October 2026">October 2026</option>
-                  <option value="November 2026">November 2026</option>
-                  <option value="December 2026">December 2026</option>
-                </select>
-              </div>
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                Reporting Cycle
+              </label>
+              <select
+                value={month}
+                onChange={(e) => setMonth(e.target.value)}
+                className="w-full text-sm rounded-xl border border-slate-300 p-2.5 bg-white focus:outline-hidden focus:ring-2 focus:ring-[#0A643B]"
+              >
+                <option value="October 2026">October 2026</option>
+                <option value="November 2026">November 2026</option>
+                <option value="December 2026">December 2026</option>
+              </select>
             </div>
 
             <div>
@@ -284,7 +322,6 @@ export default function InternView({
                     <div className="flex justify-between items-start">
                       <div>
                         <span className="font-bold text-slate-900 text-sm">{rep.monthYear}</span>
-                        <span className="text-xs text-slate-500 block">{rep.hoursContributed} hours recorded</span>
                       </div>
                       {getStatusBadge(rep.status)}
                     </div>
@@ -309,8 +346,86 @@ export default function InternView({
             )}
           </div>
         </div>
-
       </div>
+
+      {/* Suggestion / Feedback Modal for Scholars */}
+      {showSuggestionModal && (
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="font-bold text-slate-900 text-lg flex items-center">
+                <MessageSquarePlus className="w-5 h-5 mr-2 text-[#0A643B]" />
+                Share Feedback or Suggestion
+              </h3>
+              <button onClick={() => setShowSuggestionModal(false)} className="text-slate-400 hover:text-slate-600 cursor-pointer">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <p className="text-xs text-slate-500 mb-4">
+              Your suggestion goes directly to the Senior Secretary and Leadership to improve materials, resources, or field processes.
+            </p>
+
+            <form onSubmit={handleSendSuggestion} className="space-y-4 text-xs">
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Subject / Title *</label>
+                <input
+                  required
+                  type="text"
+                  value={sugTitle}
+                  onChange={(e) => setSugTitle(e.target.value)}
+                  placeholder="e.g. Offline printable school visit attendance sheet"
+                  className="w-full text-sm rounded-xl border border-slate-300 p-2.5 focus:ring-2 focus:ring-[#0A643B] focus:outline-hidden"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Category *</label>
+                <select
+                  value={sugCategory}
+                  onChange={(e) => setSugCategory(e.target.value)}
+                  className="w-full text-sm rounded-xl border border-slate-300 p-2.5 bg-white focus:ring-2 focus:ring-[#0A643B] focus:outline-hidden cursor-pointer"
+                >
+                  <option value="Materials Hub">Materials Hub</option>
+                  <option value="Curriculum">Curriculum</option>
+                  <option value="Reimbursements">Reimbursements</option>
+                  <option value="Operations">Operations</option>
+                  <option value="Technical">Technical</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Your Detailed Suggestion / Note *</label>
+                <textarea
+                  required
+                  rows={3}
+                  value={sugDesc}
+                  onChange={(e) => setSugDesc(e.target.value)}
+                  placeholder="Explain your idea or the difficulty faced during school outreach..."
+                  className="w-full text-sm rounded-xl border border-slate-300 p-2.5 focus:ring-2 focus:ring-[#0A643B] focus:outline-hidden resize-none"
+                />
+              </div>
+
+              <div className="flex justify-end space-x-2 pt-3">
+                <button
+                  type="button"
+                  onClick={() => setShowSuggestionModal(false)}
+                  className="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 font-semibold cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-xl bg-[#0A643B] hover:bg-[#074D2D] text-white font-bold shadow-xs cursor-pointer flex items-center"
+                >
+                  <Send className="w-3.5 h-3.5 mr-1.5" />
+                  Submit Suggestion
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
     </div>
   )
 }
