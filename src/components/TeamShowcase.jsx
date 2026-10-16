@@ -169,7 +169,7 @@ export default function TeamShowcase({ allUsers, onSelectIntern }) {
               </div>
 
               <p className="text-[11px] text-slate-500 truncate mb-2">
-                {intern.department || 'Outreach Track'}
+                Outreach Scholar
               </p>
 
               <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-[#0A643B]">

@@ -52,7 +52,6 @@ export default function AuthModal({
   const [signUpPassword, setSignUpPassword] = useState('')
   const [signUpPhoto, setSignUpPhoto] = useState(null) // null = default icon
   const [signUpBatch, setSignUpBatch] = useState('Batch 1')
-  const [signUpTrack, setSignUpTrack] = useState('Foundational Numeracy')
   const [signUpPhone, setSignUpPhone] = useState('')
   const [signUpSec, setSignUpSec] = useState('user-jsec-1')
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -165,9 +164,9 @@ export default function AuthModal({
       role: 'intern', // Strictly intern role
       batch: signUpBatch,
       assignedTo: signUpSec,
-      department: signUpTrack,
-      photo: signUpPhoto || null, // Custom uploaded photo or null for default icon
-      bio: `${signUpBatch} Scholar • Focus on ${signUpTrack}.`
+      department: 'Outreach Fieldwork',
+      photo: signUpPhoto || null, // Custom uploaded photo or null for WhatsApp default icon
+      bio: `${signUpBatch} Outreach Scholar.`
     }
 
     try {
@@ -514,17 +513,6 @@ export default function AuthModal({
                       className="w-full text-xs rounded-xl border border-slate-300 p-2.5 focus:ring-2 focus:ring-[#0A643B] focus:outline-hidden"
                     />
                   </div>
-                </div>
-
-                <div>
-                  <label className="block font-bold text-slate-700 mb-1">Outreach Subject Track</label>
-                  <input
-                    type="text"
-                    value={signUpTrack}
-                    onChange={(e) => setSignUpTrack(e.target.value)}
-                    placeholder="e.g. Foundational Numeracy, Science, Health"
-                    className="w-full text-xs rounded-xl border border-slate-300 p-2.5 focus:ring-2 focus:ring-[#0A643B] focus:outline-hidden"
-                  />
                 </div>
 
                 <div>

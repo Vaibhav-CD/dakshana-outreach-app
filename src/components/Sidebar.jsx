@@ -10,7 +10,8 @@ import {
   X,
   ChevronRight,
   ShieldCheck,
-  Camera
+  Camera,
+  HelpCircle
 } from 'lucide-react'
 import logoImg from '../assets/logo.png'
 import Avatar from './Avatar'
@@ -44,11 +45,12 @@ export default function Sidebar({
   const badge = getRoleBadge(currentUser?.role)
 
   // Re-ordered navigation strictly as requested:
-  // 1. Dashboard, 2. Notices, 3. Posts, 4. Materials, 5. Reimbursements, 6. Team (at the end)
+  // 1. Dashboard, 2. Notices, 3. Posts, 4. Queries & Doubts, 5. Materials, 6. Reimbursements, 7. Team
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'notices', label: 'Notices', icon: Radio, count: unreadBroadcastsCount },
     { id: 'posts', label: 'Posts & Feed', icon: Share2 },
+    { id: 'queries', label: 'Queries & Doubts', icon: HelpCircle },
     { id: 'resources', label: 'Materials Hub', icon: BookOpen },
     { id: 'reimbursements', label: 'Reimbursements', icon: CreditCard },
     { id: 'team', label: 'Team', icon: Users }

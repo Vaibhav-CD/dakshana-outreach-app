@@ -92,7 +92,7 @@ export default function InternDetailModal({
                   {intern.batch || 'Batch 1'}
                 </span>
                 <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/20 text-emerald-100">
-                  {intern.department || 'Outreach Field'}
+                  Outreach Scholar
                 </span>
               </div>
               <h2 className="text-xl sm:text-2xl font-black text-white truncate">
@@ -239,13 +239,13 @@ export default function InternDetailModal({
                 </div>
               </div>
 
-              {/* Bio & Track Info */}
+              {/* Scholar Summary */}
               <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
-                  Scholar Summary & Outreach Track
+                  Scholar Fieldwork Summary
                 </span>
                 <p className="text-slate-700 leading-relaxed text-xs">
-                  {intern.bio || `${intern.name} is a dedicated outreach scholar focusing on ${intern.department}.`}
+                  {intern.bio || `${intern.name} is a dedicated Dakshana outreach scholar.`}
                 </p>
               </div>
 

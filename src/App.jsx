@@ -14,6 +14,8 @@ import PostsFeed from './components/PostsFeed'
 import InternDetailModal from './components/InternDetailModal'
 import EditProfilePhotoModal from './components/EditProfilePhotoModal'
 import AuthModal from './components/AuthModal'
+import { Radio, X, Bell } from 'lucide-react'
+import QueriesHub from './components/QueriesHub'
 import {
   INITIAL_USERS,
   INITIAL_REPORTS,
@@ -22,7 +24,8 @@ import {
   INITIAL_REIMBURSEMENT_CLAIMS,
   INITIAL_RESOURCES,
   INITIAL_BROADCASTS,
-  INITIAL_POSTS
+  INITIAL_POSTS,
+  INITIAL_QUERIES
 } from './mockData'
 import {
   isSupabaseConfigured,
@@ -41,6 +44,29 @@ import {
 
 // 2 Weeks session duration in milliseconds (14 days = 14 * 24 * 60 * 60 * 1000)
 const TWO_WEEKS_MS = 14 * 24 * 60 * 60 * 1000
+
+// Pleasant notification sound synthesizer for incoming notices & circulars
+function playNoticeChime() {
+  try {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext
+    if (!AudioCtx) return
+    const ctx = new AudioCtx()
+    const osc = ctx.createOscillator()
+    const gain = ctx.createGain()
+    osc.connect(gain)
+    gain.connect(ctx.destination)
+    const now = ctx.currentTime
+    osc.type = 'sine'
+    osc.frequency.setValueAtTime(587.33, now) // D5
+    osc.frequency.exponentialRampToValueAtTime(880, now + 0.15) // A5
+    gain.gain.setValueAtTime(0.2, now)
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5)
+    osc.start(now)
+    osc.stop(now + 0.5)
+  } catch (e) {
+    // Audio context may require user gesture on some browsers
+  }
+}
 
 export default function App() {
   // 1. Current logged in user with 2-week session persistence
@@ -180,7 +206,29 @@ export default function App() {
     return INITIAL_BROADCASTS
   })
 
-  // 12. UI States: Modals & Sidebar
+  // 12. Queries & Doubt Resolution Hub
+  const [queries, setQueries] = useState(() => {
+    const saved = localStorage.getItem('dakshana_queries')
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved)
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed
+      } catch (e) { }
+    }
+    return INITIAL_QUERIES
+  })
+
+  // 13. Read Broadcasts tracking & Active Toast for real-time alerts
+  const [readBroadcastIds, setReadBroadcastIds] = useState(() => {
+    const saved = localStorage.getItem('dakshana_read_broadcasts')
+    if (saved) {
+      try { return JSON.parse(saved) } catch (e) { }
+    }
+    return []
+  })
+  const [activeNoticeToast, setActiveNoticeToast] = useState(null)
+
+  // 14. UI States: Modals & Sidebar
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false)
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
@@ -537,6 +585,99 @@ export default function App() {
     })
   }
 
+  // Query & Doubts Forum Handlers
+  const handleAddQuery = (newQuery) => {
+    setQueries(prev => {
+      const updated = [newQuery, ...prev]
+      localStorage.setItem('dakshana_queries', JSON.stringify(updated))
+      return updated
+    })
+  }
+
+  const handleAddAnswer = (queryId, newAnswer) => {
+    setQueries(prev => {
+      const updated = prev.map(q => {
+        if (q.id === queryId) {
+          return {
+            ...q,
+            answers: [...(q.answers || []), newAnswer]
+          }
+        }
+        return q
+      })
+      localStorage.setItem('dakshana_queries', JSON.stringify(updated))
+      return updated
+    })
+  }
+
+  const handleToggleResolveQuery = (queryId) => {
+    setQueries(prev => {
+      const updated = prev.map(q => {
+        if (q.id === queryId) {
+          const nextStatus = q.status === 'resolved' ? 'open' : 'resolved'
+          return {
+            ...q,
+            status: nextStatus,
+            resolvedAt: nextStatus === 'resolved' ? 'Just now' : null
+          }
+        }
+        return q
+      })
+      localStorage.setItem('dakshana_queries', JSON.stringify(updated))
+      return updated
+    })
+  }
+
+  const handleUpvoteQuery = (queryId) => {
+    setQueries(prev => {
+      const updated = prev.map(q => {
+        if (q.id === queryId) {
+          return { ...q, upvotes: (q.upvotes || 0) + 1 }
+        }
+        return q
+      })
+      localStorage.setItem('dakshana_queries', JSON.stringify(updated))
+      return updated
+    })
+  }
+
+  // Circulars / Notices Visibility & Notification Dispatcher
+  const visibleBroadcasts = broadcasts.filter(b => {
+    if (!currentUser) return true
+    if (currentUser.role === 'senior_sec' || currentUser.role === 'management') return true
+    if (b.audience === 'all') return true
+    if (currentUser.role === 'junior_sec') {
+      return b.audience === 'junior_secs' || b.audience === 'all_interns' || b.audience === 'batch_1' || b.audience === 'batch_2'
+    }
+    if (currentUser.role === 'intern') {
+      if (b.audience === 'all_interns') return true
+      if (currentUser.batch === 'Batch 1' && b.audience === 'batch_1') return true
+      if (currentUser.batch === 'Batch 2' && b.audience === 'batch_2') return true
+      return false
+    }
+    return false
+  })
+
+  const unreadCount = visibleBroadcasts.filter(b => !readBroadcastIds.includes(b.id)).length
+
+  const handleMarkAllNoticesRead = () => {
+    const allIds = visibleBroadcasts.map(b => b.id)
+    const updated = Array.from(new Set([...readBroadcastIds, ...allIds]))
+    setReadBroadcastIds(updated)
+    localStorage.setItem('dakshana_read_broadcasts', JSON.stringify(updated))
+  }
+
+  const handleSelectNotice = (notice) => {
+    if (notice) {
+      if (!readBroadcastIds.includes(notice.id)) {
+        const updated = [...readBroadcastIds, notice.id]
+        setReadBroadcastIds(updated)
+        localStorage.setItem('dakshana_read_broadcasts', JSON.stringify(updated))
+      }
+    }
+    handleSetActiveTab('notices')
+  }
+
   const handleSendBroadcast = (newBroadcast) => {
     setBroadcasts(prev => {
       const updated = [newBroadcast, ...prev]
@@ -544,9 +685,11 @@ export default function App() {
       return updated
     })
     dbCreateBroadcast(newBroadcast).catch(console.error)
-  }
 
-  const unreadCount = broadcasts.filter(b => b.isNew).length
+    // Notify immediately with high-priority audio & visual alert
+    setActiveNoticeToast(newBroadcast)
+    playNoticeChime()
+  }
 
   // Start everything from a dedicated full-screen login page if no active user session
   if (!currentUser) {
@@ -593,6 +736,9 @@ export default function App() {
           onOpenPhotoModal={() => setIsPhotoModalOpen(true)}
           onToggleMobileSidebar={() => setIsMobileSidebarOpen(prev => !prev)}
           unreadBroadcastsCount={unreadCount}
+          broadcasts={visibleBroadcasts}
+          onSelectNotice={handleSelectNotice}
+          onMarkAllNoticesRead={handleMarkAllNoticesRead}
         />
 
         {/* Dynamic Page Main Content */}
@@ -670,12 +816,24 @@ export default function App() {
             />
           )}
 
-          {/* TAB 4: MATERIALS HUB (Strictly the 2 official links) */}
+          {/* TAB 4: QUERIES & DOUBTS HUB */}
+          {activeTab === 'queries' && (
+            <QueriesHub
+              currentUser={currentUser}
+              queries={queries}
+              onAddQuery={handleAddQuery}
+              onAddAnswer={handleAddAnswer}
+              onToggleResolve={handleToggleResolveQuery}
+              onUpvoteQuery={handleUpvoteQuery}
+            />
+          )}
+
+          {/* TAB 5: MATERIALS HUB (Strictly the 2 official links) */}
           {activeTab === 'resources' && (
             <ResourceHub />
           )}
 
-          {/* TAB 5: REIMBURSEMENTS */}
+          {/* TAB 6: REIMBURSEMENTS */}
           {activeTab === 'reimbursements' && (
             <ReimbursementModule
               currentUser={currentUser}
@@ -689,7 +847,7 @@ export default function App() {
             />
           )}
 
-          {/* TAB 6: TEAM (Kept at the end) */}
+          {/* TAB 7: TEAM (Kept at the end) */}
           {activeTab === 'team' && (
             <TeamShowcase
               allUsers={allUsers}
@@ -698,6 +856,51 @@ export default function App() {
           )}
 
         </main>
+
+        {/* Live Circular Notification Banner / Toast */}
+        {activeNoticeToast && (
+          <div className="fixed top-20 right-4 z-50 max-w-sm sm:max-w-md w-full animate-in slide-in-from-top-4 duration-300">
+            <div className="bg-slate-900 text-white p-4 rounded-2xl border-2 border-[#0A643B] flex items-start space-x-3 shadow-2xl">
+              <div className="p-2.5 rounded-xl bg-[#0A643B] text-white flex-shrink-0 animate-bounce">
+                <Radio className="w-5 h-5" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-400 flex items-center">
+                    <Bell className="w-3 h-3 inline mr-1" />
+                    New Notice from {activeNoticeToast.senderTitle || 'Secretariat'}
+                  </span>
+                  <button
+                    onClick={() => setActiveNoticeToast(null)}
+                    className="text-slate-400 hover:text-white p-0.5 rounded-lg cursor-pointer"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+                <h4 className="font-bold text-sm text-white truncate mt-0.5">
+                  {activeNoticeToast.title}
+                </h4>
+                <p className="text-xs text-slate-300 line-clamp-2 mt-1 leading-relaxed">
+                  {activeNoticeToast.message}
+                </p>
+                <div className="flex items-center justify-between mt-3 pt-2 border-t border-slate-800">
+                  <span className="text-[11px] text-slate-400 truncate max-w-[150px]">
+                    From: <strong className="text-white">{activeNoticeToast.sender}</strong>
+                  </span>
+                  <button
+                    onClick={() => {
+                      handleSelectNotice(activeNoticeToast)
+                      setActiveNoticeToast(null)
+                    }}
+                    className="px-3.5 py-1.5 rounded-xl bg-[#0A643B] hover:bg-[#074D2D] text-white text-xs font-bold transition-colors cursor-pointer shadow-xs whitespace-nowrap ml-2"
+                  >
+                    View Circular &rarr;
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Footer */}
         <footer className="border-t border-slate-200 bg-white py-4 text-center text-xs text-slate-500">

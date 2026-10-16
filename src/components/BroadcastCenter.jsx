@@ -4,7 +4,7 @@ import { Megaphone, Send, CheckCircle2, Bell, Radio } from 'lucide-react'
 export default function BroadcastCenter({ currentUser, broadcasts, onSendBroadcast, delegatedPowers = {} }) {
   // Senior Secretary, Management & Delegated Junior Secretaries have broadcast dispatching powers
   const userPowers = currentUser.role === 'junior_sec' ? (delegatedPowers[currentUser.id] || {}) : {}
-  const isAuthority = currentUser.role === 'senior_sec' || currentUser.role === 'management' || Boolean(userPowers.canBroadcast)
+  const isAuthority = currentUser.role === 'senior_sec' || currentUser.role === 'management' || currentUser.role === 'junior_sec' || Boolean(userPowers.canBroadcast)
   
   const [targetAudience, setTargetAudience] = useState('batch_1')
   const [broadcastTitle, setBroadcastTitle] = useState('')
@@ -44,6 +44,8 @@ export default function BroadcastCenter({ currentUser, broadcasts, onSendBroadca
     const newBroadcast = {
       id: `bc-${Date.now()}`,
       sender: currentUser.name,
+      senderRole: currentUser.role,
+      senderTitle: currentUser.role === 'junior_sec' ? 'Junior Secretary' : currentUser.role === 'senior_sec' ? 'Senior Secretary' : 'Management',
       title: broadcastTitle,
       message: broadcastMessage,
       audience: targetAudience,

@@ -6,7 +6,7 @@ export const INITIAL_USERS = [
     email: 'senior.sec@dakshana.org',
     role: 'senior_sec',
     department: 'Central Coordination',
-    photo: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80',
+    photo: null,
     bio: 'Highest operational authority: coordinates Batch 1 & Batch 2 allocations, supervises the 3 Junior Secretaries, controls financial reimbursement cycles, and dispatches circulars.'
   },
   {
@@ -16,7 +16,7 @@ export const INITIAL_USERS = [
     email: 'trustee@dakshana.org',
     role: 'management',
     department: 'Governing Board',
-    photo: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&auto=format&fit=crop&q=80',
+    photo: null,
     bio: 'Board-level governance, institutional audit oversight, and long-term strategy.'
   },
   {
@@ -25,9 +25,9 @@ export const INITIAL_USERS = [
     title: 'Junior Secretary - Wing 1',
     email: 'priya.jsec@dakshana.org',
     role: 'junior_sec',
-    department: 'Community Outreach & Fieldwork',
-    photo: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&auto=format&fit=crop&q=80',
-    bio: 'Limited supervisory scope: mentors and reviews monthly reports strictly for her assigned wing scholars.'
+    department: 'Outreach Fieldwork Supervision',
+    photo: null,
+    bio: 'Supervisory scope: mentors and reviews monthly reports strictly for her assigned wing scholars.'
   },
   {
     id: 'user-jsec-2',
@@ -35,9 +35,9 @@ export const INITIAL_USERS = [
     title: 'Junior Secretary - Wing 2',
     email: 'rohan.jsec@dakshana.org',
     role: 'junior_sec',
-    department: 'Education & Curriculum Support',
-    photo: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&auto=format&fit=crop&q=80',
-    bio: 'Limited supervisory scope: reviews STEM & educational progress reports strictly for his assigned wing scholars.'
+    department: 'Outreach Fieldwork Supervision',
+    photo: null,
+    bio: 'Supervisory scope: mentors and reviews progress reports strictly for his assigned wing scholars.'
   },
   {
     id: 'user-jsec-3',
@@ -45,11 +45,11 @@ export const INITIAL_USERS = [
     title: 'Junior Secretary - Wing 3',
     email: 'sneha.jsec@dakshana.org',
     role: 'junior_sec',
-    department: 'Digital Media & Communications',
-    photo: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&auto=format&fit=crop&q=80',
-    bio: 'Limited supervisory scope: evaluates storytelling, media outputs, and digital documentation for her assigned scholars.'
+    department: 'Outreach Fieldwork Supervision',
+    photo: null,
+    bio: 'Supervisory scope: mentors and reviews documentation reports for her assigned scholars.'
   },
-  // Sample Scholars with Batch 1 and Batch 2 assignments
+  // Outreach Scholars (Strictly one internship role across Batch 1 & Batch 2)
   {
     id: 'user-intern-1',
     name: 'Aarav Gupta',
@@ -58,9 +58,9 @@ export const INITIAL_USERS = [
     role: 'intern',
     batch: 'Batch 1',
     assignedTo: 'user-jsec-1',
-    department: 'Community Outreach',
-    photo: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400&auto=format&fit=crop&q=80',
-    bio: 'Batch 1 Scholar • Conducting weekend foundational numeracy sessions.'
+    department: 'Outreach Fieldwork',
+    photo: null,
+    bio: 'Batch 1 Outreach Scholar • Conducting school visits and foundational student sessions.'
   },
   {
     id: 'user-intern-2',
@@ -70,9 +70,9 @@ export const INITIAL_USERS = [
     role: 'intern',
     batch: 'Batch 1',
     assignedTo: 'user-jsec-1',
-    department: 'Community Outreach',
-    photo: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&auto=format&fit=crop&q=80',
-    bio: 'Batch 1 Scholar • Focus on rural health survey implementation.'
+    department: 'Outreach Fieldwork',
+    photo: null,
+    bio: 'Batch 1 Outreach Scholar • Conducting school visits and community learning drives.'
   },
   {
     id: 'user-intern-3',
@@ -82,9 +82,9 @@ export const INITIAL_USERS = [
     role: 'intern',
     batch: 'Batch 2',
     assignedTo: 'user-jsec-2',
-    department: 'Education',
-    photo: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&auto=format&fit=crop&q=80',
-    bio: 'Batch 2 Scholar • Conducting robotics & science lab modules.'
+    department: 'Outreach Fieldwork',
+    photo: null,
+    bio: 'Batch 2 Outreach Scholar • Conducting hands-on school visits and student demonstrations.'
   },
   {
     id: 'user-intern-4',
@@ -94,9 +94,9 @@ export const INITIAL_USERS = [
     role: 'intern',
     batch: 'Batch 2',
     assignedTo: 'user-jsec-2',
-    department: 'Education',
-    photo: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400&auto=format&fit=crop&q=80',
-    bio: 'Batch 2 Scholar • Teaching foundational reading circles.'
+    department: 'Outreach Fieldwork',
+    photo: null,
+    bio: 'Batch 2 Outreach Scholar • Conducting classroom outreach sessions and student mentoring.'
   },
   {
     id: 'user-intern-5',
@@ -106,9 +106,9 @@ export const INITIAL_USERS = [
     role: 'intern',
     batch: 'Batch 2',
     assignedTo: 'user-jsec-3',
-    department: 'Digital Media',
-    photo: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&auto=format&fit=crop&q=80',
-    bio: 'Batch 2 Scholar • Documentation & field impact filmmaking.'
+    department: 'Outreach Fieldwork',
+    photo: null,
+    bio: 'Batch 2 Outreach Scholar • Conducting field visits and school documentation.'
   }
 ]
 
@@ -349,7 +349,7 @@ export const INITIAL_POSTS = [
     id: 'post-1',
     authorId: 'user-intern-3',
     authorName: 'Kabir Das',
-    authorPhoto: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&auto=format&fit=crop&q=80',
+    authorPhoto: null,
     batch: 'Batch 2',
     wing: 'Wing 2 (Rohan)',
     createdAt: '2 hours ago',
@@ -370,7 +370,7 @@ export const INITIAL_POSTS = [
     id: 'post-2',
     authorId: 'user-intern-1',
     authorName: 'Aarav Gupta',
-    authorPhoto: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400&auto=format&fit=crop&q=80',
+    authorPhoto: null,
     batch: 'Batch 1',
     wing: 'Wing 1 (Priya)',
     createdAt: 'Yesterday at 4:30 PM',
@@ -390,7 +390,7 @@ export const INITIAL_POSTS = [
     id: 'post-3',
     authorId: 'user-intern-2',
     authorName: 'Meera Iyer',
-    authorPhoto: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&auto=format&fit=crop&q=80',
+    authorPhoto: null,
     batch: 'Batch 1',
     wing: 'Wing 1 (Priya)',
     createdAt: '2 days ago',
@@ -408,7 +408,7 @@ export const INITIAL_POSTS = [
     id: 'post-4',
     authorId: 'user-intern-4',
     authorName: 'Ananya Rao',
-    authorPhoto: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400&auto=format&fit=crop&q=80',
+    authorPhoto: null,
     batch: 'Batch 2',
     wing: 'Wing 2 (Rohan)',
     createdAt: '3 days ago',
@@ -421,6 +421,110 @@ export const INITIAL_POSTS = [
     studentsReached: 18,
     cheersCount: 9,
     comments: []
+  }
+]
+
+// Common Outreach Queries & Doubts (Accessible by scholars from every batch)
+export const INITIAL_QUERIES = [
+  {
+    id: 'query-1',
+    authorId: 'user-intern-1',
+    authorName: 'Aarav Gupta',
+    authorRole: 'intern',
+    batch: 'Batch 1',
+    category: 'School Permissions',
+    title: 'What should we do if the Headmaster asks for an official authorization letter before entry?',
+    content: 'Today at a ZP High School, the headmaster requested a signed physical permission or authorization letter from Dakshana before permitting the outreach classroom visit. What is the standard protocol for this?',
+    status: 'resolved',
+    createdAt: 'Yesterday',
+    upvotes: 16,
+    answers: [
+      {
+        id: 'ans-1',
+        authorName: 'Priya Sharma',
+        authorRole: 'junior_sec',
+        text: 'Carry a printed copy of the official Dakshana Outreach Program Intimation Circular from the Materials Hub. If the school requires a school-specific letter, message your assigned Junior Secretary on WhatsApp with the school name and Principal name, and we will dispatch a digital signed PDF within 30 minutes.',
+        isOfficial: true,
+        createdAt: 'Yesterday at 3:15 PM'
+      },
+      {
+        id: 'ans-2',
+        authorName: 'Senior Secretary',
+        authorRole: 'senior_sec',
+        text: 'All scholars should always carry their college ID card along with the Dakshana Introduction PDF. This immediately establishes credibility with school administrators.',
+        isOfficial: true,
+        createdAt: 'Yesterday at 4:00 PM'
+      }
+    ]
+  },
+  {
+    id: 'query-2',
+    authorId: 'user-intern-3',
+    authorName: 'Kabir Das',
+    authorRole: 'intern',
+    batch: 'Batch 2',
+    category: 'Expense & Reimbursements',
+    title: 'How to claim auto / shared e-rickshaw conveyance when no physical receipt is given?',
+    content: 'Most rural autos and e-rickshaws do not provide printed bus tickets or receipts. Can we claim these travel expenses, and what documentation is required?',
+    status: 'resolved',
+    createdAt: '2 days ago',
+    upvotes: 21,
+    answers: [
+      {
+        id: 'ans-3',
+        authorName: 'Rohan Verma',
+        authorRole: 'junior_sec',
+        text: 'Yes! Download the official Cash Voucher PDF from the Materials Hub. Fill in the travel details (from/to, purpose, amount up to ₹250 per voucher). If paid via UPI, attach the UPI transaction screenshot as supporting proof in your bills PDF.',
+        isOfficial: true,
+        createdAt: '2 days ago'
+      }
+    ]
+  },
+  {
+    id: 'query-3',
+    authorId: 'user-intern-4',
+    authorName: 'Ananya Rao',
+    authorRole: 'intern',
+    batch: 'Batch 2',
+    category: 'School Visits & Scheduling',
+    title: 'Are we permitted to conduct outreach sessions on Saturdays, or only weekdays?',
+    content: 'Some government schools have shorter half-day schedules on Saturdays. Is it permissible to conduct our foundational sessions on Saturday mornings?',
+    status: 'resolved',
+    createdAt: '3 days ago',
+    upvotes: 12,
+    answers: [
+      {
+        id: 'ans-4',
+        authorName: 'Sneha Kulkarni',
+        authorRole: 'junior_sec',
+        text: 'Yes, Saturday morning half-days are fully permitted and count toward your verified school visits, as long as school attendance is normal and the session is completed.',
+        isOfficial: true,
+        createdAt: '3 days ago'
+      }
+    ]
+  },
+  {
+    id: 'query-4',
+    authorId: 'user-intern-2',
+    authorName: 'Meera Iyer',
+    authorRole: 'intern',
+    batch: 'Batch 1',
+    category: 'Classroom & Teaching Materials',
+    title: 'Can two outreach scholars visit the same school if student strength is large (>70 students)?',
+    content: 'We have a high school with two sections of grade 8. Can two interns visit jointly and split the classrooms?',
+    status: 'open',
+    createdAt: '5 hours ago',
+    upvotes: 8,
+    answers: [
+      {
+        id: 'ans-5',
+        authorName: 'Priya Sharma',
+        authorRole: 'junior_sec',
+        text: 'Yes, joint visits are allowed for larger schools (>60 students). Both interns must independently log their visit in the Activity Feed and detail the separate classroom sections they conducted.',
+        isOfficial: true,
+        createdAt: '3 hours ago'
+      }
+    ]
   }
 ]
 

@@ -91,7 +91,7 @@ export default function InternView({
                 </span>
               </div>
               <h2 className="text-2xl font-bold mt-1">{currentUser.name}</h2>
-              <p className="text-emerald-100 text-xs">{currentUser.department || 'Grassroots Outreach'}</p>
+              <p className="text-emerald-100 text-xs">Outreach Scholar • Field Operations</p>
             </div>
           </div>
           <div className="bg-white/15 backdrop-blur-sm px-4 py-2.5 rounded-xl border border-white/20 text-xs">

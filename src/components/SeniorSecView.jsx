@@ -66,8 +66,8 @@ export default function SeniorSecView({
       role: 'intern',
       batch: newInternBatch,
       assignedTo: newInternSec,
-      department: newInternDept,
-      photo: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80',
+      department: 'Outreach Fieldwork',
+      photo: null,
       title: 'Outreach Scholar'
     })
 
@@ -324,7 +324,6 @@ export default function SeniorSecView({
                   <tr className="border-b border-slate-200 text-slate-500 uppercase tracking-wider">
                     <th className="pb-3 font-semibold">Scholar Name</th>
                     <th className="pb-3 font-semibold">Batch</th>
-                    <th className="pb-3 font-semibold">Outreach Track</th>
                     <th className="pb-3 font-semibold">Assigned Junior Secretary</th>
                     <th className="pb-3 font-semibold text-right">Senior Sec Authority</th>
                   </tr>
@@ -365,7 +364,6 @@ export default function SeniorSecView({
                             <option value="Batch 2">Batch 2</option>
                           </select>
                         </td>
-                        <td className="py-3.5 text-slate-600">{intern.department || 'General Outreach'}</td>
                         <td className="py-3.5">
                           <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-[#EBF7F0] text-[#0A643B] border border-[#0A643B]/30">
                             {assignedSec ? assignedSec.name : 'Unassigned'}
@@ -595,29 +593,16 @@ export default function SeniorSecView({
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block font-bold text-slate-700 mb-1">Cohort Batch *</label>
-                  <select
-                    value={newInternBatch}
-                    onChange={(e) => setNewInternBatch(e.target.value)}
-                    className="w-full text-sm rounded-xl border border-slate-300 p-2.5 bg-white focus:ring-2 focus:ring-[#0A643B] focus:outline-hidden cursor-pointer"
-                  >
-                    <option value="Batch 1">Batch 1</option>
-                    <option value="Batch 2">Batch 2</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block font-bold text-slate-700 mb-1">Outreach Track</label>
-                  <input
-                    type="text"
-                    value={newInternDept}
-                    onChange={(e) => setNewInternDept(e.target.value)}
-                    placeholder="e.g. Foundational Numeracy"
-                    className="w-full text-sm rounded-xl border border-slate-300 p-2.5 focus:ring-2 focus:ring-[#0A643B] focus:outline-hidden"
-                  />
-                </div>
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Cohort Batch *</label>
+                <select
+                  value={newInternBatch}
+                  onChange={(e) => setNewInternBatch(e.target.value)}
+                  className="w-full text-sm rounded-xl border border-slate-300 p-2.5 bg-white focus:ring-2 focus:ring-[#0A643B] focus:outline-hidden cursor-pointer"
+                >
+                  <option value="Batch 1">Batch 1</option>
+                  <option value="Batch 2">Batch 2</option>
+                </select>
               </div>
 
               <div>

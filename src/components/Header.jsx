@@ -1,5 +1,5 @@
-import React from 'react'
-import { Menu, LogOut, LogIn, Bell, CheckCircle2, Camera } from 'lucide-react'
+import React, { useState } from 'react'
+import { Menu, LogOut, LogIn, Bell, CheckCircle2, Camera, Radio } from 'lucide-react'
 import logoImg from '../assets/logo.png'
 import Avatar from './Avatar'
 
@@ -10,8 +10,12 @@ export default function Header({
   onSignOut,
   onToggleMobileSidebar,
   unreadBroadcastsCount = 0,
+  broadcasts = [],
+  onSelectNotice,
+  onMarkAllNoticesRead,
   onOpenPhotoModal
 }) {
+  const [showNotifMenu, setShowNotifMenu] = useState(false)
   const getRoleBadge = (role) => {
     switch (role) {
       case 'management':
@@ -37,6 +41,8 @@ export default function Header({
         return 'Notices & Circulars'
       case 'posts':
         return 'Community Posts & Activity Feed'
+      case 'queries':
+        return 'Queries & Doubts Hub'
       case 'resources':
         return 'Materials Hub'
       case 'reimbursements':
@@ -91,6 +97,116 @@ export default function Header({
             
             {currentUser && (
               <>
+                {/* Notification Bell Button & Dropdown */}
+                <div className="relative">
+                  <button
+                    onClick={() => setShowNotifMenu(!showNotifMenu)}
+                    className="p-2 sm:p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-600 hover:text-slate-900 transition-colors relative cursor-pointer"
+                    title="Official Notices & Circulars"
+                  >
+                    <Bell className="w-4 h-4 sm:w-5 sm:h-5 text-slate-700" />
+                    {unreadBroadcastsCount > 0 && (
+                      <span className="absolute -top-1 -right-1 px-1.5 py-0.2 min-w-[18px] text-[10px] font-black bg-[#7B2E68] text-white rounded-full flex items-center justify-center animate-pulse border-2 border-white shadow-xs">
+                        {unreadBroadcastsCount}
+                      </span>
+                    )}
+                  </button>
+
+                  {/* Dropdown Popover */}
+                  {showNotifMenu && (
+                    <>
+                      <div
+                        className="fixed inset-0 z-40"
+                        onClick={() => setShowNotifMenu(false)}
+                      />
+                      <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-2xl shadow-xl border border-slate-200 z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+                        <div className="p-3.5 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+                          <div className="flex items-center space-x-2">
+                            <Radio className="w-4 h-4 text-[#0A643B] animate-pulse" />
+                            <span className="font-extrabold text-xs text-slate-900">
+                              Official Notices & Circulars
+                            </span>
+                          </div>
+                          {unreadBroadcastsCount > 0 && onMarkAllNoticesRead && (
+                            <button
+                              onClick={() => {
+                                onMarkAllNoticesRead()
+                                setShowNotifMenu(false)
+                              }}
+                              className="text-[11px] font-bold text-[#0A643B] hover:underline cursor-pointer"
+                            >
+                              Mark all read
+                            </button>
+                          )}
+                        </div>
+
+                        <div className="max-h-80 overflow-y-auto divide-y divide-slate-100">
+                          {broadcasts && broadcasts.length > 0 ? (
+                            broadcasts.slice(0, 6).map((bc) => {
+                              const isFromJuniorSec = bc.senderRole === 'junior_sec' || bc.senderTitle === 'Junior Secretary'
+                              const isFromSeniorSec = bc.senderRole === 'senior_sec' || bc.senderTitle === 'Senior Secretary'
+                              
+                              return (
+                                <div
+                                  key={bc.id}
+                                  onClick={() => {
+                                    if (onSelectNotice) onSelectNotice(bc)
+                                    setShowNotifMenu(false)
+                                  }}
+                                  className={`p-3.5 hover:bg-slate-50 cursor-pointer transition-colors ${
+                                    bc.isNew ? 'bg-[#EBF7F0]/40' : ''
+                                  }`}
+                                >
+                                  <div className="flex items-center justify-between mb-1">
+                                    <span className={`text-[10px] font-bold px-1.5 py-0.2 rounded-full border ${
+                                      isFromJuniorSec
+                                        ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                                        : isFromSeniorSec
+                                        ? 'bg-[#EBF7F0] text-[#0A643B] border-[#0A643B]/30'
+                                        : 'bg-purple-50 text-purple-800 border-purple-200'
+                                    }`}>
+                                      {bc.senderTitle || (isFromJuniorSec ? 'Junior Secretary' : 'Leadership')}
+                                    </span>
+                                    <span className="text-[10px] text-slate-400 font-medium">
+                                      {bc.date || 'Recent'}
+                                    </span>
+                                  </div>
+                                  <h5 className="font-bold text-xs text-slate-900 leading-snug line-clamp-1">
+                                    {bc.title}
+                                  </h5>
+                                  <p className="text-[11px] text-slate-600 line-clamp-2 mt-0.5 leading-relaxed">
+                                    {bc.message}
+                                  </p>
+                                  <div className="mt-1.5 text-[10px] text-[#0A643B] font-bold flex items-center space-x-1">
+                                    <span>From {bc.sender}</span>
+                                    <span>• Click to read full &rarr;</span>
+                                  </div>
+                                </div>
+                              )
+                            })
+                          ) : (
+                            <div className="p-6 text-center text-slate-400 text-xs">
+                              No active circulars at this moment.
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="p-2.5 bg-slate-50 border-t border-slate-100 text-center">
+                          <button
+                            onClick={() => {
+                              if (onSelectNotice) onSelectNotice(null)
+                              setShowNotifMenu(false)
+                            }}
+                            className="text-xs font-bold text-[#0A643B] hover:underline cursor-pointer"
+                          >
+                            Open Full Circular Center &rarr;
+                          </button>
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
+
                 {/* User Pill Button (Click avatar to change photo, click text to switch profile) */}
                 <div className="flex items-center space-x-1.5 p-1 sm:p-1.5 rounded-xl border border-slate-200 bg-white shadow-2xs">
                   <div
