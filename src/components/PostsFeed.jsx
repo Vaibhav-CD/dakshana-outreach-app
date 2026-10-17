@@ -130,9 +130,11 @@ export default function PostsFeed({
     setNewCommentText('')
   }
 
-  // Filter posts
-  const filteredPosts = posts.filter(post => {
-    if (filter === 'completed') return post.isCompleted
+  // Filter posts with full null safety
+  const safePosts = Array.isArray(posts) ? posts.filter(Boolean) : []
+  const filteredPosts = safePosts.filter(post => {
+    if (!post) return false
+    if (filter === 'completed') return Boolean(post.isCompleted)
     if (filter === 'batch_1') return post.batch === 'Batch 1'
     if (filter === 'batch_2') return post.batch === 'Batch 2'
     return true
@@ -314,7 +316,7 @@ export default function PostsFeed({
             filter === 'all' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-500 hover:text-slate-800'
           }`}
         >
-          All Posts ({posts.length})
+          All Posts ({safePosts.length})
         </button>
         <button
           onClick={() => setFilter('completed')}
@@ -323,7 +325,7 @@ export default function PostsFeed({
           }`}
         >
           <CheckCircle2 className="w-3.5 h-3.5" />
-          Completed Activities ({posts.filter(p => p.isCompleted).length})
+          Completed Activities ({safePosts.filter(p => p && p.isCompleted).length})
         </button>
         <button
           onClick={() => setFilter('batch_1')}
@@ -353,12 +355,14 @@ export default function PostsFeed({
           </div>
         ) : (
           filteredPosts.map((post) => {
-            const isCheered = cheeredPosts[post.id]
-            const postComments = post.comments || []
-            const addedLocal = localComments[post.id] || []
+            if (!post) return null
+            const isCheered = Boolean(cheeredPosts[post.id])
+            const totalCheers = (Number(post.cheersCount) || 0) + (isCheered ? 1 : 0)
+            const postComments = Array.isArray(post.comments) ? post.comments : []
+            const addedLocal = Array.isArray(localComments[post.id]) ? localComments[post.id] : []
             const commentsList = [
               ...postComments,
-              ...addedLocal.filter(lc => !postComments.some(pc => pc.id === lc.id))
+              ...addedLocal.filter(lc => lc && !postComments.some(pc => pc && pc.id === lc.id))
             ]
             const showComments = activeCommentsPostId === post.id
 
@@ -469,15 +473,18 @@ export default function PostsFeed({
                       {commentsList.length === 0 ? (
                         <p className="text-[11px] text-slate-400 italic">No notes yet. Leave some encouragement!</p>
                       ) : (
-                        commentsList.map(c => (
-                          <div key={c.id} className="bg-white p-2.5 rounded-xl border border-slate-200 text-xs">
-                            <div className="flex justify-between items-center mb-0.5">
-                              <span className="font-bold text-slate-900">{c.authorName}</span>
-                              <span className="text-[10px] text-slate-500 font-medium">{formatDateWithRelative(c.time || c.createdAt)}</span>
+                        commentsList.map((c, cIdx) => {
+                          if (!c) return null
+                          return (
+                            <div key={c.id || `c-${cIdx}`} className="bg-white p-2.5 rounded-xl border border-slate-200 text-xs">
+                              <div className="flex justify-between items-center mb-0.5">
+                                <span className="font-bold text-slate-900">{c.authorName || 'Outreach Member'}</span>
+                                <span className="text-[10px] text-slate-500 font-medium">{formatDateWithRelative(c.time || c.createdAt)}</span>
+                              </div>
+                              <p className="text-slate-600">{c.text || ''}</p>
                             </div>
-                            <p className="text-slate-600">{c.text}</p>
-                          </div>
-                        ))
+                          )
+                        })
                       )}
                     </div>
 

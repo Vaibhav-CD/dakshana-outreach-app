@@ -15,6 +15,7 @@ import InternDetailModal from './components/InternDetailModal'
 import EditProfilePhotoModal from './components/EditProfilePhotoModal'
 import AuthModal from './components/AuthModal'
 import FeedbackModal from './components/FeedbackModal'
+import ErrorBoundary from './components/ErrorBoundary'
 import { Radio, X, Bell, Bug } from 'lucide-react'
 import QueriesHub from './components/QueriesHub'
 import {
@@ -902,6 +903,7 @@ export default function App() {
 
         {/* Dynamic Page Main Content */}
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full flex-1">
+          <ErrorBoundary onReset={() => setActiveTab('dashboard')} onGoHome={() => handleSetActiveTab('dashboard')}>
           
           {/* TAB 1: DASHBOARD */}
           {activeTab === 'dashboard' && currentUser && (
@@ -1033,6 +1035,7 @@ export default function App() {
             />
           )}
 
+          </ErrorBoundary>
         </main>
 
         {/* Live Circular Notification Banner / Toast */}
