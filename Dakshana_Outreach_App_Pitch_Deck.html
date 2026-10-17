@@ -1,0 +1,1396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dakshana Outreach Portal — Leadership Pitch Deck</title>
+  <style>
+    :root {
+      --primary: #0A643B;
+      --primary-dark: #074D2D;
+      --primary-light: #EBF7F0;
+      --gold: #D97706;
+      --gold-light: #FEF3C7;
+      --slate-900: #0F172A;
+      --slate-800: #1E293B;
+      --slate-600: #475569;
+      --slate-500: #64748B;
+      --slate-200: #E2E8F0;
+      --slate-100: #F1F5F9;
+      --slate-50: #F8FAFC;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background: #0B131E;
+      color: var(--slate-900);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      overflow-x: hidden;
+    }
+
+    /* Top Control Bar */
+    .top-bar {
+      width: 100%;
+      max-width: 1100px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      color: #94A3B8;
+      font-size: 13px;
+    }
+
+    .top-bar .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      color: white;
+    }
+
+    .top-bar .brand .badge {
+      background: var(--primary);
+      color: white;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      letter-spacing: 0.5px;
+    }
+
+    .top-bar .actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn-top {
+      background: #1E293B;
+      color: #E2E8F0;
+      border: 1px solid #334155;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .btn-top:hover {
+      background: #334155;
+      color: white;
+    }
+
+    /* Deck Stage */
+    .deck-container {
+      width: 100%;
+      max-width: 1100px;
+      aspect-ratio: 16 / 9;
+      min-height: 580px;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Slide Item */
+    .slide {
+      position: absolute;
+      inset: 0;
+      padding: 44px 56px;
+      display: none;
+      flex-direction: column;
+      justify-content: space-between;
+      background: white;
+      animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .slide.active {
+      display: flex;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.99); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    /* Header in Slide */
+    .slide-header {
+      margin-bottom: 24px;
+    }
+
+    .slide-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--primary);
+      background: var(--primary-light);
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 8px;
+      border: 1px solid rgba(10, 100, 59, 0.2);
+    }
+
+    .slide-title {
+      font-size: 28px;
+      font-weight: 900;
+      color: var(--slate-900);
+      line-height: 1.2;
+      letter-spacing: -0.5px;
+    }
+
+    .slide-subtitle {
+      font-size: 14px;
+      color: var(--slate-600);
+      margin-top: 4px;
+    }
+
+    /* Slide Content Layouts */
+    .slide-body {
+      flex: 1;
+      display: flex;
+      gap: 36px;
+      align-items: center;
+    }
+
+    .col-left {
+      flex: 1.1;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .col-right {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Feature List Bullets */
+    .feature-card {
+      background: var(--slate-50);
+      border: 1px solid var(--slate-200);
+      padding: 14px 18px;
+      border-radius: 14px;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      transition: all 0.2s;
+    }
+
+    .feature-card:hover {
+      border-color: var(--primary);
+      background: #FAFCFA;
+      transform: translateY(-1px);
+    }
+
+    .feature-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: var(--primary-light);
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .feature-text h4 {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--slate-900);
+      margin-bottom: 2px;
+    }
+
+    .feature-text p {
+      font-size: 12px;
+      color: var(--slate-600);
+      line-height: 1.4;
+    }
+
+    /* UI Mockup Window */
+    .mockup-window {
+      width: 100%;
+      background: white;
+      border: 1px solid var(--slate-200);
+      border-radius: 16px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+      font-size: 11px;
+    }
+
+    .mockup-topbar {
+      background: #F8FAFC;
+      border-bottom: 1px solid var(--slate-200);
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .mockup-dots {
+      display: flex;
+      gap: 5px;
+    }
+
+    .mockup-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #CBD5E1;
+    }
+
+    .mockup-title {
+      font-weight: 700;
+      color: var(--slate-600);
+      font-size: 10px;
+    }
+
+    .mockup-body {
+      padding: 14px;
+      background: #FAFAFB;
+    }
+
+    /* Podium Mockup */
+    .podium-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr 1fr;
+      gap: 8px;
+      align-items: flex-end;
+      text-align: center;
+      margin-top: 8px;
+    }
+
+    .podium-box {
+      background: white;
+      border: 1px solid var(--slate-200);
+      border-radius: 12px;
+      padding: 10px 6px;
+    }
+
+    .podium-box.rank-1 {
+      border: 2px solid #F59E0B;
+      background: #FFFBEB;
+      padding-top: 16px;
+    }
+
+    .podium-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: white;
+      margin: 0 auto 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 11px;
+    }
+
+    /* Post Card Mockup */
+    .post-mockup {
+      background: white;
+      border: 1px solid var(--slate-200);
+      border-radius: 12px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .post-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .post-user {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .post-img {
+      width: 100%;
+      height: 100px;
+      background: linear-gradient(135deg, #0A643B 0%, #064E3B 100%);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      font-size: 12px;
+      text-align: center;
+      padding: 10px;
+    }
+
+    /* Notice Mockup */
+    .notice-mockup {
+      background: white;
+      border-left: 4px solid var(--primary);
+      border: 1px solid var(--slate-200);
+      border-left-width: 4px;
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 8px;
+    }
+
+    /* Slide Footer Controls */
+    .slide-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 16px;
+      border-top: 1px solid var(--slate-100);
+      font-size: 11px;
+      color: var(--slate-500);
+      margin-top: 14px;
+    }
+
+    .nav-buttons {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-nav {
+      background: var(--slate-100);
+      color: var(--slate-800);
+      border: 1px solid var(--slate-200);
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s;
+    }
+
+    .btn-nav:hover {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    .btn-nav.primary {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    .btn-nav.primary:hover {
+      background: var(--primary-dark);
+    }
+
+    /* Speaker Notes Drawer */
+    .notes-toggle {
+      background: none;
+      border: none;
+      color: var(--primary);
+      font-weight: 700;
+      font-size: 11px;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    .speaker-drawer {
+      display: none;
+      position: absolute;
+      bottom: 60px;
+      left: 56px;
+      right: 56px;
+      background: #0F172A;
+      color: #E2E8F0;
+      padding: 14px 18px;
+      border-radius: 12px;
+      font-size: 12px;
+      line-height: 1.5;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+      z-index: 10;
+      border: 1px solid #334155;
+    }
+
+    .speaker-drawer.open {
+      display: block;
+    }
+
+    .speaker-drawer strong {
+      color: #38BDF8;
+      display: block;
+      margin-bottom: 4px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Title Slide Special Styles */
+    .slide-title-hero {
+      text-align: center;
+      margin: auto 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .title-logo-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      background: var(--primary-light);
+      border: 1px solid rgba(10,100,59,0.3);
+      border-radius: 999px;
+      color: var(--primary);
+      font-weight: 800;
+      font-size: 13px;
+    }
+
+    .hero-h1 {
+      font-size: 40px;
+      font-weight: 900;
+      color: var(--slate-900);
+      letter-spacing: -1px;
+      line-height: 1.15;
+      max-width: 820px;
+    }
+
+    .hero-h1 span {
+      color: var(--primary);
+    }
+
+    .hero-p {
+      font-size: 17px;
+      color: var(--slate-600);
+      max-width: 680px;
+      line-height: 1.5;
+    }
+
+    .hero-pills {
+      display: flex;
+      gap: 10px;
+      margin-top: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .hero-pill {
+      background: #F8FAFC;
+      border: 1px solid var(--slate-200);
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--slate-800);
+    }
+
+    /* Print Styles (Turns slides into clean 16:9 pages for PDF export) */
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      .top-bar, .slide-footer {
+        display: none !important;
+      }
+      .deck-container {
+        box-shadow: none;
+        max-width: 100%;
+        border-radius: 0;
+      }
+      .slide {
+        display: flex !important;
+        position: relative !important;
+        page-break-after: always;
+        height: 100vh;
+        width: 100vw;
+        padding: 40px;
+      }
+      .speaker-drawer {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Action Controls -->
+  <div class="top-bar">
+    <div class="brand">
+      <span class="badge">DAKSHANA FOUNDATION</span>
+      <span>Outreach Internship Portal — Executive Pitch</span>
+    </div>
+    <div class="actions">
+      <button class="btn-top" onclick="toggleSpeakerNotes()">🎙️ Speaker Notes</button>
+      <button class="btn-top" onclick="window.print()">📄 Save as PDF / Print Deck</button>
+      <button class="btn-top" onclick="toggleFullscreen()">⛶ Fullscreen</button>
+    </div>
+  </div>
+
+  <!-- The Presentation Deck Container -->
+  <div class="deck-container" id="deckContainer">
+
+    <!-- ========================================== -->
+    <!-- SLIDE 1: TITLE & COVER -->
+    <!-- ========================================== -->
+    <div class="slide active" data-slide="1">
+      <div class="slide-title-hero">
+        <div class="title-logo-badge">
+          <span>🌿 DAKSHANA OUTREACH 2026–27</span>
+        </div>
+        <h1 class="hero-h1">Empowering Scholars. Streamlining Operations. <span>Maximizing Outreach Impact.</span></h1>
+        <p class="hero-p">
+          A dedicated, mobile-first operations hub designed specifically for Dakshana Outreach Scholars, Coordinators, and Secretariat Leadership.
+        </p>
+        <div class="hero-pills">
+          <span class="hero-pill">✓ No More Buried WhatsApp Circulars</span>
+          <span class="hero-pill">✓ Real-time School Visit Tracking</span>
+          <span class="hero-pill">✓ 1-Click Reimbursements</span>
+          <span class="hero-pill">✓ Recognition & Morale Boost</span>
+        </div>
+      </div>
+
+      <div class="speaker-drawer" id="notes-1">
+        <strong>Pitch Talking Point:</strong>
+        "Good afternoon team. Today, our scholars are traveling to government schools across regions to inspire young minds. But managing this scale through scattered WhatsApp groups creates operational chaos. Today, I'm pitching our dedicated Dakshana Outreach App — built to give scholars, junior secretaries, and management one clean, effortless home for all outreach operations."
+      </div>
+
+      <div class="slide-footer">
+        <span>Dakshana Outreach Internship Platform</span>
+        <button class="notes-toggle" onclick="toggleSpeakerNotes()">Show Speaker Notes</button>
+        <div class="nav-buttons">
+          <span style="align-self: center; margin-right: 8px; font-weight: bold;">Slide 1 / 10</span>
+          <button class="btn-nav primary" onclick="nextSlide()">Next Slide →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- SLIDE 2: THE CURRENT CHALLENGE -->
+    <!-- ========================================== -->
+    <div class="slide" data-slide="2">
+      <div class="slide-header">
+        <div class="slide-eyebrow">The Challenge Today</div>
+        <h2 class="slide-title">Why Outreach Coordination Needed a Dedicated App</h2>
+        <p class="slide-subtitle">Operating across batches, states, and schools without a unified tool creates friction.</p>
+      </div>
+
+      <div class="slide-body">
+        <div class="col-left">
+          <div class="feature-card">
+            <div class="feature-icon" style="background: #FEE2E2; color: #DC2626;">✕</div>
+            <div class="feature-text">
+              <h4>WhatsApp Fatigue & Missed Notices</h4>
+              <p>Official circulars, deadline reminders, and reimbursement guidelines get buried under hundreds of daily group chats.</p>
+            </div>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon" style="background: #FEF3C7; color: #D97706;">!</div>
+            <div class="feature-text">
+              <h4>Zero Real-Time Progress Visibility</h4>
+              <p>Leadership has to manually ask who visited which school and repeatedly request monthly Excel sheets to count visits.</p>
+            </div>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon" style="background: #E0E7FF; color: #4F46E5;">₹</div>
+            <div class="feature-text">
+              <h4>Reimbursement Chaos & Repeated Questions</h4>
+              <p>Scholars are unsure when forms open, how to calculate bills vs. cash vouchers, or whether their claims have been approved.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-right">
+          <div class="mockup-window" style="background: #FFF5F5; border-color: #FECACA;">
+            <div class="mockup-topbar" style="background: #FEE2E2;">
+              <span class="mockup-title" style="color: #991B1B;">⚠️ The Pain Points We Solve</span>
+            </div>
+            <div class="mockup-body" style="padding: 20px; display: flex; flex-direction: column; gap: 10px;">
+              <div style="background: white; padding: 10px; border-radius: 8px; border: 1px solid #FCA5A5; color: #7F1D1D;">
+                <strong>Before:</strong> "Sir, what was the link for the session form again?" (Asked for the 20th time)
+              </div>
+              <div style="background: white; padding: 10px; border-radius: 8px; border: 1px solid #FCA5A5; color: #7F1D1D;">
+                <strong>Before:</strong> "Did my October travel claim get approved or is it pending?"
+              </div>
+              <div style="background: white; padding: 10px; border-radius: 8px; border: 1px solid #FCA5A5; color: #7F1D1D;">
+                <strong>Before:</strong> "I didn't see the broadcast message because of 100 group messages."
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="speaker-drawer" id="notes-2">
+        <strong>Pitch Talking Point:</strong>
+        "Ask anyone who has coordinated an outreach internship: WhatsApp is great for quick chats, but terrible for running a program. Crucial guidelines get lost, scholars keep asking the same questions, and secretaries spend valuable hours chasing visit counts instead of mentoring."
+      </div>
+
+      <div class="slide-footer">
+        <span>Problem Identification</span>
+        <button class="notes-toggle" onclick="toggleSpeakerNotes()">Show Speaker Notes</button>
+        <div class="nav-buttons">
+          <button class="btn-nav" onclick="prevSlide()">← Prev</button>
+          <span style="align-self: center; margin: 0 8px; font-weight: bold;">Slide 2 / 10</span>
+          <button class="btn-nav primary" onclick="nextSlide()">Next Slide →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- SLIDE 3: SOLUTION OVERVIEW -->
+    <!-- ========================================== -->
+    <div class="slide" data-slide="3">
+      <div class="slide-header">
+        <div class="slide-eyebrow">The Solution</div>
+        <h2 class="slide-title">The Dakshana Outreach Portal at a Glance</h2>
+        <p class="slide-subtitle">A clean, 7-section single destination built for speed, mobile phones, and simple adoption.</p>
+      </div>
+
+      <div class="slide-body">
+        <div class="col-left">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div class="feature-card" style="padding: 10px;">
+              <div class="feature-text">
+                <h4>1. Dashboard</h4>
+                <p>Metrics, progress bars & Podium spotlights.</p>
+              </div>
+            </div>
+            <div class="feature-card" style="padding: 10px;">
+              <div class="feature-text">
+                <h4>2. Notices</h4>
+                <p>Broadcasts with batch filters & audio chimes.</p>
+              </div>
+            </div>
+            <div class="feature-card" style="padding: 10px;">
+              <div class="feature-text">
+                <h4>3. Posts Wall</h4>
+                <p>School visit photos, stories & "Mark as Done".</p>
+              </div>
+            </div>
+            <div class="feature-card" style="padding: 10px;">
+              <div class="feature-text">
+                <h4>4. Queries Hub</h4>
+                <p>Public doubt clearing across all batches.</p>
+              </div>
+            </div>
+            <div class="feature-card" style="padding: 10px;">
+              <div class="feature-text">
+                <h4>5. Materials</h4>
+                <p>Official Session form & Intern Toolkit links.</p>
+              </div>
+            </div>
+            <div class="feature-card" style="padding: 10px;">
+              <div class="feature-text">
+                <h4>6. Reimbursements</h4>
+                <p>Deadlines, claim logs & approval status.</p>
+              </div>
+            </div>
+          </div>
+          <div class="feature-card" style="background: var(--primary-light); border-color: rgba(10,100,59,0.3);">
+            <div class="feature-text">
+              <h4 style="color: var(--primary);">7. Meet the Outreach Team</h4>
+              <p style="color: var(--primary-dark);">Strict hierarchy: Management → Senior Secretary → Junior Secretaries → Scholars.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-right">
+          <div class="mockup-window">
+            <div class="mockup-topbar">
+              <span class="mockup-title">📱 Designed with Familiar Simplicity</span>
+            </div>
+            <div class="mockup-body" style="text-align: center; padding: 24px 16px;">
+              <div style="font-size: 32px; margin-bottom: 8px;">📲</div>
+              <h4 style="font-size: 15px; font-weight: 800; color: var(--slate-900); margin-bottom: 4px;">Zero Learning Curve</h4>
+              <p style="font-size: 12px; color: var(--slate-600); max-width: 260px; margin: 0 auto; line-height: 1.4;">
+                Works straight from mobile browser or installs as a home screen app. Familiar WhatsApp-style avatars, simple tap navigation, and zero confusing technical jargon.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="speaker-drawer" id="notes-3">
+        <strong>Pitch Talking Point:</strong>
+        "Instead of forcing scholars to adopt complicated software, we created a streamlined 7-tab portal that feels as natural and fast as browsing social media or WhatsApp, but gives us enterprise-grade organization and accountability."
+      </div>
+
+      <div class="slide-footer">
+        <span>Architecture & Flow</span>
+        <button class="notes-toggle" onclick="toggleSpeakerNotes()">Show Speaker Notes</button>
+        <div class="nav-buttons">
+          <button class="btn-nav" onclick="prevSlide()">← Prev</button>
+          <span style="align-self: center; margin: 0 8px; font-weight: bold;">Slide 3 / 10</span>
+          <button class="btn-nav primary" onclick="nextSlide()">Next Slide →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- SLIDE 4: DASHBOARD & MOTIVATION PODIUM -->
+    <!-- ========================================== -->
+    <div class="slide" data-slide="4">
+      <div class="slide-header">
+        <div class="slide-eyebrow">Feature Spotlight 1</div>
+        <h2 class="slide-title">Dashboard & 3-Tier Motivation Podium</h2>
+        <p class="slide-subtitle">Driving enthusiasm and friendly competition among interns in the field.</p>
+      </div>
+
+      <div class="slide-body">
+        <div class="col-left">
+          <div class="feature-card">
+            <div class="feature-icon">🏆</div>
+            <div class="feature-text">
+              <h4>Three Distinct Spotlights</h4>
+              <p>Recognizes the Top Performer in <strong>Batch 1</strong>, the Top Performer in <strong>Batch 2</strong>, and the <strong>Overall Best Intern</strong> across all panels.</p>
+            </div>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">📊</div>
+            <div class="feature-text">
+              <h4>Real-Time Progress Tracking</h4>
+              <p>Every intern immediately sees their personal visit target progress bar (e.g. 14 / 20 visits completed).</p>
+            </div>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">🎯</div>
+            <div class="feature-text">
+              <h4>Leadership Target Flexibility</h4>
+              <p>Secretaries can customize targets individually if an intern is assigned remote clusters or special roles.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-right">
+          <div class="mockup-window">
+            <div class="mockup-topbar">
+              <span class="mockup-title">🏅 Live Podium Spotlight Interface</span>
+            </div>
+            <div class="mockup-body">
+              <div style="font-weight: 800; text-align: center; font-size: 11px; margin-bottom: 6px; color: var(--primary);">
+                TOP OUTREACH SCHOLARS PODIUM
+              </div>
+              <div class="podium-grid">
+                <!-- 2nd: Batch 1 -->
+                <div class="podium-box">
+                  <div class="podium-avatar">AG</div>
+                  <div style="font-weight: 800; font-size: 11px;">Aarav Gupta</div>
+                  <div style="font-size: 9px; color: var(--slate-500);">Batch 1 Star</div>
+                  <div style="font-size: 10px; font-weight: 800; color: var(--primary); margin-top: 4px;">16 Visits</div>
+                </div>
+
+                <!-- 1st: Overall -->
+                <div class="podium-box rank-1">
+                  <div style="font-size: 14px; margin-bottom: 2px;">👑</div>
+                  <div class="podium-avatar" style="background: #F59E0B;">KD</div>
+                  <div style="font-weight: 800; font-size: 12px; color: #92400E;">Kabir Das</div>
+                  <div style="font-size: 9px; color: #B45309; font-weight: bold;">Overall Top Intern</div>
+                  <div style="font-size: 11px; font-weight: 900; color: #92400E; margin-top: 4px;">18 Visits</div>
+                </div>
+
+                <!-- 3rd: Batch 2 -->
+                <div class="podium-box">
+                  <div class="podium-avatar">MI</div>
+                  <div style="font-weight: 800; font-size: 11px;">Meera Iyer</div>
+                  <div style="font-size: 9px; color: var(--slate-500);">Batch 1 Star</div>
+                  <div style="font-size: 10px; font-weight: 800; color: var(--primary); margin-top: 4px;">12 Visits</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="speaker-drawer" id="notes-4">
+        <strong>Pitch Talking Point:</strong>
+        "Internship fatigue is real when scholars are traveling to schools every week. The podium gamifies and celebrates their dedication. Having separate spotlights for Batch 1 and Batch 2 ensures fairness and keeps everyone motivated."
+      </div>
+
+      <div class="slide-footer">
+        <span>Scholar Engagement</span>
+        <button class="notes-toggle" onclick="toggleSpeakerNotes()">Show Speaker Notes</button>
+        <div class="nav-buttons">
+          <button class="btn-nav" onclick="prevSlide()">← Prev</button>
+          <span style="align-self: center; margin: 0 8px; font-weight: bold;">Slide 4 / 10</span>
+          <button class="btn-nav primary" onclick="nextSlide()">Next Slide →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- SLIDE 5: POSTS WALL & ACTIVITY TRACKER -->
+    <!-- ========================================== -->
+    <div class="slide" data-slide="5">
+      <div class="slide-header">
+        <div class="slide-eyebrow">Feature Spotlight 2</div>
+        <h2 class="slide-title">Posts Wall & "Mark as Done" Tracker</h2>
+        <p class="slide-subtitle">A community feed where school visits turn into shared stories and automatic logs.</p>
+      </div>
+
+      <div class="slide-body">
+        <div class="col-left">
+          <div class="feature-card">
+            <div class="feature-icon">📸</div>
+            <div class="feature-text">
+              <h4>Photo Uploads & Field Notes</h4>
+              <p>Scholars share photos from classroom sessions, inspiring moments with students, and teaching techniques.</p>
+            </div>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">✅</div>
+            <div class="feature-text">
+              <h4>1-Click "Mark as Done" Visit Logging</h4>
+              <p>When an intern marks a post as completed with their school name, the system automatically logs a visit to their record!</p>
+            </div>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">💬</div>
+            <div class="feature-text">
+              <h4>Peer Cheers & Encouraging Notes</h4>
+              <p>Fellow scholars and secretaries leave notes and cheers, building strong camaraderie across batches.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-right">
+          <div class="mockup-window">
+            <div class="mockup-topbar">
+              <span class="mockup-title">📰 Community Wall Post Preview</span>
+            </div>
+            <div class="mockup-body">
+              <div class="post-mockup">
+                <div class="post-header">
+                  <div class="post-user">
+                    <div style="width: 24px; height: 24px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold;">KD</div>
+                    <div>
+                      <div style="font-weight: 800; font-size: 11px;">Kabir Das <span style="font-weight: normal; color: #64748B;">• 2 hours ago</span></div>
+                    </div>
+                  </div>
+                  <span style="background: #EBF7F0; color: #0A643B; font-size: 9px; font-weight: 800; padding: 2px 8px; border-radius: 999px;">✓ Completed Activity</span>
+                </div>
+                <div style="font-weight: 800; font-size: 12px; color: var(--slate-900);">Robotics & Science Circuits at JNV Pune</div>
+                <div class="post-img">🏫 JNV Pune Classroom Photo</div>
+                <div style="background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 6px; padding: 4px 8px; font-size: 10px; color: #166534;">
+                  📍 School Visited: <strong>JNV Pune - Rural Science Hub</strong>
+                </div>
+                <div style="display: flex; gap: 8px; font-size: 10px; color: #64748B; border-top: 1px solid #F1F5F9; padding-top: 6px;">
+                  <span>❤️ 14 Cheers</span>
+                  <span>💬 2 Notes from Secretary & Peers</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="speaker-drawer" id="notes-5">
+        <strong>Pitch Talking Point:</strong>
+        "This is the heart of the intern experience. Instead of tedious manual reporting, an intern posts a photo of their session, tags the school, clicks 'Mark as Done', and their official visit count updates automatically."
+      </div>
+
+      <div class="slide-footer">
+        <span>Field Documentation</span>
+        <button class="notes-toggle" onclick="toggleSpeakerNotes()">Show Speaker Notes</button>
+        <div class="nav-buttons">
+          <button class="btn-nav" onclick="prevSlide()">← Prev</button>
+          <span style="align-self: center; margin: 0 8px; font-weight: bold;">Slide 5 / 10</span>
+          <button class="btn-nav primary" onclick="nextSlide()">Next Slide →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- SLIDE 6: BROADCAST NOTICES & CIRCULARS -->
+    <!-- ========================================== -->
+    <div class="slide" data-slide="6">
+      <div class="slide-header">
+        <div class="slide-eyebrow">Feature Spotlight 3</div>
+        <h2 class="slide-title">Broadcast Notices & Circulars</h2>
+        <p class="slide-subtitle">Clear, authoritative communication channel with zero clutter.</p>
+      </div>
+
+      <div class="slide-body">
+        <div class="col-left">
+          <div class="feature-card">
+            <div class="feature-icon">📢</div>
+            <div class="feature-text">
+              <h4>Direct Leadership Broadcast Channel</h4>
+              <p>Only Management and Secretaries can issue official notices, eliminating spam and keeping information 100% reliable.</p>
+            </div>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">🎯</div>
+            <div class="feature-text">
+              <h4>Batch-Targeted Announcements</h4>
+              <p>Send notices to <strong>All Scholars</strong>, specifically to <strong>Batch 1</strong>, or to <strong>Batch 2</strong>, so interns only see what applies to them.</p>
+            </div>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">🔔</div>
+            <div class="feature-text">
+              <h4>Audio Chime & Relative Timestamps</h4>
+              <p>Pleasant audio chime alerts on new circulars with clean date indicators (e.g. <em>"2 hours ago"</em>, <em>"Yesterday"</em>).</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-right">
+          <div class="mockup-window">
+            <div class="mockup-topbar">
+              <span class="mockup-title">🔔 Official Broadcast Stream</span>
+            </div>
+            <div class="mockup-body">
+              <div class="notice-mockup">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                  <span style="font-weight: 800; font-size: 10px; color: var(--primary);">Senior Secretary • Batch 1 & 2</span>
+                  <span style="font-size: 9px; color: #64748B;">2 hours ago</span>
+                </div>
+                <div style="font-weight: 800; font-size: 12px; margin-bottom: 2px;">October Reimbursement Window Now Open</div>
+                <div style="font-size: 11px; color: #475569; line-height: 1.3;">
+                  Please submit your verified transport tickets and vouchers before the 5th. Templates are downloadable in the portal.
+                </div>
+              </div>
+
+              <div class="notice-mockup" style="border-left-color: #D97706;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                  <span style="font-weight: 800; font-size: 10px; color: #D97706;">Junior Secretary • Batch 1 Only</span>
+                  <span style="font-size: 9px; color: #64748B;">Yesterday</span>
+                </div>
+                <div style="font-weight: 800; font-size: 12px; margin-bottom: 2px;">School Visit Permission Letters Updated</div>
+                <div style="font-size: 11px; color: #475569; line-height: 1.3;">
+                  Signed permission letters for Cluster 3 have been uploaded to your Materials tab.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="speaker-drawer" id="notes-6">
+        <strong>Pitch Talking Point:</strong>
+        "No more 'I didn't see the notice.' This gives the Senior Secretary and Management a megaphone to broadcast important deadlines with zero chatter or distraction."
+      </div>
+
+      <div class="slide-footer">
+        <span>Official Communications</span>
+        <button class="notes-toggle" onclick="toggleSpeakerNotes()">Show Speaker Notes</button>
+        <div class="nav-buttons">
+          <button class="btn-nav" onclick="prevSlide()">← Prev</button>
+          <span style="align-self: center; margin: 0 8px; font-weight: bold;">Slide 6 / 10</span>
+          <button class="btn-nav primary" onclick="nextSlide()">Next Slide →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- SLIDE 7: QUERIES & REIMBURSEMENTS -->
+    <!-- ========================================== -->
+    <div class="slide" data-slide="7">
+      <div class="slide-header">
+        <div class="slide-eyebrow">Feature Spotlights 4 & 5</div>
+        <h2 class="slide-title">Queries Hub & Stress-Free Reimbursements</h2>
+        <p class="slide-subtitle">Crowdsourced answers for common questions and transparent finance tracking.</p>
+      </div>
+
+      <div class="slide-body">
+        <div class="col-left">
+          <div class="feature-card">
+            <div class="feature-icon">💡</div>
+            <div class="feature-text">
+              <h4>Public Doubts & Knowledge Base</h4>
+              <p>Scholars post questions on permissions, travel, and teaching kits. Once answered by leadership, the solution helps all interns forever.</p>
+            </div>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">💰</div>
+            <div class="feature-text">
+              <h4>Reimbursement Policy & Form in 1 Click</h4>
+              <p>Includes official guidelines, ₹250 cash voucher limits, single monthly submission rules, and the official Google Form link.</p>
+            </div>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">🔍</div>
+            <div class="feature-text">
+              <h4>Transparent Claim Status Tracking</h4>
+              <p>Interns see exact status: <strong>Pending Review</strong> → <strong>Approved</strong> → <strong>Paid</strong> with zero guesswork.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-right">
+          <div class="mockup-window">
+            <div class="mockup-topbar">
+              <span class="mockup-title">💳 Reimbursements & Doubts Live Views</span>
+            </div>
+            <div class="mockup-body" style="display: flex; flex-direction: column; gap: 8px;">
+              <div style="background: white; border: 1px solid var(--slate-200); border-radius: 8px; padding: 10px;">
+                <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 11px;">
+                  <span>Travel Claim: Aarav Gupta</span>
+                  <span style="background: #DEF7EC; color: #03543F; font-size: 9px; padding: 2px 6px; border-radius: 4px;">Approved (₹3,250)</span>
+                </div>
+                <div style="font-size: 10px; color: #64748B; margin-top: 2px;">October Cycle • Bus passes & verified vouchers</div>
+              </div>
+
+              <div style="background: white; border: 1px solid var(--slate-200); border-radius: 8px; padding: 10px;">
+                <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 11px;">
+                  <span>Q: How to claim rural auto fare without printed bills?</span>
+                  <span style="background: #EBF7F0; color: #0A643B; font-size: 9px; padding: 2px 6px; border-radius: 4px;">✓ Answered</span>
+                </div>
+                <div style="font-size: 10px; color: #0A643B; margin-top: 3px; font-weight: 600;">
+                  "Use the Cash Voucher template up to ₹250 per trip, sign it, and merge it with your PDF."
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="speaker-drawer" id="notes-7">
+        <strong>Pitch Talking Point:</strong>
+        "Reimbursements are typically the biggest source of friction in any internship. By publishing deadlines, rules, and live approval status inside the app, we eliminate endless repetitive inquiries."
+      </div>
+
+      <div class="slide-footer">
+        <span>Operations & Finance</span>
+        <button class="notes-toggle" onclick="toggleSpeakerNotes()">Show Speaker Notes</button>
+        <div class="nav-buttons">
+          <button class="btn-nav" onclick="prevSlide()">← Prev</button>
+          <span style="align-self: center; margin: 0 8px; font-weight: bold;">Slide 7 / 10</span>
+          <button class="btn-nav primary" onclick="nextSlide()">Next Slide →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- SLIDE 8: LEADERSHIP CONTROL SUITE -->
+    <!-- ========================================== -->
+    <div class="slide" data-slide="8">
+      <div class="slide-header">
+        <div class="slide-eyebrow">Leadership Tools</div>
+        <h2 class="slide-title">Superpowers for Secretaries & Management</h2>
+        <p class="slide-subtitle">Deep visibility into performance without micro-managing the scholars.</p>
+      </div>
+
+      <div class="slide-body">
+        <div class="col-left">
+          <div class="feature-card">
+            <div class="feature-icon">📈</div>
+            <div class="feature-text">
+              <h4>1-Click Scholar Deep-Dive</h4>
+              <p>Click any scholar in the roster to open a comprehensive progress report with visit graphs, task completions, and history.</p>
+            </div>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">🤝</div>
+            <div class="feature-text">
+              <h4>Privilege Delegation</h4>
+              <p>The Senior Secretary can delegate specific approval rights and notice broadcasting powers to Junior Secretaries with a simple switch.</p>
+            </div>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">🛠️</div>
+            <div class="feature-text">
+              <h4>Dedicated Bug & Improvement Desk</h4>
+              <p>Scholars can report app issues or submit operational suggestions directly to the Senior Secretary to resolve and clear.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-right">
+          <div class="mockup-window">
+            <div class="mockup-topbar">
+              <span class="mockup-title">📊 Scholar Deep-Dive Inspector</span>
+            </div>
+            <div class="mockup-body" style="text-align: left; padding: 12px;">
+              <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px;">
+                <div style="width: 28px; height: 28px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: bold;">AG</div>
+                <div>
+                  <div style="font-weight: 800; font-size: 12px;">Aarav Gupta (Batch 1)</div>
+                  <div style="font-size: 10px; color: #64748B;">Assigned to: Priya Sharma (Junior Sec)</div>
+                </div>
+              </div>
+              <div style="background: white; border: 1px solid var(--slate-200); border-radius: 8px; padding: 8px; font-size: 10px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                  <span>School Visits Target</span>
+                  <strong>16 / 20 (80%)</strong>
+                </div>
+                <div style="height: 6px; background: #E2E8F0; border-radius: 999px; overflow: hidden;">
+                  <div style="width: 80%; height: 100%; background: #0A643B;"></div>
+                </div>
+              </div>
+              <div style="margin-top: 8px; display: flex; gap: 6px;">
+                <button style="flex: 1; padding: 5px; font-size: 9px; font-weight: bold; background: #0A643B; color: white; border: none; border-radius: 6px;">Modify Target</button>
+                <button style="flex: 1; padding: 5px; font-size: 9px; font-weight: bold; background: #F1F5F9; color: #334155; border: 1px solid #CBD5E1; border-radius: 6px;">View Full History</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="speaker-drawer" id="notes-8">
+        <strong>Pitch Talking Point:</strong>
+        "For the Senior Secretary and Management, this turns hours of manual spreadsheet reconciliation into an instantaneous 1-click inspection of any scholar's progress."
+      </div>
+
+      <div class="slide-footer">
+        <span>Governance & Oversight</span>
+        <button class="notes-toggle" onclick="toggleSpeakerNotes()">Show Speaker Notes</button>
+        <div class="nav-buttons">
+          <button class="btn-nav" onclick="prevSlide()">← Prev</button>
+          <span style="align-self: center; margin: 0 8px; font-weight: bold;">Slide 8 / 10</span>
+          <button class="btn-nav primary" onclick="nextSlide()">Next Slide →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- SLIDE 9: WHY THIS IS WIN-WIN FOR ALL ROLES -->
+    <!-- ========================================== -->
+    <div class="slide" data-slide="9">
+      <div class="slide-header">
+        <div class="slide-eyebrow">Value Proposition</div>
+        <h2 class="slide-title">How Every Team Member Benefits</h2>
+        <p class="slide-subtitle">Designed to add value at every level of the Dakshana Outreach hierarchy.</p>
+      </div>
+
+      <div class="slide-body">
+        <div style="width: 100%; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+          <!-- Outreach Scholars -->
+          <div class="feature-card" style="flex-direction: column; background: white;">
+            <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 4px;">
+              <div class="feature-icon" style="background: #EBF7F0; color: #0A643B;">🎓</div>
+              <h4 style="font-size: 14px; font-weight: 800;">For Outreach Scholars</h4>
+            </div>
+            <ul style="font-size: 11px; color: #475569; padding-left: 16px; line-height: 1.6;">
+              <li>All official session forms & toolkits in 1 tap</li>
+              <li>Podium recognition for hard work in schools</li>
+              <li>Instant "Mark as Done" visit tracking</li>
+              <li>Transparent reimbursement claim updates</li>
+              <li>Private login with 2-week active sessions</li>
+            </ul>
+          </div>
+
+          <!-- Junior Secretaries -->
+          <div class="feature-card" style="flex-direction: column; background: white;">
+            <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 4px;">
+              <div class="feature-icon" style="background: #FEF3C7; color: #D97706;">📋</div>
+              <h4 style="font-size: 14px; font-weight: 800;">For Junior Secretaries</h4>
+            </div>
+            <ul style="font-size: 11px; color: #475569; padding-left: 16px; line-height: 1.6;">
+              <li>Instant overview of all scholars in their wing</li>
+              <li>Batch-wise targeting for specific announcements</li>
+              <li>Phone numbers accessible for direct mentor contact</li>
+              <li>Faster doubt resolution via Queries forum</li>
+              <li>No manual visit counting from group chats</li>
+            </ul>
+          </div>
+
+          <!-- Senior Sec & Management -->
+          <div class="feature-card" style="flex-direction: column; background: white;">
+            <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 4px;">
+              <div class="feature-icon" style="background: #E0E7FF; color: #4338CA;">🏛️</div>
+              <h4 style="font-size: 14px; font-weight: 800;">For Senior Sec & Trustees</h4>
+            </div>
+            <ul style="font-size: 11px; color: #475569; padding-left: 16px; line-height: 1.6;">
+              <li>High-level metrics across all batches and wings</li>
+              <li>1-Click privilege delegation to Junior Secs</li>
+              <li>Streamlined reimbursement verification</li>
+              <li>Strict privacy (Management phone numbers hidden)</li>
+              <li>Real-time database sync across all devices</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="speaker-drawer" id="notes-9">
+        <strong>Pitch Talking Point:</strong>
+        "This app doesn't just help the interns; it gives junior secretaries effortless batch management and gives the Secretariat leadership complete peace of mind."
+      </div>
+
+      <div class="slide-footer">
+        <span>Team Impact Matrix</span>
+        <button class="notes-toggle" onclick="toggleSpeakerNotes()">Show Speaker Notes</button>
+        <div class="nav-buttons">
+          <button class="btn-nav" onclick="prevSlide()">← Prev</button>
+          <span style="align-self: center; margin: 0 8px; font-weight: bold;">Slide 9 / 10</span>
+          <button class="btn-nav primary" onclick="nextSlide()">Next Slide →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- SLIDE 10: READY FOR ROLLOUT & CONCLUSION -->
+    <!-- ========================================== -->
+    <div class="slide" data-slide="10">
+      <div class="slide-header">
+        <div class="slide-eyebrow">Production Ready</div>
+        <h2 class="slide-title">100% Ready to Adopt Today</h2>
+        <p class="slide-subtitle">Already built, fully tested, and ready to put in the hands of our scholars.</p>
+      </div>
+
+      <div class="slide-body">
+        <div class="col-left">
+          <div class="feature-card" style="border-left: 4px solid var(--primary);">
+            <div class="feature-icon">🚀</div>
+            <div class="feature-text">
+              <h4>Fully Functional & Live</h4>
+              <p>All 7 core modules, login security, and mobile optimizations are thoroughly implemented and tested.</p>
+            </div>
+          </div>
+
+          <div class="feature-card" style="border-left: 4px solid #D97706;">
+            <div class="feature-icon">📲</div>
+            <div class="feature-text">
+              <h4>Works on Any Phone (iOS & Android)</h4>
+              <p>Installable as a Progressive Web App (PWA) with the official Dakshana logo right on the scholar's phone home screen.</p>
+            </div>
+          </div>
+
+          <div class="feature-card" style="border-left: 4px solid #4338CA;">
+            <div class="feature-icon">🔒</div>
+            <div class="feature-text">
+              <h4>Secure & Reliable</h4>
+              <p>Dual-persistence architecture: works reliably offline in remote rural schools and syncs seamlessly with the cloud database.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-right">
+          <div style="background: linear-gradient(135deg, #0A643B 0%, #064E3B 100%); color: white; border-radius: 16px; padding: 28px; text-align: center; box-shadow: 0 10px 25px rgba(10,100,59,0.3);">
+            <div style="font-size: 28px; margin-bottom: 8px;">🌟</div>
+            <h3 style="font-size: 20px; font-weight: 900; margin-bottom: 8px;">Ready to Empower Our Outreach Team?</h3>
+            <p style="font-size: 13px; opacity: 0.9; line-height: 1.5; margin-bottom: 16px;">
+              Let's give our scholars and secretaries the clean, modern tool they deserve to represent Dakshana with excellence.
+            </p>
+            <div style="background: rgba(255,255,255,0.15); padding: 8px 16px; border-radius: 999px; font-weight: 700; font-size: 12px; display: inline-block;">
+              Thank You! • Open for Discussion & Q&A
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="speaker-drawer" id="notes-10">
+        <strong>Closing Pitch Statement:</strong>
+        "Team, the portal isn't just an idea or a wireframe — it is completely built, tested, and ready for deployment right now. Adopting this will save hundreds of administrative hours, make our scholars feel valued and recognized, and ensure every single school visit is accounted for. Thank you, and I look forward to your thoughts!"
+      </div>
+
+      <div class="slide-footer">
+        <span>Conclusion & Discussion</span>
+        <button class="notes-toggle" onclick="toggleSpeakerNotes()">Show Speaker Notes</button>
+        <div class="nav-buttons">
+          <button class="btn-nav" onclick="prevSlide()">← Prev</button>
+          <span style="align-self: center; margin: 0 8px; font-weight: bold;">Slide 10 / 10</span>
+          <button class="btn-nav primary" onclick="goToSlide(1)">Restart Deck ↺</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    let currentSlide = 1;
+    const totalSlides = 10;
+
+    function showSlide(n) {
+      const slides = document.querySelectorAll('.slide');
+      if (n > totalSlides) n = totalSlides;
+      if (n < 1) n = 1;
+      currentSlide = n;
+
+      slides.forEach((slide) => {
+        slide.classList.remove('active');
+        if (parseInt(slide.getAttribute('data-slide')) === currentSlide) {
+          slide.classList.add('active');
+        }
+      });
+    }
+
+    function nextSlide() {
+      if (currentSlide < totalSlides) {
+        showSlide(currentSlide + 1);
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlide > 1) {
+        showSlide(currentSlide - 1);
+      }
+    }
+
+    function goToSlide(n) {
+      showSlide(n);
+    }
+
+    function toggleSpeakerNotes() {
+      const activeDrawer = document.getElementById(`notes-${currentSlide}`);
+      if (activeDrawer) {
+        activeDrawer.classList.toggle('open');
+      }
+    }
+
+    function toggleFullscreen() {
+      const elem = document.getElementById('deckContainer');
+      if (!document.fullscreenElement) {
+        if (elem.requestFullscreen) {
+          elem.requestFullscreen();
+        }
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+
+    // Keyboard Navigation
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+        nextSlide();
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        prevSlide();
+      } else if (e.key === 'f' || e.key === 'F') {
+        toggleFullscreen();
+      } else if (e.key === 's' || e.key === 'S') {
+        toggleSpeakerNotes();
+      }
+    });
+  </script>
+</body>
+</html>

@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Menu, LogOut, LogIn, Bell, CheckCircle2, Camera, Radio, Bug } from 'lucide-react'
 import logoImg from '../assets/logo.png'
 import Avatar from './Avatar'
-import { formatDateWithRelative } from '../utils/dateUtils'
+import { formatDateWithRelative, parseDateToTimestamp } from '../utils/dateUtils'
 
 export default function Header({
   currentUser,
@@ -18,6 +18,14 @@ export default function Header({
   onOpenFeedback
 }) {
   const [showNotifMenu, setShowNotifMenu] = useState(false)
+
+  // Ensure latest circulars and notices appear at the top
+  const safeBroadcasts = Array.isArray(broadcasts) ? broadcasts.filter(Boolean) : []
+  const sortedBroadcasts = [...safeBroadcasts].sort((a, b) => {
+    const timeA = parseDateToTimestamp(a?.date || a?.createdAt)
+    const timeB = parseDateToTimestamp(b?.date || b?.createdAt)
+    return timeB - timeA
+  })
   const getRoleBadge = (role) => {
     switch (role) {
       case 'management':
@@ -143,8 +151,8 @@ export default function Header({
                         </div>
 
                         <div className="max-h-80 overflow-y-auto divide-y divide-slate-100">
-                          {broadcasts && broadcasts.length > 0 ? (
-                            broadcasts.slice(0, 6).map((bc) => {
+                          {sortedBroadcasts.length > 0 ? (
+                            sortedBroadcasts.slice(0, 6).map((bc) => {
                               const isFromJuniorSec = bc.senderRole === 'junior_sec' || bc.senderTitle === 'Junior Secretary' || (bc.sender && bc.sender.toLowerCase().includes('junior'))
                               const isFromSeniorSec = bc.senderRole === 'senior_sec' || bc.senderTitle === 'Senior Secretary' || (bc.sender && bc.sender.toLowerCase().includes('senior'))
                               const senderBadgeLabel = isFromJuniorSec ? 'Junior Secretary' : isFromSeniorSec ? 'Senior Secretary' : 'Secretariat'

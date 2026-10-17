@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dakshana AppDev Learnings & Engineering Retrospective</title>
+  <style>
+    :root {
+      --primary: #4F46E5;
+      --primary-light: #EEF2FF;
+      --accent: #059669;
+      --accent-light: #ECFDF5;
+      --amber: #D97706;
+      --slate-900: #0F172A;
+      --slate-800: #1E293B;
+      --slate-700: #334155;
+      --slate-600: #475569;
+      --slate-200: #E2E8F0;
+      --slate-100: #F1F5F9;
+      --slate-50: #F8FAFC;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background: #0A0F1D; color: #0F172A; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+
+    .top-bar { width: 100%; max-width: 1100px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; color: #94A3B8; font-size: 13px; }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; color: white; }
+    .badge { background: #4F46E5; color: white; padding: 3px 8px; border-radius: 999px; font-size: 11px; }
+    .btn-top { background: #1E293B; color: #E2E8F0; border: 1px solid #334155; padding: 6px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .btn-top:hover { background: #334155; color: white; }
+
+    .deck-container { width: 100%; max-width: 1100px; aspect-ratio: 16 / 9; min-height: 590px; background: white; border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); position: relative; overflow: hidden; display: flex; flex-direction: column; }
+    .slide { position: absolute; inset: 0; padding: 42px 54px; display: none; flex-direction: column; justify-content: space-between; background: white; animation: fadeIn 0.25s ease-out; }
+    .slide.active { display: flex; }
+    @keyframes fadeIn { from { opacity: 0; transform: scale(0.995); } to { opacity: 1; transform: scale(1); } }
+
+    .slide-eyebrow { display: inline-flex; align-items: center; gap: 6px; color: #4F46E5; background: #EEF2FF; padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 800; text-transform: uppercase; margin-bottom: 8px; }
+    .slide-title { font-size: 26px; font-weight: 900; color: #0F172A; line-height: 1.2; }
+    .slide-subtitle { font-size: 13px; color: #475569; margin-top: 4px; }
+
+    .slide-body { flex: 1; display: flex; gap: 32px; align-items: center; margin-top: 14px; }
+    .col-left { flex: 1.1; display: flex; flex-direction: column; gap: 12px; }
+    .col-right { flex: 1; display: flex; align-items: center; justify-content: center; }
+
+    .learn-card { background: #F8FAFC; border: 1px solid #E2E8F0; padding: 12px 16px; border-radius: 12px; display: flex; gap: 12px; align-items: flex-start; }
+    .learn-card:hover { border-color: #4F46E5; background: #F5F3FF; }
+    .learn-icon { width: 34px; height: 34px; border-radius: 8px; background: #EEF2FF; color: #4338CA; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 15px; flex-shrink: 0; }
+    .learn-title { font-size: 13px; font-weight: 800; color: #0F172A; }
+    .learn-desc { font-size: 11.5px; color: #475569; line-height: 1.4; margin-top: 2px; }
+
+    .quote-box { width: 100%; background: #FAF5FF; border: 1px solid #E9D5FF; border-left: 4px solid #9333EA; border-radius: 12px; padding: 18px; color: #581C87; font-size: 13px; line-height: 1.5; font-style: italic; }
+    .quote-author { font-style: normal; font-weight: 800; font-size: 11px; color: #7E22CE; margin-top: 8px; display: block; }
+
+    .comparison-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+    .comparison-table th { background: #F1F5F9; padding: 8px; text-align: left; font-weight: 800; border: 1px solid #CBD5E1; color: #1E293B; }
+    .comparison-table td { padding: 8px; border: 1px solid #CBD5E1; color: #334155; }
+    .comparison-table tr:nth-child(even) { background: #F8FAFC; }
+
+    /* Footer & Controls */
+    .slide-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 14px; border-top: 1px solid #F1F5F9; font-size: 11px; color: #64748B; }
+    .btn-nav { background: #F1F5F9; color: #1E293B; border: 1px solid #E2E8F0; padding: 6px 14px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; }
+    .btn-nav.primary { background: #4F46E5; color: white; border-color: #4F46E5; }
+    .btn-nav.primary:hover { background: #4338CA; }
+
+    .speaker-drawer { display: none; position: absolute; bottom: 58px; left: 54px; right: 54px; background: #0F172A; color: #E2E8F0; padding: 14px 18px; border-radius: 12px; font-size: 12px; line-height: 1.5; z-index: 10; border: 1px solid #334155; }
+    .speaker-drawer.open { display: block; }
+    .speaker-drawer strong { color: #A5B4FC; display: block; margin-bottom: 4px; font-size: 11px; text-transform: uppercase; }
+
+    @media print {
+      body { background: white; padding: 0; }
+      .top-bar, .slide-footer { display: none !important; }
+      .deck-container { box-shadow: none; max-width: 100%; border-radius: 0; }
+      .slide { display: flex !important; position: relative !important; page-break-after: always; height: 100vh; width: 100vw; padding: 36px; }
+      .speaker-drawer { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="top-bar">
+    <div class="brand">
+      <span class="badge">DEVELOPER RETROSPECTIVE</span>
+      <span>AppDev Journey & Engineering Learnings — Dakshana Portal</span>
+    </div>
+    <div class="actions">
+      <button class="btn-top" onclick="toggleNotes()">🎙️ Speaker Notes</button>
+      <button class="btn-top" onclick="window.print()">📄 Save as PDF / Print Deck</button>
+      <button class="btn-top" onclick="toggleFullscreen()">⛶ Fullscreen</button>
+    </div>
+  </div>
+
+  <div class="deck-container" id="deckContainer">
+
+    <!-- SLIDE 1: COVER -->
+    <div class="slide active" data-slide="1">
+      <div style="text-align: center; margin: auto 0; display: flex; flex-direction: column; align-items: center; gap: 14px;">
+        <span class="slide-eyebrow">ENGINEERING RETROSPECTIVE</span>
+        <h1 style="font-size: 38px; font-weight: 900; color: #0F172A; max-width: 840px; line-height: 1.15;">
+          What We Learned Building This App: <span style="color: #4F46E5;">A Modern AppDev Journey</span>
+        </h1>
+        <p style="font-size: 15px; color: #475569; max-width: 660px; line-height: 1.5;">
+          From rough user requirements to a production-ready Progressive Web App: key engineering principles, architectural decisions, and product lessons learned along the way.
+        </p>
+        <div style="display: flex; gap: 8px; margin-top: 6px; flex-wrap: wrap; justify-content: center;">
+          <span style="background: #F1F5F9; border: 1px solid #CBD5E1; padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 700;">Product Design & UX</span>
+          <span style="background: #F1F5F9; border: 1px solid #CBD5E1; padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 700;">React State Architecture</span>
+          <span style="background: #F1F5F9; border: 1px solid #CBD5E1; padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 700;">Database Modeling</span>
+          <span style="background: #F1F5F9; border: 1px solid #CBD5E1; padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 700;">Offline Reliability</span>
+          <span style="background: #F1F5F9; border: 1px solid #CBD5E1; padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 700;">Iterative Engineering</span>
+        </div>
+      </div>
+      <div class="speaker-drawer" id="notes-1">
+        <strong>Retrospective Overview:</strong>
+        "Building software in the real world is very different from textbook exercises. In this retrospective deck, we summarize the top 8 engineering and design lessons we learned while creating the Dakshana Outreach Portal from the ground up."
+      </div>
+      <div class="slide-footer">
+        <span>Engineering Retrospective • Dakshana App</span>
+        <button onclick="toggleNotes()" style="background:none; border:none; color:#4F46E5; font-weight:bold; cursor:pointer;">Show Notes</button>
+        <div style="display: flex; gap: 6px;">
+          <span style="align-self: center; margin-right: 6px; font-weight: bold;">Slide 1 / 10</span>
+          <button class="btn-nav primary" onclick="nextSlide()">Next Slide →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 2: LESSON 1 - PRODUCT THINKING -->
+    <div class="slide" data-slide="2">
+      <div class="slide-header">
+        <span class="slide-eyebrow">Lesson 1: Product Thinking</span>
+        <h2 class="slide-title">Design for Human Behavior, Not Theoretical Perfection</h2>
+        <p class="slide-subtitle">How user feedback transformed the app from complex enterprise software into an intuitive mobile tool.</p>
+      </div>
+      <div class="slide-body">
+        <div class="col-left">
+          <div class="learn-card">
+            <div class="learn-icon">👤</div>
+            <div>
+              <div class="learn-title">Removing Misleading Fake Avatars</div>
+              <div class="learn-desc">We originally used AI stock photos for users. User feedback correctly noted that fake faces mislead scholars; switching to clean, WhatsApp-style initials instantly felt authentic and trustworthy.</div>
+            </div>
+          </div>
+          <div class="learn-card">
+            <div class="learn-icon">🧼</div>
+            <div>
+              <div class="learn-title">Eliminating Unnecessary Verbose Text</div>
+              <div class="learn-desc">Cut lengthy conceptual descriptions in favor of clear, direct action buttons (e.g. <em>"Mark as Done"</em>, <em>"Submit Claim"</em>). Users don't read manuals; they respond to clear visual affordances.</div>
+            </div>
+          </div>
+          <div class="learn-card">
+            <div class="learn-icon">🏅</div>
+            <div>
+              <div class="learn-title">Gamification That Actually Matters (The Podium)</div>
+              <div class="learn-desc">Creating separate spotlights for Batch 1 and Batch 2 meant scholars didn't feel overshadowed by seniors, driving genuine peer engagement.</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-right">
+          <div class="quote-box">
+            "The best UI is the one you don't notice. When an outreach intern on a bus to a remote school can submit their visit photo in 10 seconds without asking for instructions, the product has succeeded."
+            <span class="quote-author">— Core Product Insight</span>
+          </div>
+        </div>
+      </div>
+      <div class="speaker-drawer" id="notes-2">
+        <strong>Discussion Point:</strong>
+        "Junior developers often over-complicate interfaces with unnecessary text and complex settings. The best thing we learned was stripping away noise so that every user knows immediately where to tap."
+      </div>
+      <div class="slide-footer">
+        <span>User Experience & Product Design</span>
+        <button onclick="toggleNotes()" style="background:none; border:none; color:#4F46E5; font-weight:bold; cursor:pointer;">Show Notes</button>
+        <div style="display: flex; gap: 6px;">
+          <button class="btn-nav" onclick="prevSlide()">← Prev</button>
+          <span style="align-self: center; margin: 0 6px; font-weight: bold;">Slide 2 / 10</span>
+          <button class="btn-nav primary" onclick="nextSlide()">Next Slide →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 3: LESSON 2 - REACT STATE MANAGEMENT -->
+    <div class="slide" data-slide="3">
+      <div class="slide-header">
+        <span class="slide-eyebrow">Lesson 2: Frontend Engineering</span>
+        <h2 class="slide-title">State Management Without Library Bloat</h2>
+        <p class="slide-subtitle">Mastering the 'Single Source of Truth' pattern in pure React without Redux overhead.</p>
+      </div>
+      <div class="slide-body">
+        <div class="col-left">
+          <div class="learn-card">
+            <div class="learn-icon">🌳</div>
+            <div>
+              <div class="learn-title">Lifting State Up to the Root</div>
+              <div class="learn-desc">By managing core collections (<code>posts</code>, <code>claims</code>, <code>broadcasts</code>) in <code>App.jsx</code> and passing pure handlers down, we achieved seamless cross-tab coordination without stale closures.</div>
+            </div>
+          </div>
+          <div class="learn-card">
+            <div class="learn-icon">⚡</div>
+            <div>
+              <div class="learn-title">Optimistic UI Updates for 0ms Lag</div>
+              <div class="learn-desc">When a user cheers a post or adds a comment, the UI updates synchronously in React state before the cloud request even leaves the device, making the app feel instantaneous.</div>
+            </div>
+          </div>
+          <div class="learn-card">
+            <div class="learn-icon">🧹</div>
+            <div>
+              <div class="learn-title">Comment De-duplication on Sync</div>
+              <div class="learn-desc">Learned how to filter optimistic local IDs against incoming server response arrays to prevent duplicate comment bubbles during fast typing.</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-right">
+          <table class="comparison-table">
+            <thead>
+              <tr>
+                <th>Pattern</th>
+                <th>Bloated Approach</th>
+                <th>What We Built (Clean)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>State Engine</strong></td>
+                <td>Heavy Redux / Saga boilerplate</td>
+                <td>React 19 Hooks + Pure Handlers</td>
+              </tr>
+              <tr>
+                <td><strong>Network Delay</strong></td>
+                <td>Blocking spinner until server reply</td>
+                <td>Optimistic UI with instant update</td>
+              </tr>
+              <tr>
+                <td><strong>Data Loss</strong></td>
+                <td>Lost on page refresh</td>
+                <td>Dual-persistence (Cache + Cloud)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="speaker-drawer" id="notes-3">
+        <strong>Discussion Point:</strong>
+        "A common pitfall is adding massive third-party state libraries before understanding pure React primitives. By relying on well-structured state lifting and optimistic updates, our code remains fast, clean, and easily maintainable."
+      </div>
+      <div class="slide-footer">
+        <span>State Architecture & React Patterns</span>
+        <button onclick="toggleNotes()" style="background:none; border:none; color:#4F46E5; font-weight:bold; cursor:pointer;">Show Notes</button>
+        <div style="display: flex; gap: 6px;">
+          <button class="btn-nav" onclick="prevSlide()">← Prev</button>
+          <span style="align-self: center; margin: 0 6px; font-weight: bold;">Slide 3 / 10</span>
+          <button class="btn-nav primary" onclick="nextSlide()">Next Slide →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 4: LESSON 3 - DATABASE MODELING HYBRID -->
+    <div class="slide" data-slide="4">
+      <div class="slide-header">
+        <span class="slide-eyebrow">Lesson 3: Backend & Database</span>
+        <h2 class="slide-title">The Power of Hybrid PostgreSQL: Relational + JSONB</h2>
+        <p class="slide-subtitle">Knowing when to use strict foreign keys versus flexible document columns.</p>
+      </div>
+      <div class="slide-body">
+        <div class="col-left">
+          <div class="learn-card">
+            <div class="learn-icon">⚖️</div>
+            <div>
+              <div class="learn-title">Strict Relational Integrity Where It Counts</div>
+              <div class="learn-desc">Users, supervisor relationships, monthly reports, and reimbursement amounts require strict relational constraints (<code>UUID</code>, <code>NUMERIC</code>, <code>ENUM</code>) to prevent data corruption.</div>
+            </div>
+          </div>
+          <div class="learn-card">
+            <div class="learn-icon">📦</div>
+            <div>
+              <div class="learn-title">JSONB for High-Velocity Social Threads</div>
+              <div class="learn-desc">For post comments and query answers, creating separate relational tables would require expensive joins on mobile. Storing comments as a <code>JSONB</code> array gives single-query speed and zero schema friction.</div>
+            </div>
+          </div>
+          <div class="learn-card">
+            <div class="learn-icon">🛡️</div>
+            <div>
+              <div class="learn-title">UUID vs. String ID Compatibility</div>
+              <div class="learn-desc">Learned how to design schemas that accommodate both optimistic client strings (<code>post-1729...</code>) and database generated <code>gen_random_uuid()</code> without crashing PostgreSQL types.</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-right">
+          <div style="background: #F8FAFC; border: 1px solid #CBD5E1; border-radius: 12px; padding: 16px; font-size: 11px;">
+            <div style="font-weight: 800; color: #4F46E5; margin-bottom: 8px;">DATABASE ARCHITECTURE LESSON</div>
+            <div style="margin-bottom: 10px;">
+              <strong>1. Profiles & Finance:</strong> Strictly Relational<br>
+              <span style="color: #64748B;">Requires audit trails, exact sums, and supervisor constraints.</span>
+            </div>
+            <div>
+              <strong>2. Social Comments & Discussions:</strong> JSONB Document<br>
+              <span style="color: #64748B;">Requires rapid appending, fast reads, and nested author metadata.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="speaker-drawer" id="notes-4">
+        <strong>Discussion Point:</strong>
+        "A senior engineering skill is avoiding dogmatism. You don't have to choose 100% Relational or 100% NoSQL. PostgreSQL allows the best of both worlds with native JSONB."
+      </div>
+      <div class="slide-footer">
+        <span>Database Modeling Insights</span>
+        <button onclick="toggleNotes()" style="background:none; border:none; color:#4F46E5; font-weight:bold; cursor:pointer;">Show Notes</button>
+        <div style="display: flex; gap: 6px;">
+          <button class="btn-nav" onclick="prevSlide()">← Prev</button>
+          <span style="align-self: center; margin: 0 6px; font-weight: bold;">Slide 4 / 10</span>
+          <button class="btn-nav primary" onclick="nextSlide()">Next Slide →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 5: LESSON 4 - SECURITY & PRIVACY -->
+    <div class="slide" data-slide="5">
+      <div class="slide-header">
+        <span class="slide-eyebrow">Lesson 4: Security Engineering</span>
+        <h2 class="slide-title">Real-World Security & Role-Based Boundaries</h2>
+        <p class="slide-subtitle">Balancing rigorous access control with frictionless mobile usability.</p>
+      </div>
+      <div class="slide-body">
+        <div class="col-left">
+          <div class="learn-card">
+            <div class="learn-icon">🔒</div>
+            <div>
+              <div class="learn-title">Strict Registration Role Lock</div>
+              <div class="learn-desc">Public signups are hard-coded strictly to the <code>intern</code> role. Secretariat, Trustee, and Junior Secretary accounts cannot be self-created, eliminating privilege escalation.</div>
+            </div>
+          </div>
+          <div class="learn-card">
+            <div class="learn-icon">📱</div>
+            <div>
+              <div class="learn-title">Contextual Privacy Rules</div>
+              <div class="learn-desc">Learned to protect executive leadership by hiding Management personal phone numbers, while keeping Junior Secretary numbers visible for emergency scholar support.</div>
+            </div>
+          </div>
+          <div class="learn-card">
+            <div class="learn-icon">⏱️</div>
+            <div>
+              <div class="learn-title">2-Week Persistent Sessions</div>
+              <div class="learn-desc">Scholars shouldn't have to type passwords daily on mobile. Implementing timestamped 14-day persistent sessions gave security without annoying re-login prompts.</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-right">
+          <div class="quote-box">
+            "Security isn't just about encryption keys; it's about business rules. Designing who can delegate privileges, who sees phone numbers, and who can approve funds is where real-world software security lives."
+            <span class="quote-author">— Security Engineering Principle</span>
+          </div>
+        </div>
+      </div>
+      <div class="speaker-drawer" id="notes-5">
+        <strong>Discussion Point:</strong>
+        "If security is too painful, users bypass it. Our 2-week persistent session balance gave the Dakshana team rock-solid account isolation without making scholars re-enter passwords every morning."
+      </div>
+      <div class="slide-footer">
+        <span>Security & Access Control</span>
+        <button onclick="toggleNotes()" style="background:none; border:none; color:#4F46E5; font-weight:bold; cursor:pointer;">Show Notes</button>
+        <div style="display: flex; gap: 6px;">
+          <button class="btn-nav" onclick="prevSlide()">← Prev</button>
+          <span style="align-self: center; margin: 0 6px; font-weight: bold;">Slide 5 / 10</span>
+          <button class="btn-nav primary" onclick="nextSlide()">Next Slide →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 6: LESSON 5 - OFFLINE-FIRST & WEB AUDIO -->
+    <div class="slide" data-slide="6">
+      <div class="slide-header">
+        <span class="slide-eyebrow">Lesson 5: Native Web APIs</span>
+        <h2 class="slide-title">Leveraging Modern Web Capabilities</h2>
+        <p class="slide-subtitle">How Web Audio API and PWA standards replace bloated mobile dependencies.</p>
+      </div>
+      <div class="slide-body">
+        <div class="col-left">
+          <div class="learn-card">
+            <div class="learn-icon">🔔</div>
+            <div>
+              <div class="learn-title">Code-Synthesized Chimes (Web Audio API)</div>
+              <div class="learn-desc">Instead of loading external MP3 files that fail when offline or slow to download, we synthesized a pleasant D5-to-A5 chime directly in RAM using code oscillators.</div>
+            </div>
+          </div>
+          <div class="learn-card">
+            <div class="learn-icon">📲</div>
+            <div>
+              <div class="learn-title">The Power of Progressive Web Apps</div>
+              <div class="learn-desc">By creating an adaptive <code>manifest.json</code> and mobile meta tags, the app installs directly to mobile home screens without App Store delays or 30% developer fees.</div>
+            </div>
+          </div>
+          <div class="learn-card">
+            <div class="learn-icon">📅</div>
+            <div>
+              <div class="learn-title">Human-Friendly Date Math</div>
+              <div class="learn-desc">Implemented custom relative date formatters (<em>"2 hours ago"</em>, <em>"Yesterday"</em>) that transform raw ISO UTC timestamps into natural human language.</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-right">
+          <div style="background: #0F172A; color: #E2E8F0; padding: 14px; border-radius: 12px; font-size: 11px; font-family: monospace;">
+            <span style="color: #38BDF8;">// Web Audio API Synthesis</span><br>
+            ctx = <span style="color: #F59E0B;">new AudioContext()</span><br>
+            osc = ctx.<span style="color: #4ADE80;">createOscillator()</span><br>
+            gain = ctx.<span style="color: #4ADE80;">createGain()</span><br>
+            osc.frequency.setValueAtTime(<span style="color: #F43F5E;">587.33</span>, now)<br>
+            osc.frequency.exponentialRampToValueAtTime(<span style="color: #F43F5E;">880</span>, now + 0.15)<br>
+            <br>
+            <span style="color: #94A3B8;">// Result: 0 KB downloaded, instant harmonic chime!</span>
+          </div>
+        </div>
+      </div>
+      <div class="speaker-drawer" id="notes-6">
+        <strong>Discussion Point:</strong>
+        "Browsers today have incredible native APIs that most developers overlook. Synthesizing audio and using PWA manifests allowed us to build an app that feels completely native without the bloat of React Native or Flutter."
+      </div>
+      <div class="slide-footer">
+        <span>Browser Native Capabilities</span>
+        <button onclick="toggleNotes()" style="background:none; border:none; color:#4F46E5; font-weight:bold; cursor:pointer;">Show Notes</button>
+        <div style="display: flex; gap: 6px;">
+          <button class="btn-nav" onclick="prevSlide()">← Prev</button>
+          <span style="align-self: center; margin: 0 6px; font-weight: bold;">Slide 6 / 10</span>
+          <button class="btn-nav primary" onclick="nextSlide()">Next Slide →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 7: LESSON 6 - ITERATIVE REFACTORING -->
+    <div class="slide" data-slide="7">
+      <div class="slide-header">
+        <span class="slide-eyebrow">Lesson 6: Agility & Refactoring</span>
+        <h2 class="slide-title">Handling Evolving Requirements Without Regressions</h2>
+        <p class="slide-subtitle">The software engineering discipline of continuous improvement.</p>
+      </div>
+      <div class="slide-body">
+        <div class="col-left">
+          <div class="learn-card">
+            <div class="learn-icon">🔄</div>
+            <div>
+              <div class="learn-title">Safe Incremental Edits</div>
+              <div class="learn-desc">Throughout development, requirements shifted: re-ordering tabs, adding leaderboards, modifying target visits. Making surgical, targeted modifications prevented breaking existing features.</div>
+            </div>
+          </div>
+          <div class="learn-card">
+            <div class="learn-icon">🛡️</div>
+            <div>
+              <div class="learn-title">Graceful Fallback Engineering</div>
+              <div class="learn-desc">Every cloud integration was designed so that if a Supabase table didn't exist yet, the client caught the error gracefully and fell back to local storage without crashing.</div>
+            </div>
+          </div>
+          <div class="learn-card">
+            <div class="learn-icon">🧩</div>
+            <div>
+              <div class="learn-title">Component Reusability</div>
+              <div class="learn-desc">Reusable primitives like <code>Avatar</code>, <code>FeedbackModal</code>, and <code>relativeDateUtils</code> allowed rapid feature additions with consistent visual polish.</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-right">
+          <div class="quote-box">
+            "In real projects, requirements are never static. The mark of quality code is that it can bend and evolve when leadership asks for changes without breaking what was built yesterday."
+            <span class="quote-author">— Software Engineering Discipline</span>
+          </div>
+        </div>
+      </div>
+      <div class="speaker-drawer" id="notes-7">
+        <strong>Discussion Point:</strong>
+        "Every single revision in this conversation was tested and verified. Building resilient fallback layers meant we could introduce cloud databases without ever breaking the working offline prototype."
+      </div>
+      <div class="slide-footer">
+        <span>Refactoring & Code Resilience</span>
+        <button onclick="toggleNotes()" style="background:none; border:none; color:#4F46E5; font-weight:bold; cursor:pointer;">Show Notes</button>
+        <div style="display: flex; gap: 6px;">
+          <button class="btn-nav" onclick="prevSlide()">← Prev</button>
+          <span style="align-self: center; margin: 0 6px; font-weight: bold;">Slide 7 / 10</span>
+          <button class="btn-nav primary" onclick="nextSlide()">Next Slide →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 8: LESSON 7 - DEVOPS & BUNDLE OPTIMIZATION -->
+    <div class="slide" data-slide="8">
+      <div class="slide-header">
+        <span class="slide-eyebrow">Lesson 7: Production DevOps</span>
+        <h2 class="slide-title">Shipping to Production with Zero Infrastructure Cost</h2>
+        <p class="slide-subtitle">How modern tooling enables enterprise-grade deployments for non-profits.</p>
+      </div>
+      <div class="slide-body">
+        <div class="col-left">
+          <div class="learn-card">
+            <div class="learn-icon">📦</div>
+            <div>
+              <div class="learn-title">Vite Production Asset Optimization</div>
+              <div class="learn-desc">Minified Rollup chunking, tree-shaking dead code, and scoped CSS compiling into lean, cacheable static assets.</div>
+            </div>
+          </div>
+          <div class="learn-card">
+            <div class="learn-icon">🚀</div>
+            <div>
+              <div class="learn-title">Atomic Git-Based Deployments</div>
+              <div class="learn-desc">Using <code>gh-pages</code> to publish versioned releases directly to a global CDN. Instant rollback capability if issues ever arise.</div>
+            </div>
+          </div>
+          <div class="learn-card">
+            <div class="learn-icon">💰</div>
+            <div>
+              <div class="learn-title">100% Free Tier Architecture</div>
+              <div class="learn-desc">GitHub Pages + Supabase Free Tier provides up to 500MB PostgreSQL storage, 50,000 monthly active users, and unlimited CDN bandwidth at $0 budget.</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-right">
+          <div style="background: #F8FAFC; border: 1px solid #CBD5E1; border-radius: 12px; padding: 16px; font-size: 11px;">
+            <div style="font-weight: 800; color: #059669; margin-bottom: 8px;">INFRASTRUCTURE BUDGET SCORECARD</div>
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #E2E8F0; padding: 4px 0;">
+              <span>Static Edge Hosting (GitHub CDN)</span>
+              <strong>$0.00 / mo</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #E2E8F0; padding: 4px 0;">
+              <span>PostgreSQL BaaS (Supabase)</span>
+              <strong>$0.00 / mo</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #E2E8F0; padding: 4px 0;">
+              <span>SSL / TLS Certificates</span>
+              <strong>$0.00 / mo</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding: 6px 0; font-weight: 800; color: #0A643B;">
+              <span>Total Monthly Server Cost</span>
+              <span>$0.00 (Free Forever)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="speaker-drawer" id="notes-8">
+        <strong>Discussion Point:</strong>
+        "For non-profit organizations like Dakshana, spending thousands on cloud servers is unnecessary. Modern static edge hosting paired with serverless databases provides enterprise performance with zero overhead."
+      </div>
+      <div class="slide-footer">
+        <span>DevOps & Infrastructure Economics</span>
+        <button onclick="toggleNotes()" style="background:none; border:none; color:#4F46E5; font-weight:bold; cursor:pointer;">Show Notes</button>
+        <div style="display: flex; gap: 6px;">
+          <button class="btn-nav" onclick="prevSlide()">← Prev</button>
+          <span style="align-self: center; margin: 0 6px; font-weight: bold;">Slide 8 / 10</span>
+          <button class="btn-nav primary" onclick="nextSlide()">Next Slide →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 9: KEY SKILLS ACQUIRED SUMMARY -->
+    <div class="slide" data-slide="9">
+      <div class="slide-header">
+        <span class="slide-eyebrow">Developer Toolkit</span>
+        <h2 class="slide-title">Full-Stack Competencies Mastered</h2>
+        <p class="slide-subtitle">A comprehensive checklist of modern app development skills applied in this project.</p>
+      </div>
+      <div class="slide-body">
+        <div style="width: 100%; display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;">
+          <div class="learn-card" style="flex-direction: column; background: white;">
+            <div style="font-size: 20px;">🎨</div>
+            <div class="learn-title">Frontend Engineering</div>
+            <div class="learn-desc">React 19 hooks, component architecture, Tailwind CSS v4, Web Audio API synthesis, responsive mobile layouts, and custom UX animations.</div>
+          </div>
+          <div class="learn-card" style="flex-direction: column; background: white;">
+            <div style="font-size: 20px;">🗄️</div>
+            <div class="learn-title">Database & Backend</div>
+            <div class="learn-desc">PostgreSQL relational modeling, JSONB document fields, Row-Level Security (RLS) policies, PostgREST API integration, and UUID handling.</div>
+          </div>
+          <div class="learn-card" style="flex-direction: column; background: white;">
+            <div style="font-size: 20px;">⚙️</div>
+            <div class="learn-title">System & DevOps</div>
+            <div class="learn-desc">Dual-persistence offline syncing, PWA manifest engineering, Rollup bundle optimization, environment variable security, and CI/CD hosting.</div>
+          </div>
+        </div>
+      </div>
+      <div class="speaker-drawer" id="notes-9">
+        <strong>Discussion Point:</strong>
+        "Notice the breadth of skills here: UI/UX empathy, core computer science data modeling, cybersecurity policies, and continuous deployment. This is what true full-stack software development looks like."
+      </div>
+      <div class="slide-footer">
+        <span>Competencies & Skill Inventory</span>
+        <button onclick="toggleNotes()" style="background:none; border:none; color:#4F46E5; font-weight:bold; cursor:pointer;">Show Notes</button>
+        <div style="display: flex; gap: 6px;">
+          <button class="btn-nav" onclick="prevSlide()">← Prev</button>
+          <span style="align-self: center; margin: 0 6px; font-weight: bold;">Slide 9 / 10</span>
+          <button class="btn-nav primary" onclick="nextSlide()">Next Slide →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 10: CONCLUSION -->
+    <div class="slide" data-slide="10">
+      <div class="slide-header">
+        <span class="slide-eyebrow">Final Thought</span>
+        <h2 class="slide-title">Software Engineering is Problem Solving</h2>
+        <p class="slide-subtitle">Technology is only as good as the human lives it touches and improves.</p>
+      </div>
+      <div class="slide-body">
+        <div class="col-left">
+          <div class="learn-card" style="border-left: 4px solid #4F46E5;">
+            <div class="learn-icon">💡</div>
+            <div>
+              <div class="learn-title">Empathy Over Complexity</div>
+              <div class="learn-desc">Never build features to show off technical cleverness; build them to solve genuine human frustration for interns and coordinators.</div>
+            </div>
+          </div>
+          <div class="learn-card" style="border-left: 4px solid #059669;">
+            <div class="learn-icon">🚀</div>
+            <div>
+              <div class="learn-title">Shipping is a Discipline</div>
+              <div class="learn-desc">Ideas are easy; writing working, bug-free, deployable software that handles real network disconnects and edge cases is what delivers real value.</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-right">
+          <div style="background: linear-gradient(135deg, #4F46E5 0%, #312E81 100%); color: white; border-radius: 16px; padding: 24px; text-align: center; box-shadow: 0 10px 25px rgba(79,70,229,0.3);">
+            <div style="font-size: 28px; margin-bottom: 8px;">🎓</div>
+            <h3 style="font-size: 18px; font-weight: 900; margin-bottom: 6px;">We Built Something Meaningful</h3>
+            <p style="font-size: 12px; opacity: 0.9; line-height: 1.5;">
+              This portal will help hundreds of Dakshana outreach scholars reach thousands of deserving rural students across India. That is the true power of software engineering.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="speaker-drawer" id="notes-10">
+        <strong>Closing Retrospective Remark:</strong>
+        "At the end of the day, all our state management, database schemas, and CSS styling serve one ultimate purpose: helping Dakshana scholars inspire young minds without operational friction. Thank you!"
+      </div>
+      <div class="slide-footer">
+        <span>Retrospective Conclusion</span>
+        <button onclick="toggleNotes()" style="background:none; border:none; color:#4F46E5; font-weight:bold; cursor:pointer;">Show Notes</button>
+        <div style="display: flex; gap: 6px;">
+          <button class="btn-nav" onclick="prevSlide()">← Prev</button>
+          <span style="align-self: center; margin: 0 6px; font-weight: bold;">Slide 10 / 10</span>
+          <button class="btn-nav primary" onclick="goToSlide(1)">Restart Deck ↺</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    let currentSlide = 1;
+    const totalSlides = 10;
+    function showSlide(n) {
+      if (n > totalSlides) n = totalSlides;
+      if (n < 1) n = 1;
+      currentSlide = n;
+      document.querySelectorAll('.slide').forEach(s => {
+        s.classList.remove('active');
+        if (parseInt(s.getAttribute('data-slide')) === currentSlide) s.classList.add('active');
+      });
+    }
+    function nextSlide() { if (currentSlide < totalSlides) showSlide(currentSlide + 1); }
+    function prevSlide() { if (currentSlide > 1) showSlide(currentSlide - 1); }
+    function goToSlide(n) { showSlide(n); }
+    function toggleNotes() {
+      const active = document.getElementById(`notes-${currentSlide}`);
+      if (active) active.classList.toggle('open');
+    }
+    function toggleFullscreen() {
+      const elem = document.getElementById('deckContainer');
+      if (!document.fullscreenElement) {
+        if (elem.requestFullscreen) elem.requestFullscreen();
+      } else {
+        if (document.exitFullscreen) document.exitFullscreen();
+      }
+    }
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') nextSlide();
+      else if (e.key === 'ArrowLeft' || e.key === 'PageUp') prevSlide();
+      else if (e.key === 'f' || e.key === 'F') toggleFullscreen();
+      else if (e.key === 's' || e.key === 'S') toggleNotes();
+    });
+  </script>
+</body>
+</html>

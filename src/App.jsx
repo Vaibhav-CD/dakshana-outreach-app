@@ -18,6 +18,7 @@ import FeedbackModal from './components/FeedbackModal'
 import ErrorBoundary from './components/ErrorBoundary'
 import { Radio, X, Bell, Bug } from 'lucide-react'
 import QueriesHub from './components/QueriesHub'
+import { parseDateToTimestamp } from './utils/dateUtils'
 import {
   INITIAL_USERS,
   INITIAL_REPORTS,
@@ -316,8 +317,11 @@ export default function App() {
           localStorage.setItem('dakshana_claims', JSON.stringify(cloudClaims))
         }
         if (cloudBroadcasts && cloudBroadcasts.length > 0) {
-          setBroadcasts(cloudBroadcasts)
-          localStorage.setItem('dakshana_broadcasts', JSON.stringify(cloudBroadcasts))
+          const sortedCloudBroadcasts = [...cloudBroadcasts].sort((a, b) => {
+            return parseDateToTimestamp(b?.date || b?.createdAt) - parseDateToTimestamp(a?.date || a?.createdAt)
+          })
+          setBroadcasts(sortedCloudBroadcasts)
+          localStorage.setItem('dakshana_broadcasts', JSON.stringify(sortedCloudBroadcasts))
         }
         if (cloudPosts && cloudPosts.length > 0) {
           setPosts(prev => {
@@ -326,6 +330,9 @@ export default function App() {
               if (!combined.some(cp => cp.id === localPost.id)) {
                 combined.unshift(localPost)
               }
+            })
+            combined.sort((a, b) => {
+              return parseDateToTimestamp(b?.createdAt || b?.date) - parseDateToTimestamp(a?.createdAt || a?.date)
             })
             localStorage.setItem('dakshana_posts', JSON.stringify(combined))
             return combined

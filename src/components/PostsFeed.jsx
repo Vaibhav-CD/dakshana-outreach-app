@@ -18,7 +18,7 @@ import {
   Calendar
 } from 'lucide-react'
 import Avatar from './Avatar'
-import { formatDateWithRelative } from '../utils/dateUtils'
+import { formatDateWithRelative, parseDateToTimestamp } from '../utils/dateUtils'
 
 export default function PostsFeed({
   currentUser,
@@ -75,7 +75,7 @@ export default function PostsFeed({
       authorPhoto: currentUser.photo,
       batch: currentUser.batch || 'Batch 1',
       wing: currentUser.department || 'Outreach Wing',
-      createdAt: new Date().toISOString().split('T')[0],
+      createdAt: new Date().toISOString(),
       title: title.trim() || 'Outreach Milestone Update',
       content: content.trim(),
       photoUrl: photoUrl || localImagePreview || selectedPresetPhoto || null,
@@ -138,6 +138,13 @@ export default function PostsFeed({
     if (filter === 'batch_1') return post.batch === 'Batch 1'
     if (filter === 'batch_2') return post.batch === 'Batch 2'
     return true
+  })
+
+  // Ensure latest at the top pattern
+  const sortedPosts = [...filteredPosts].sort((a, b) => {
+    const timeA = parseDateToTimestamp(a?.createdAt || a?.date)
+    const timeB = parseDateToTimestamp(b?.createdAt || b?.date)
+    return timeB - timeA
   })
 
   return (
@@ -347,14 +354,14 @@ export default function PostsFeed({
 
       {/* Posts Feed List */}
       <div className="space-y-5">
-        {filteredPosts.length === 0 ? (
+        {sortedPosts.length === 0 ? (
           <div className="bg-white rounded-3xl p-8 text-center border border-slate-200">
             <Share2 className="w-10 h-10 text-slate-300 mx-auto mb-2" />
             <p className="text-slate-600 font-bold text-sm">No posts found in this category</p>
             <p className="text-slate-400 text-xs mt-1">Be the first to share an outreach update!</p>
           </div>
         ) : (
-          filteredPosts.map((post) => {
+          sortedPosts.map((post) => {
             if (!post) return null
             const isCheered = Boolean(cheeredPosts[post.id])
             const totalCheers = (Number(post.cheersCount) || 0) + (isCheered ? 1 : 0)

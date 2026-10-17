@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import { Megaphone, Send, CheckCircle2, Bell, Radio } from 'lucide-react'
-import { formatDateWithRelative } from '../utils/dateUtils'
+import { formatDateWithRelative, parseDateToTimestamp } from '../utils/dateUtils'
 
-export default function BroadcastCenter({ currentUser, broadcasts, onSendBroadcast, delegatedPowers = {} }) {
+export default function BroadcastCenter({ currentUser, broadcasts = [], onSendBroadcast, delegatedPowers = {} }) {
   // Senior Secretary, Management & Delegated Junior Secretaries (with canBroadcast) have broadcast dispatching powers
   const userPowers = currentUser.role === 'junior_sec' ? (delegatedPowers[currentUser.id] || {}) : {}
   const isAuthority = currentUser.role === 'senior_sec' || currentUser.role === 'management' || Boolean(userPowers.canBroadcast)
@@ -14,7 +14,8 @@ export default function BroadcastCenter({ currentUser, broadcasts, onSendBroadca
   const [sendSuccess, setSendSuccess] = useState(false)
 
   // Smart audience visibility based on user role and batch
-  const visibleBroadcasts = broadcasts.filter(b => {
+  const safeBroadcasts = Array.isArray(broadcasts) ? broadcasts.filter(Boolean) : []
+  const visibleBroadcasts = safeBroadcasts.filter(b => {
     // Senior Secretary and Management see all broadcasts
     if (currentUser.role === 'senior_sec' || currentUser.role === 'management') return true
     
@@ -37,11 +38,19 @@ export default function BroadcastCenter({ currentUser, broadcasts, onSendBroadca
     return false
   })
 
+  // Ensure latest at the top pattern for circulars & notices
+  const sortedBroadcasts = [...visibleBroadcasts].sort((a, b) => {
+    const timeA = parseDateToTimestamp(a?.date || a?.createdAt)
+    const timeB = parseDateToTimestamp(b?.date || b?.createdAt)
+    return timeB - timeA
+  })
+
   const handleSend = (e) => {
     e.preventDefault()
     if (!broadcastTitle || !broadcastMessage) return
 
     setIsSending(true)
+    const nowIso = new Date().toISOString()
     const newBroadcast = {
       id: `bc-${Date.now()}`,
       sender: currentUser.name,
@@ -50,7 +59,8 @@ export default function BroadcastCenter({ currentUser, broadcasts, onSendBroadca
       title: broadcastTitle,
       message: broadcastMessage,
       audience: targetAudience,
-      date: 'Just now',
+      date: nowIso,
+      createdAt: nowIso,
       isNew: true
     }
 
@@ -183,7 +193,7 @@ export default function BroadcastCenter({ currentUser, broadcasts, onSendBroadca
           <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs">
             <h3 className="font-bold text-slate-900 text-base mb-1 flex items-center">
               <Bell className="w-5 h-5 mr-2 text-[#0A643B]" />
-              Official Notices & Memos ({visibleBroadcasts.length})
+              Official Notices & Memos ({sortedBroadcasts.length})
             </h3>
             <p className="text-xs text-slate-500 mb-4">
               {currentUser.role === 'intern' 
@@ -192,7 +202,7 @@ export default function BroadcastCenter({ currentUser, broadcasts, onSendBroadca
             </p>
 
             <div className="space-y-3">
-              {visibleBroadcasts.map((b) => {
+              {sortedBroadcasts.map((b) => {
                 const badge = getAudienceBadge(b.audience)
 
                 return (

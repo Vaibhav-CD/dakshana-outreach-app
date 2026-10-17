@@ -78,3 +78,71 @@ export function getDaysAgoBadge(dateInput) {
   const parts = text.split('•')
   return parts.length > 1 ? parts[1].trim() : parts[0].trim()
 }
+
+/**
+ * Parses any date format (ISO timestamp, relative string, or Date)
+ * into a numeric Unix timestamp in milliseconds for sorting "latest at the top".
+ */
+export function parseDateToTimestamp(dateInput) {
+  if (!dateInput) return 0
+  if (typeof dateInput === 'number') return dateInput
+  if (dateInput instanceof Date) return dateInput.getTime()
+
+  const inputStr = String(dateInput).trim()
+  const lower = inputStr.toLowerCase()
+  const now = Date.now()
+
+  if (lower.includes('just now')) return now
+  if (lower.includes('min')) {
+    const match = lower.match(/(\d+)\s*min/)
+    const mins = match ? parseInt(match[1], 10) : 5
+    return now - mins * 60 * 1000
+  }
+  if (lower.includes('hour')) {
+    const match = lower.match(/(\d+)\s*hour/)
+    const hours = match ? parseInt(match[1], 10) : 1
+    return now - hours * 60 * 60 * 1000
+  }
+  if (lower.includes('today')) {
+    if (lower.includes(':')) {
+      const timeMatch = lower.match(/(\d{1,2}):(\d{2})\s*(am|pm)?/)
+      if (timeMatch) {
+        let h = parseInt(timeMatch[1], 10)
+        const m = parseInt(timeMatch[2], 10)
+        const ampm = timeMatch[3]
+        if (ampm === 'pm' && h < 12) h += 12
+        if (ampm === 'am' && h === 12) h = 0
+        const d = new Date()
+        d.setHours(h, m, 0, 0)
+        return d.getTime()
+      }
+    }
+    return now - 2 * 60 * 60 * 1000
+  }
+  if (lower.includes('yesterday')) {
+    if (lower.includes(':')) {
+      const timeMatch = lower.match(/(\d{1,2}):(\d{2})\s*(am|pm)?/)
+      if (timeMatch) {
+        let h = parseInt(timeMatch[1], 10)
+        const m = parseInt(timeMatch[2], 10)
+        const ampm = timeMatch[3]
+        if (ampm === 'pm' && h < 12) h += 12
+        if (ampm === 'am' && h === 12) h = 0
+        const d = new Date(now - 24 * 60 * 60 * 1000)
+        d.setHours(h, m, 0, 0)
+        return d.getTime()
+      }
+    }
+    return now - 24 * 60 * 60 * 1000
+  }
+  if (lower.includes('day')) {
+    const match = lower.match(/(\d+)\s*day/)
+    const days = match ? parseInt(match[1], 10) : 2
+    return now - days * 24 * 60 * 60 * 1000
+  }
+
+  const parsed = Date.parse(inputStr)
+  if (!isNaN(parsed)) return parsed
+
+  return 0
+}

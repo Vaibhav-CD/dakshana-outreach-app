@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dakshana Outreach Portal — Comprehensive Technical Specification</title>
+  <style>
+    :root {
+      --primary: #0A643B;
+      --primary-dark: #074D2D;
+      --primary-light: #EBF7F0;
+      --accent: #0284C7;
+      --slate-900: #0F172A;
+      --slate-800: #1E293B;
+      --slate-700: #334155;
+      --slate-600: #475569;
+      --slate-200: #E2E8F0;
+      --slate-100: #F1F5F9;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: var(--slate-900);
+      background: #F8FAFC;
+      line-height: 1.6;
+      padding: 40px 20px;
+    }
+
+    .doc-container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: white;
+      padding: 60px 80px;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      border: 1px solid var(--slate-200);
+    }
+
+    .print-bar {
+      position: sticky;
+      top: 10px;
+      max-width: 900px;
+      margin: 0 auto 20px auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--slate-900);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 12px;
+      z-index: 100;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+
+    .btn-print {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 8px 18px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.2s;
+    }
+    .btn-print:hover { background: #08502F; }
+
+    /* Header */
+    .doc-header {
+      border-bottom: 2px solid var(--slate-200);
+      padding-bottom: 24px;
+      margin-bottom: 32px;
+    }
+    .doc-badge {
+      display: inline-block;
+      background: var(--primary-light);
+      color: var(--primary);
+      font-weight: 800;
+      font-size: 11px;
+      padding: 4px 12px;
+      border-radius: 999px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+    }
+    h1 { font-size: 30px; font-weight: 900; color: var(--slate-900); line-height: 1.2; margin-bottom: 8px; }
+    .doc-meta { font-size: 13px; color: var(--slate-600); display: flex; gap: 20px; flex-wrap: wrap; margin-top: 10px; }
+
+    h2 { font-size: 20px; font-weight: 800; color: var(--primary); margin: 32px 0 12px 0; border-bottom: 1px solid var(--slate-200); padding-bottom: 6px; }
+    h3 { font-size: 15px; font-weight: 800; color: var(--slate-800); margin: 18px 0 6px 0; }
+    p, li { font-size: 13.5px; color: var(--slate-700); margin-bottom: 12px; }
+    ul, ol { padding-left: 20px; margin-bottom: 16px; }
+
+    /* Code Blocks */
+    pre {
+      background: #0F172A;
+      color: #E2E8F0;
+      padding: 16px 20px;
+      border-radius: 10px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 12px;
+      line-height: 1.5;
+      overflow-x: auto;
+      margin: 16px 0;
+      border: 1px solid #334155;
+    }
+
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      background: #F1F5F9;
+      color: #0F172A;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+
+    /* Tables */
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 12.5px; }
+    th { background: #F8FAFC; padding: 10px 14px; text-align: left; font-weight: 800; color: var(--slate-800); border: 1px solid var(--slate-200); }
+    td { padding: 10px 14px; border: 1px solid var(--slate-200); color: var(--slate-700); }
+    tr:nth-child(even) { background: #FAFAFB; }
+
+    .callout {
+      background: #F0FDF4;
+      border-left: 4px solid var(--primary);
+      padding: 14px 18px;
+      border-radius: 8px;
+      margin: 16px 0;
+      font-size: 13px;
+      color: #166534;
+    }
+
+    @media print {
+      body { background: white; padding: 0; }
+      .print-bar { display: none !important; }
+      .doc-container { box-shadow: none; border: none; padding: 0; max-width: 100%; }
+      h2 { page-break-after: avoid; }
+      pre, table { page-break-inside: avoid; }
+      @page { margin: 2cm; size: A4; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sticky Print Bar -->
+  <div class="print-bar">
+    <div>
+      <strong>Dakshana Technical Whitepaper</strong> • Architecture & Tech Stack Specification
+    </div>
+    <button class="btn-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  </div>
+
+  <div class="doc-container">
+
+    <!-- Document Header -->
+    <div class="doc-header">
+      <div class="doc-badge">Official Architecture Specification</div>
+      <h1>Dakshana Outreach Portal: Full-Stack Architecture & Engineering Whitepaper</h1>
+      <div class="doc-meta">
+        <span><strong>Version:</strong> 2.0.0 (Production)</span>
+        <span><strong>Client:</strong> React 19 + Vite + Tailwind v4</span>
+        <span><strong>Backend:</strong> Supabase PostgreSQL (PostgREST BaaS)</span>
+        <span><strong>Date:</strong> October 2026</span>
+      </div>
+    </div>
+
+    <!-- Section 1 -->
+    <h2>1. Executive Technical Summary</h2>
+    <p>
+      The <strong>Dakshana Outreach Portal</strong> is a high-performance Progressive Web Application (PWA) designed to manage educational outreach operations across India. The system bridges mobile field reporting by outreach scholars in remote rural schools with real-time operational oversight for Junior Secretaries, the Senior Secretary, and Executive Trustees.
+    </p>
+    <p>
+      The architecture adopts a <strong>JAMstack Serverless Topology</strong>: client-side reactive rendering via React 19, zero-cost edge distribution via GitHub Pages, and a secure cloud relational database powered by Supabase PostgreSQL with PostgREST APIs and Row-Level Security (RLS).
+    </p>
+
+    <!-- Section 2 -->
+    <h2>2. Complete Technology Stack</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Layer</th>
+          <th>Technology</th>
+          <th>Version</th>
+          <th>Architectural Purpose</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Runtime UI</strong></td>
+          <td>React</td>
+          <td>19.0.0</td>
+          <td>Declarative component tree, reactive state hooks, sub-millisecond DOM reconciliation.</td>
+        </tr>
+        <tr>
+          <td><strong>Build Tool</strong></td>
+          <td>Vite</td>
+          <td>8.3.4</td>
+          <td>ESM HMR development server, Rollup tree-shaking, production asset bundling.</td>
+        </tr>
+        <tr>
+          <td><strong>Styling</strong></td>
+          <td>Tailwind CSS</td>
+          <td>4.1.18</td>
+          <td>Zero-runtime utility CSS compiler, fluid typography, responsive mobile breakpoints.</td>
+        </tr>
+        <tr>
+          <td><strong>Icons</strong></td>
+          <td>Lucide React</td>
+          <td>1.16.0</td>
+          <td>Tree-shaken SVG icon set, minimal bundle weight footprint.</td>
+        </tr>
+        <tr>
+          <td><strong>Audio API</strong></td>
+          <td>Web Audio API</td>
+          <td>Native Browser</td>
+          <td>RAM-synthesized oscillator chimes for notices; 0 KB external audio asset load.</td>
+        </tr>
+        <tr>
+          <td><strong>Database Engine</strong></td>
+          <td>PostgreSQL</td>
+          <td>15.x</td>
+          <td>ACID relational transactions, custom ENUMs, UUID keys, JSONB document fields.</td>
+        </tr>
+        <tr>
+          <td><strong>Backend API</strong></td>
+          <td>PostgREST (Supabase)</td>
+          <td>2.99.1 (JS SDK)</td>
+          <td>Auto-generated OpenAPI REST gateway directly on PostgreSQL tables.</td>
+        </tr>
+        <tr>
+          <td><strong>Security</strong></td>
+          <td>PostgreSQL RLS</td>
+          <td>Native</td>
+          <td>Kernel-level row authorization, preventing unauthorized data modification.</td>
+        </tr>
+        <tr>
+          <td><strong>Hosting</strong></td>
+          <td>GitHub Pages CDN</td>
+          <td>Edge</td>
+          <td>Static global edge CDN, HTTP/2, automated Git branch deployments ($0 cost).</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Section 3 -->
+    <h2>3. Dual-Persistence & Offline Resilience Engine</h2>
+    <p>
+      Outreach scholars conduct workshops in remote rural locations (JNVs and government schools) where cellular connectivity is frequently intermittent or non-existent. Standard web apps crash or stall when network requests fail.
+    </p>
+    <p>
+      To solve this, the application implements a <strong>Dual-Persistence Synchronization Pattern</strong>:
+    </p>
+    <ol>
+      <li><strong>Level 1 (Synchronous Browser Cache):</strong> Every user action (logging a visit, publishing a post, adding a note, submitting an expense claim) writes synchronously to <code>localStorage</code> under namespaced keys (<code>dakshana_*</code>). The UI updates instantaneously (0ms optimistic latency).</li>
+      <li><strong>Level 2 (Asynchronous Cloud Mutation):</strong> The mutation triggers an asynchronous HTTP REST call to Supabase. If the network is online, PostgreSQL updates seamlessly. If offline, the request catches gracefully, and the local copy remains 100% intact.</li>
+      <li><strong>Reconciliation on Launch:</strong> When the app mounts, <code>syncFromCloud()</code> executes parallel queries (<code>Promise.all</code>) across all tables, merges new cloud updates with existing local records, and deduplicates IDs.</li>
+    </ol>
+
+    <pre><code>// Dual-Persistence Synchronization Implementation
+const handleAddPost = async (newPost) => {
+  // Step 1: Immediate optimistic UI update & LocalStorage commit
+  setPosts(prev => {
+    const updated = [newPost, ...prev]
+    localStorage.setItem('dakshana_posts', JSON.stringify(updated))
+    return updated
+  })
+
+  // Step 2: Background cloud push to Supabase PostgreSQL
+  try {
+    await dbCreatePost(newPost)
+  } catch (err) {
+    console.warn('Network offline: Cloud sync deferred')
+  }
+}</code></pre>
+
+    <!-- Section 4 -->
+    <h2>4. PostgreSQL Database Schema Specification</h2>
+    <p>
+      The backend database uses a hybrid design combining strict relational integrity for governance and financial tracking with <code>JSONB</code> document columns for high-velocity discussions.
+    </p>
+
+    <h3>Core Tables Overview:</h3>
+    <ul>
+      <li><code>public.profiles</code>: Primary user entities, assigned mentors, phone numbers, and ENUM roles (<code>management</code>, <code>senior_sec</code>, <code>junior_sec</code>, <code>intern</code>).</li>
+      <li><code>public.posts</code>: School visit activity feed, attached photos, visited school name pill, and a <code>comments JSONB</code> array containing author metadata, text, and timestamps.</li>
+      <li><code>public.monthly_reports</code>: Monthly performance submissions, challenges, and reviewer approval feedback.</li>
+      <li><code>public.reimbursement_claims</code>: Financial claim logs, decimal currency amounts (<code>NUMERIC(10,2)</code>), and approval states.</li>
+      <li><code>public.broadcast_messages</code>: Official notices with target audience ENUMs (<code>all</code>, <code>batch_1</code>, <code>batch_2</code>).</li>
+      <li><code>public.queries</code>: Public doubt resolution forum with JSONB answers array and upvote tracking.</li>
+      <li><code>public.feedback</code>: Bug maintenance and operational improvement desk.</li>
+    </ul>
+
+    <!-- Section 5 -->
+    <h2>5. Security Architecture & Role-Based Access Control (RBAC)</h2>
+    <p>
+      Security is enforced across three distinct layers:
+    </p>
+    <ul>
+      <li><strong>Database Row-Level Security (RLS):</strong> Every table has RLS enabled. Unauthorized API requests without valid JWT roles are rejected at the PostgreSQL engine level.</li>
+      <li><strong>Registration Locking:</strong> Self-registration through the client is hard-coded strictly to the <code>intern</code> role. Secretariat and Management accounts cannot be created by public signups.</li>
+      <li><strong>Contextual Privacy Boundaries:</strong> Executive Management personal phone numbers are strictly scrubbed from student-facing UI views, while Junior Secretary phone numbers are accessible for emergency mentor support.</li>
+      <li><strong>Session Expiry Cryptography:</strong> Active sessions are sealed with timestamps (<code>loggedInAt</code>, <code>expiresAt: now + 14 days</code>). State checks verify expiration math on every route navigation.</li>
+    </ul>
+
+    <!-- Section 6 -->
+    <h2>6. Zero-Asset Audio Synthesis (Web Audio API)</h2>
+    <p>
+      To announce urgent leadership circulars without forcing users on mobile data to download large MP3 audio files, the portal synthesizes harmonic audio in RAM:
+    </p>
+    <pre><code>function playNoticeChime() {
+  const ctx = new (window.AudioContext || window.webkitAudioContext)()
+  const osc = ctx.createOscillator()
+  const gain = ctx.createGain()
+  osc.type = 'sine'
+  osc.frequency.setValueAtTime(587.33, ctx.currentTime) // D5
+  osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.15) // A5
+  gain.gain.setValueAtTime(0.12, ctx.currentTime)
+  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4)
+  osc.connect(gain).connect(ctx.destination)
+  osc.start()
+  osc.stop(ctx.currentTime + 0.4)
+}</code></pre>
+
+    <!-- Section 7 -->
+    <h2>7. Progressive Web App (PWA) Deployment</h2>
+    <p>
+      The application conforms to modern PWA specifications with <code>display: "standalone"</code>, translucent status bars, and adaptive maskable icons. It installs directly onto Android and iOS home screens as a standalone native app, bypassing app store approval delays and recurring developer fees.
+    </p>
+
+    <!-- Section 8 -->
+    <h2>8. Operational Economics & Hosting Costs</h2>
+    <div class="callout">
+      <strong>Total Monthly Operating Cost: ₹0.00 / $0.00</strong><br>
+      By using GitHub Pages for static edge asset distribution and Supabase’s free tier for PostgreSQL database management, the Dakshana Foundation incurs zero recurring server costs for up to 50,000 monthly active users.
+    </div>
+
+  </div>
+
+</body>
+</html>
