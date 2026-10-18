@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
-import { Menu, LogOut, LogIn, Bell, CheckCircle2, Camera, Radio, Bug } from 'lucide-react'
+import { Menu, LogOut, LogIn, Bell, CheckCircle2, Camera, Radio, Bug, Key } from 'lucide-react'
 import logoImg from '../assets/logo.png'
 import Avatar from './Avatar'
+import StreamBadge from './StreamBadge'
 import { formatDateWithRelative, parseDateToTimestamp } from '../utils/dateUtils'
 
 export default function Header({
@@ -15,7 +16,8 @@ export default function Header({
   onSelectNotice,
   onMarkAllNoticesRead,
   onOpenPhotoModal,
-  onOpenFeedback
+  onOpenFeedback,
+  onOpenChangePassword
 }) {
   const [showNotifMenu, setShowNotifMenu] = useState(false)
 
@@ -251,14 +253,29 @@ export default function Header({
                     className="text-left hidden sm:block pr-1 hover:opacity-80 transition-opacity cursor-pointer"
                     title="Switch profile or role"
                   >
-                    <span className="text-xs font-bold text-slate-900 block leading-tight truncate max-w-[120px]">
-                      {currentUser.name}
-                    </span>
+                    <div className="flex items-center space-x-1.5">
+                      <span className="text-xs font-bold text-slate-900 block leading-tight truncate max-w-[120px]">
+                        {currentUser.name}
+                      </span>
+                      {currentUser.role === 'intern' && currentUser.stream && (
+                        <StreamBadge stream={currentUser.stream} size="xs" />
+                      )}
+                    </div>
                     <span className={`text-[10px] font-bold ${currentUser.role === 'senior_sec' ? 'text-[#0A643B]' : 'text-slate-500'}`}>
                       {badge.label}
                     </span>
                   </button>
                 </div>
+
+                {/* Change Password Button (strictly authenticated) */}
+                <button
+                  onClick={onOpenChangePassword}
+                  className="px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl border border-slate-200 hover:bg-[#EBF7F0] hover:border-[#0A643B]/40 text-slate-700 hover:text-[#0A643B] transition-colors flex items-center space-x-1.5 cursor-pointer shadow-2xs text-xs font-bold"
+                  title="Change your account password"
+                >
+                  <Key className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#0A643B]" />
+                  <span className="hidden xl:inline">Password</span>
+                </button>
 
                 {/* Sign Out Button */}
                 <button

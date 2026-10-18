@@ -6,6 +6,7 @@ export const INITIAL_USERS = [
     email: 'senior.sec@dakshana.org',
     phone: '+91 98765 43210',
     role: 'senior_sec',
+    password: 'dakshana2026',
     department: 'Central Coordination',
     photo: null,
     bio: 'Highest operational authority: coordinates Batch 1 & Batch 2 allocations, supervises the 3 Junior Secretaries, controls financial reimbursement cycles, and dispatches circulars.'
@@ -16,6 +17,7 @@ export const INITIAL_USERS = [
     title: 'Executive Director & Trustee',
     email: 'trustee@dakshana.org',
     role: 'management',
+    password: 'dakshana2026',
     department: 'Governing Board',
     photo: null,
     bio: 'Board-level governance, institutional audit oversight, and long-term strategy.'
@@ -26,6 +28,7 @@ export const INITIAL_USERS = [
     title: 'Trustee & Senior Advisor',
     email: 'ram.sharma@dakshana.org',
     role: 'management',
+    password: 'dakshana2026',
     department: 'Governing Board',
     photo: null,
     bio: 'Institutional governance, nationwide outreach expansion, and operational audit oversight.'
@@ -36,6 +39,7 @@ export const INITIAL_USERS = [
     title: 'Trustee & Academic Director',
     email: 'sunita.deshmukh@dakshana.org',
     role: 'management',
+    password: 'dakshana2026',
     department: 'Governing Board',
     photo: null,
     bio: 'Academic excellence, curriculum pedagogical standards, and scholarship policy governance.'
@@ -47,6 +51,7 @@ export const INITIAL_USERS = [
     email: 'priya.jsec@dakshana.org',
     phone: '+91 98765 43211',
     role: 'junior_sec',
+    password: 'dakshana2026',
     department: '',
     photo: null,
     bio: 'Supervises, mentors, and reviews monthly progress reports for assigned outreach scholars.'
@@ -58,6 +63,7 @@ export const INITIAL_USERS = [
     email: 'rohan.jsec@dakshana.org',
     phone: '+91 98765 43212',
     role: 'junior_sec',
+    password: 'dakshana2026',
     department: '',
     photo: null,
     bio: 'Supervises, mentors, and reviews progress reports for assigned outreach scholars.'
@@ -69,11 +75,12 @@ export const INITIAL_USERS = [
     email: 'sneha.jsec@dakshana.org',
     phone: '+91 98765 43213',
     role: 'junior_sec',
+    password: 'dakshana2026',
     department: '',
     photo: null,
     bio: 'Supervises, mentors, and reviews fieldwork documentation for assigned outreach scholars.'
   },
-  // Outreach Scholars (Strictly one internship role across Batch 1 & Batch 2 with individual target visits)
+  // Outreach Scholars (Strictly one internship role across Batch 1 & Batch 2 with individual target visits and JEE/NEET stream)
   {
     id: 'user-intern-1',
     name: 'Aarav Gupta',
@@ -81,11 +88,13 @@ export const INITIAL_USERS = [
     email: 'aarav.scholar@dakshana.org',
     role: 'intern',
     batch: 'Batch 1',
+    stream: 'JEE',
+    password: 'dakshana123',
     targetVisits: 16,
     assignedTo: 'user-jsec-1',
     department: 'Outreach Fieldwork',
     photo: null,
-    bio: 'Batch 1 Outreach Scholar • Conducting school visits and foundational student sessions.'
+    bio: 'Batch 1 Outreach Scholar (JEE Engineering) • Conducting school visits and foundational student sessions.'
   },
   {
     id: 'user-intern-2',
@@ -94,11 +103,13 @@ export const INITIAL_USERS = [
     email: 'meera.scholar@dakshana.org',
     role: 'intern',
     batch: 'Batch 1',
+    stream: 'NEET',
+    password: 'dakshana123',
     targetVisits: 14,
     assignedTo: 'user-jsec-1',
     department: 'Outreach Fieldwork',
     photo: null,
-    bio: 'Batch 1 Outreach Scholar • Conducting school visits and community learning drives.'
+    bio: 'Batch 1 Outreach Scholar (NEET Medical) • Conducting school visits and community learning drives.'
   },
   {
     id: 'user-intern-3',
@@ -107,11 +118,13 @@ export const INITIAL_USERS = [
     email: 'kabir.scholar@dakshana.org',
     role: 'intern',
     batch: 'Batch 2',
+    stream: 'JEE',
+    password: 'dakshana123',
     targetVisits: 18,
     assignedTo: 'user-jsec-2',
     department: 'Outreach Fieldwork',
     photo: null,
-    bio: 'Batch 2 Outreach Scholar • Conducting hands-on school visits and student demonstrations.'
+    bio: 'Batch 2 Outreach Scholar (JEE Engineering) • Conducting hands-on school visits and student demonstrations.'
   },
   {
     id: 'user-intern-4',
@@ -120,11 +133,13 @@ export const INITIAL_USERS = [
     email: 'ananya.scholar@dakshana.org',
     role: 'intern',
     batch: 'Batch 2',
+    stream: 'NEET',
+    password: 'dakshana123',
     targetVisits: 15,
     assignedTo: 'user-jsec-2',
     department: 'Outreach Fieldwork',
     photo: null,
-    bio: 'Batch 2 Outreach Scholar • Conducting classroom outreach sessions and student mentoring.'
+    bio: 'Batch 2 Outreach Scholar (NEET Medical) • Conducting classroom outreach sessions and student mentoring.'
   },
   {
     id: 'user-intern-5',
@@ -133,11 +148,13 @@ export const INITIAL_USERS = [
     email: 'vikram.scholar@dakshana.org',
     role: 'intern',
     batch: 'Batch 2',
+    stream: 'JEE',
+    password: 'dakshana123',
     targetVisits: 12,
     assignedTo: 'user-jsec-3',
     department: 'Outreach Fieldwork',
     photo: null,
-    bio: 'Batch 2 Outreach Scholar • Conducting field visits and school documentation.'
+    bio: 'Batch 2 Outreach Scholar (JEE Engineering) • Conducting field visits and school documentation.'
   }
 ]
 
@@ -388,6 +405,7 @@ export const INITIAL_POSTS = [
     authorName: 'Kabir Das',
     authorPhoto: null,
     batch: 'Batch 2',
+    stream: 'JEE',
     wing: 'Wing 2 (Rohan)',
     createdAt: '2 hours ago',
     title: 'Hands-on Robotics & Science Circuits at JNV Pune',
@@ -409,6 +427,7 @@ export const INITIAL_POSTS = [
     authorName: 'Aarav Gupta',
     authorPhoto: null,
     batch: 'Batch 1',
+    stream: 'JEE',
     wing: 'Wing 1 (Priya)',
     createdAt: 'Yesterday at 4:30 PM',
     title: 'Foundational Math Speed Drills with Grade 5 Scholars',
@@ -429,6 +448,7 @@ export const INITIAL_POSTS = [
     authorName: 'Meera Iyer',
     authorPhoto: null,
     batch: 'Batch 1',
+    stream: 'NEET',
     wing: 'Wing 1 (Priya)',
     createdAt: '2 days ago',
     title: 'Health, Hygiene & Nutrition Awareness Drive',
@@ -447,6 +467,7 @@ export const INITIAL_POSTS = [
     authorName: 'Ananya Rao',
     authorPhoto: null,
     batch: 'Batch 2',
+    stream: 'NEET',
     wing: 'Wing 2 (Rohan)',
     createdAt: '3 days ago',
     title: 'English Literacy & Reading Circles in Cluster 2',

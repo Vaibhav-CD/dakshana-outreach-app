@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { FileText, Clock, AlertCircle, CheckCircle, Send, MessageSquare, Calendar, Phone, TrendingUp, MessageSquarePlus, X, CheckCircle2 } from 'lucide-react'
 import PodiumSpotlight from './PodiumSpotlight'
 import Avatar from './Avatar'
+import StreamBadge from './StreamBadge'
 
 export default function InternView({
   currentUser,
@@ -127,6 +128,7 @@ export default function InternView({
                 <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full ${currentUser.batch === 'Batch 2' ? 'bg-[#7B2E68] text-white border border-white/30' : 'bg-emerald-200 text-[#074D2D]'}`}>
                   {currentUser.batch || 'Batch 1'}
                 </span>
+                <StreamBadge stream={currentUser.stream} size="sm" />
               </div>
               <h2 className="text-2xl font-bold mt-1">{currentUser.name}</h2>
               <p className="text-emerald-100 text-xs">Outreach Scholar • Field Operations</p>

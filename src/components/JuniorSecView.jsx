@@ -25,6 +25,7 @@ import {
 
 import PodiumSpotlight from './PodiumSpotlight'
 import Avatar from './Avatar'
+import StreamBadge from './StreamBadge'
 import { formatDateWithRelative } from '../utils/dateUtils'
 
 export default function JuniorSecView({
@@ -472,7 +473,10 @@ export default function JuniorSecView({
                           className="group-hover:border-[#0A643B] transition-colors"
                         />
                         <div>
-                          <p className="text-xs font-bold text-slate-900 group-hover:text-[#0A643B] transition-colors">{intern.name}</p>
+                          <div className="flex items-center space-x-1.5">
+                            <p className="text-xs font-bold text-slate-900 group-hover:text-[#0A643B] transition-colors">{intern.name}</p>
+                            {intern.stream && <StreamBadge stream={intern.stream} size="xs" />}
+                          </div>
                           <span className="text-[10px] text-slate-500">{intern.batch || 'Batch 1'} • Outreach Scholar</span>
                         </div>
                       </div>

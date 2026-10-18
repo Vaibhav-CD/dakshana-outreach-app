@@ -18,6 +18,7 @@ import {
   MapPin
 } from 'lucide-react'
 import Avatar from './Avatar'
+import StreamBadge from './StreamBadge'
 
 export default function InternDetailModal({
   intern,
@@ -29,6 +30,7 @@ export default function InternDetailModal({
   currentUser = {},
   onReassignIntern,
   onUpdateInternBatch,
+  onUpdateInternStream,
   onUpdateInternTargetVisits
 }) {
   if (!intern) return null
@@ -104,6 +106,7 @@ export default function InternDetailModal({
                 <span className="text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-amber-400 text-slate-950">
                   {intern.batch || 'Batch 1'}
                 </span>
+                <StreamBadge stream={intern.stream} size="sm" />
                 <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/20 text-emerald-100">
                   Outreach Scholar
                 </span>
@@ -305,13 +308,25 @@ export default function InternDetailModal({
                     <span className="font-bold text-slate-900 text-xs block">Scholar Administrative Controls</span>
                     <span className="text-[11px] text-slate-600">Reassign cohort batch or supervisory wing</span>
                   </div>
-                  <div className="flex items-center space-x-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     {onUpdateInternBatch && (
                       <button
                         onClick={() => onUpdateInternBatch(intern.id, intern.batch === 'Batch 1' ? 'Batch 2' : 'Batch 1')}
                         className="px-3 py-1.5 rounded-xl bg-white border border-slate-300 hover:bg-slate-50 text-slate-800 font-bold text-xs cursor-pointer shadow-2xs"
                       >
                         Switch to {intern.batch === 'Batch 1' ? 'Batch 2' : 'Batch 1'}
+                      </button>
+                    )}
+                    {onUpdateInternStream && (
+                      <button
+                        onClick={() => onUpdateInternStream(intern.id, intern.stream === 'JEE' ? 'NEET' : 'JEE')}
+                        className={`px-3 py-1.5 rounded-xl border font-bold text-xs cursor-pointer shadow-2xs transition-colors ${
+                          intern.stream === 'NEET'
+                            ? 'bg-[#EBF7F0] text-[#0A643B] border-[#0A643B]/30 hover:bg-[#DFF1E7]'
+                            : 'bg-[#F8EDF5] text-[#7B2E68] border-[#7B2E68]/30 hover:bg-[#F3DEEE]'
+                        }`}
+                      >
+                        Switch Stream to {intern.stream === 'JEE' ? 'NEET' : 'JEE'}
                       </button>
                     )}
                   </div>

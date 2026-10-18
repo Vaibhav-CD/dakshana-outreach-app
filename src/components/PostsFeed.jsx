@@ -18,6 +18,7 @@ import {
   Calendar
 } from 'lucide-react'
 import Avatar from './Avatar'
+import StreamBadge from './StreamBadge'
 import { formatDateWithRelative, parseDateToTimestamp } from '../utils/dateUtils'
 
 export default function PostsFeed({
@@ -74,6 +75,7 @@ export default function PostsFeed({
       authorName: currentUser.name,
       authorPhoto: currentUser.photo,
       batch: currentUser.batch || 'Batch 1',
+      stream: currentUser.stream || 'JEE',
       wing: currentUser.department || 'Outreach Wing',
       createdAt: new Date().toISOString(),
       title: title.trim() || 'Outreach Milestone Update',
@@ -392,13 +394,16 @@ export default function PostsFeed({
                       className="group-hover:ring-2 group-hover:ring-[#0A643B] transition-all"
                     />
                     <div>
-                      <div className="flex items-center space-x-2">
+                      <div className="flex items-center space-x-1.5 flex-wrap">
                         <span className="font-extrabold text-slate-900 text-sm group-hover:text-[#0A643B] transition-colors">
                           {post.authorName}
                         </span>
                         <span className="text-[10px] font-bold px-2 py-0.2 rounded-full bg-slate-100 text-slate-600">
                           {post.batch}
                         </span>
+                        {post.stream && (
+                          <StreamBadge stream={post.stream} size="xs" />
+                        )}
                       </div>
                       <span className="text-[11px] text-slate-500 font-medium block">
                         {formatDateWithRelative(post.createdAt)}

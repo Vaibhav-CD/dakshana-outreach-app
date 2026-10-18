@@ -12,10 +12,12 @@ import {
   ShieldCheck,
   Camera,
   HelpCircle,
-  Bug
+  Bug,
+  Key
 } from 'lucide-react'
 import logoImg from '../assets/logo.png'
 import Avatar from './Avatar'
+import StreamBadge from './StreamBadge'
 
 export default function Sidebar({
   activeTab,
@@ -26,6 +28,7 @@ export default function Sidebar({
   onSwitchProfile,
   onOpenPhotoModal,
   onOpenFeedback,
+  onOpenChangePassword,
   isMobileOpen,
   setIsMobileOpen
 }) {
@@ -119,13 +122,26 @@ export default function Sidebar({
               <span className="font-extrabold text-slate-900 text-xs block truncate">
                 {currentUser.name}
               </span>
-              <span className={`text-[10px] font-bold px-2 py-0.2 rounded-full border inline-block mt-0.5 truncate ${badge.bg}`}>
-                {badge.label}
-              </span>
+              <div className="flex items-center space-x-1.5 flex-wrap mt-0.5">
+                <span className={`text-[10px] font-bold px-2 py-0.2 rounded-full border inline-block truncate ${badge.bg}`}>
+                  {badge.label}
+                </span>
+                {currentUser.role === 'intern' && currentUser.stream && (
+                  <StreamBadge stream={currentUser.stream} size="xs" />
+                )}
+              </div>
             </div>
           </div>
 
           <div className="flex items-center space-x-1.5 pt-2 border-t border-slate-200/60 text-[11px]">
+            <button
+              onClick={onOpenChangePassword}
+              className="flex-1 py-1.5 rounded-lg bg-white hover:bg-emerald-50 text-slate-700 hover:text-[#0A643B] font-bold text-center border border-slate-200 hover:border-[#0A643B]/30 transition-colors cursor-pointer flex items-center justify-center space-x-1"
+              title="Change account password"
+            >
+              <Key className="w-3 h-3 text-[#0A643B]" />
+              <span>Password</span>
+            </button>
             <button
               onClick={onSwitchProfile}
               className="flex-1 py-1.5 rounded-lg bg-white hover:bg-slate-100 text-slate-700 font-bold text-center border border-slate-200 transition-colors cursor-pointer"
@@ -134,11 +150,10 @@ export default function Sidebar({
             </button>
             <button
               onClick={onSignOut}
-              className="flex-1 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-center border border-rose-200 transition-colors cursor-pointer flex items-center justify-center space-x-1"
+              className="p-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-center border border-rose-200 transition-colors cursor-pointer flex items-center justify-center"
               title="Sign out of current account"
             >
               <LogOut className="w-3 h-3" />
-              <span>Sign Out</span>
             </button>
           </div>
         </div>

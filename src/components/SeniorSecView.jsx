@@ -40,6 +40,7 @@ export default function SeniorSecView({
   sessions = [],
   onReassignIntern,
   onUpdateInternBatch,
+  onUpdateInternStream,
   onUpdateInternTargetVisits,
   onAddIntern,
   onSelectIntern,
@@ -60,6 +61,7 @@ export default function SeniorSecView({
   const [newInternEmail, setNewInternEmail] = useState('')
   const [newInternSec, setNewInternSec] = useState('user-jsec-1')
   const [newInternBatch, setNewInternBatch] = useState('Batch 1')
+  const [newInternStream, setNewInternStream] = useState('JEE')
   const [newInternTargetVisits, setNewInternTargetVisits] = useState('15')
   const [newInternDept, setNewInternDept] = useState('Field Outreach')
 
@@ -110,15 +112,19 @@ export default function SeniorSecView({
       email: newInternEmail,
       role: 'intern',
       batch: newInternBatch,
+      stream: newInternStream,
+      password: 'dakshana123',
       assignedTo: newInternSec,
       targetVisits: parseInt(newInternTargetVisits, 10) || 15,
       department: 'Outreach Fieldwork',
       photo: null,
-      title: 'Outreach Scholar'
+      title: 'Outreach Scholar',
+      bio: `${newInternBatch} Outreach Scholar (${newInternStream} Stream).`
     })
 
     setNewInternName('')
     setNewInternEmail('')
+    setNewInternStream('JEE')
     setNewInternTargetVisits('15')
     setShowAddModal(false)
   }
@@ -486,6 +492,7 @@ export default function SeniorSecView({
                   <tr className="border-b border-slate-200 text-slate-500 uppercase tracking-wider">
                     <th className="pb-3 font-semibold">Scholar Name</th>
                     <th className="pb-3 font-semibold">Batch</th>
+                    <th className="pb-3 font-semibold">Stream</th>
                     <th className="pb-3 font-semibold">Target Visits</th>
                     <th className="pb-3 font-semibold">Assigned Junior Secretary</th>
                     <th className="pb-3 font-semibold text-right">Senior Sec Authority</th>
@@ -525,6 +532,21 @@ export default function SeniorSecView({
                           >
                             <option value="Batch 1">Batch 1</option>
                             <option value="Batch 2">Batch 2</option>
+                          </select>
+                        </td>
+                        <td className="py-3.5">
+                          <select
+                            aria-label={`Change stream for ${intern.name}`}
+                            value={intern.stream || 'JEE'}
+                            onChange={(e) => onUpdateInternStream && onUpdateInternStream(intern.id, e.target.value)}
+                            className={`text-xs font-black rounded-lg px-2.5 py-1 border cursor-pointer transition-colors ${
+                              intern.stream === 'NEET' 
+                                ? 'bg-[#F8EDF5] text-[#7B2E68] border-[#7B2E68]/40' 
+                                : 'bg-[#EBF7F0] text-[#0A643B] border-[#0A643B]/40'
+                            }`}
+                          >
+                            <option value="JEE">JEE</option>
+                            <option value="NEET">NEET</option>
                           </select>
                         </td>
                         <td className="py-3.5">
@@ -1448,16 +1470,46 @@ export default function SeniorSecView({
                 />
               </div>
 
-              <div>
-                <label className="block font-bold text-slate-700 mb-1">Cohort Batch *</label>
-                <select
-                  value={newInternBatch}
-                  onChange={(e) => setNewInternBatch(e.target.value)}
-                  className="w-full text-sm rounded-xl border border-slate-300 p-2.5 bg-white focus:ring-2 focus:ring-[#0A643B] focus:outline-hidden cursor-pointer"
-                >
-                  <option value="Batch 1">Batch 1</option>
-                  <option value="Batch 2">Batch 2</option>
-                </select>
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Cohort Batch *</label>
+                  <select
+                    value={newInternBatch}
+                    onChange={(e) => setNewInternBatch(e.target.value)}
+                    className="w-full text-sm rounded-xl border border-slate-300 p-2.5 bg-white focus:ring-2 focus:ring-[#0A643B] focus:outline-hidden cursor-pointer"
+                  >
+                    <option value="Batch 1">Batch 1</option>
+                    <option value="Batch 2">Batch 2</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Scholar Stream *</label>
+                  <div className="grid grid-cols-2 gap-1.5 pt-0.5">
+                    <button
+                      type="button"
+                      onClick={() => setNewInternStream('JEE')}
+                      className={`py-2 px-1 rounded-xl text-xs font-black transition-all cursor-pointer border text-center ${
+                        newInternStream === 'JEE'
+                          ? 'bg-[#EBF7F0] text-[#0A643B] border-[#0A643B] ring-2 ring-[#0A643B]/20'
+                          : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'
+                      }`}
+                    >
+                      JEE
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setNewInternStream('NEET')}
+                      className={`py-2 px-1 rounded-xl text-xs font-black transition-all cursor-pointer border text-center ${
+                        newInternStream === 'NEET'
+                          ? 'bg-[#F8EDF5] text-[#7B2E68] border-[#7B2E68] ring-2 ring-[#7B2E68]/20'
+                          : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'
+                      }`}
+                    >
+                      NEET
+                    </button>
+                  </div>
+                </div>
               </div>
 
               <div>

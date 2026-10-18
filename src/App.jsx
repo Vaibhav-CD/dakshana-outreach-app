@@ -14,6 +14,7 @@ import PostsFeed from './components/PostsFeed'
 import InternDetailModal from './components/InternDetailModal'
 import EditProfilePhotoModal from './components/EditProfilePhotoModal'
 import AuthModal from './components/AuthModal'
+import ChangePasswordModal from './components/ChangePasswordModal'
 import FeedbackModal from './components/FeedbackModal'
 import ErrorBoundary from './components/ErrorBoundary'
 import { Radio, X, Bell, Bug } from 'lucide-react'
@@ -263,6 +264,7 @@ export default function App() {
   // 14. UI States: Modals & Sidebar
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false)
+  const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false)
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false)
   const [selectedInternForModal, setSelectedInternForModal] = useState(null)
@@ -395,6 +397,36 @@ export default function App() {
     }
   }
 
+  const handleUpdatePassword = async (newPassword) => {
+    if (!currentUser) return false
+    const updatedUser = { ...currentUser, password: newPassword }
+    setCurrentUser(updatedUser)
+
+    const sessionStr = localStorage.getItem('dakshana_session')
+    if (sessionStr) {
+      try {
+        const session = JSON.parse(sessionStr)
+        session.user = updatedUser
+        localStorage.setItem('dakshana_session', JSON.stringify(session))
+      } catch (e) { }
+    }
+    localStorage.setItem('dakshana_current_user', JSON.stringify(updatedUser))
+
+    setAllUsers(prev => {
+      const updated = prev.map(u => u.id === currentUser.id ? { ...u, password: newPassword } : u)
+      localStorage.setItem('dakshana_all_users', JSON.stringify(updated))
+      return updated
+    })
+
+    try {
+      await dbUpdateProfile(currentUser.id, { password: newPassword })
+    } catch (err) {
+      console.warn('Could not sync password to Supabase:', err)
+    }
+
+    return true
+  }
+
   const handleAddPost = async (newPost) => {
     setPosts(prev => {
       const updated = [newPost, ...prev]
@@ -522,6 +554,37 @@ export default function App() {
     })
 
     dbUpdateProfile(internId, { batch: newBatch }).catch(console.error)
+  }
+
+  const handleUpdateInternStream = (internId, newStream) => {
+    setAllUsers(prev => {
+      const updated = prev.map(user => {
+        if (user.id === internId) {
+          return { ...user, stream: newStream }
+        }
+        return user
+      })
+      localStorage.setItem('dakshana_all_users', JSON.stringify(updated))
+      return updated
+    })
+
+    if (currentUser && currentUser.id === internId) {
+      setCurrentUser(prev => {
+        const updated = { ...prev, stream: newStream }
+        localStorage.setItem('dakshana_current_user', JSON.stringify(updated))
+        const sessionStr = localStorage.getItem('dakshana_session')
+        if (sessionStr) {
+          try {
+            const session = JSON.parse(sessionStr)
+            session.user = updated
+            localStorage.setItem('dakshana_session', JSON.stringify(session))
+          } catch (e) { }
+        }
+        return updated
+      })
+    }
+
+    dbUpdateProfile(internId, { stream: newStream }).catch(console.error)
   }
 
   const handleUpdateInternTargetVisits = (internId, newTarget) => {
@@ -883,6 +946,7 @@ export default function App() {
         onSwitchProfile={() => setIsAuthModalOpen(true)}
         onOpenPhotoModal={() => setIsPhotoModalOpen(true)}
         onOpenFeedback={() => setIsFeedbackModalOpen(true)}
+        onOpenChangePassword={() => setIsChangePasswordOpen(true)}
         isMobileOpen={isMobileSidebarOpen}
         setIsMobileOpen={setIsMobileSidebarOpen}
       />
@@ -901,6 +965,7 @@ export default function App() {
           onSignOut={handleSignOut}
           onOpenPhotoModal={() => setIsPhotoModalOpen(true)}
           onOpenFeedback={() => setIsFeedbackModalOpen(true)}
+          onOpenChangePassword={() => setIsChangePasswordOpen(true)}
           onToggleMobileSidebar={() => setIsMobileSidebarOpen(prev => !prev)}
           unreadBroadcastsCount={unreadCount}
           broadcasts={visibleBroadcasts}
@@ -923,6 +988,7 @@ export default function App() {
                   sessions={sessions}
                   onReassignIntern={handleReassignIntern}
                   onUpdateInternBatch={handleUpdateInternBatch}
+                  onUpdateInternStream={handleUpdateInternStream}
                   onUpdateInternTargetVisits={handleUpdateInternTargetVisits}
                   onAddIntern={handleAddIntern}
                   onSelectIntern={(intern) => setSelectedInternForModal(intern)}
@@ -1108,6 +1174,7 @@ export default function App() {
         currentUser={currentUser}
         onReassignIntern={handleReassignIntern}
         onUpdateInternBatch={handleUpdateInternBatch}
+        onUpdateInternStream={handleUpdateInternStream}
         onUpdateInternTargetVisits={handleUpdateInternTargetVisits}
       />
 
@@ -1127,6 +1194,14 @@ export default function App() {
         onClose={() => setIsPhotoModalOpen(false)}
         currentUser={currentUser}
         onUpdatePhoto={handleUpdatePhoto}
+      />
+
+      {/* Change Password Modal (Strictly Accessible When Logged In) */}
+      <ChangePasswordModal
+        isOpen={isChangePasswordOpen}
+        onClose={() => setIsChangePasswordOpen(false)}
+        currentUser={currentUser}
+        onUpdatePassword={handleUpdatePassword}
       />
 
       {/* Global Feedback & Bug Report Desk Modal */}

@@ -2,6 +2,7 @@ import React from 'react'
 import { Mail, Phone, Shield, Award, Users, Sparkles } from 'lucide-react'
 import logoImg from '../assets/logo.png'
 import Avatar from './Avatar'
+import StreamBadge from './StreamBadge'
 
 export default function TeamShowcase({ allUsers, onSelectIntern }) {
   const managementMembers = allUsers.filter(u => u.role === 'management')
@@ -218,9 +219,12 @@ export default function TeamShowcase({ allUsers, onSelectIntern }) {
                   <h4 className="font-extrabold text-slate-900 text-xs truncate group-hover:text-[#0A643B] transition-colors">
                     {intern.name}
                   </h4>
-                  <span className="text-[10px] font-bold px-2 py-0.2 rounded-full bg-amber-50 text-amber-900 border border-amber-200 inline-block mt-0.5">
-                    {intern.batch || 'Batch 1'}
-                  </span>
+                  <div className="flex items-center space-x-1.5 flex-wrap mt-0.5">
+                    <span className="text-[10px] font-bold px-2 py-0.2 rounded-full bg-amber-50 text-amber-900 border border-amber-200">
+                      {intern.batch || 'Batch 1'}
+                    </span>
+                    {intern.stream && <StreamBadge stream={intern.stream} size="xs" />}
+                  </div>
                 </div>
               </div>
 

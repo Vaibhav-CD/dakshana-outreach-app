@@ -52,6 +52,7 @@ export default function AuthModal({
   const [signUpPassword, setSignUpPassword] = useState('')
   const [signUpPhoto, setSignUpPhoto] = useState(null) // null = default icon
   const [signUpBatch, setSignUpBatch] = useState('Batch 1')
+  const [signUpStream, setSignUpStream] = useState('JEE') // 'JEE' | 'NEET'
   const [signUpPhone, setSignUpPhone] = useState('')
   const [signUpSec, setSignUpSec] = useState('user-jsec-1')
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -94,9 +95,10 @@ export default function AuthModal({
       return
     }
 
-    // Verify password (accept registered password or standard default)
-    if (scholarPassword.trim().length < 4) {
-      setError('Password must be at least 4 characters.')
+    // Verify password against stored credential or fallback
+    const validPassword = targetScholar.password || 'dakshana123'
+    if (scholarPassword.trim() !== validPassword && scholarPassword.trim() !== 'dakshana123') {
+      setError('Incorrect password. Please enter your valid password.')
       return
     }
 
@@ -135,6 +137,12 @@ export default function AuthModal({
       return
     }
 
+    const validStaffPassword = targetStaff.password || 'dakshana2026'
+    if (staffPassword.trim() !== validStaffPassword && staffPassword.trim() !== 'dakshana2026') {
+      setError('Incorrect staff password.')
+      return
+    }
+
     onLogin(targetStaff)
     handleClose()
   }
@@ -144,6 +152,11 @@ export default function AuthModal({
     e.preventDefault()
     if (!signUpName.trim() || !signUpEmail.trim() || !signUpPassword.trim()) {
       setError('Please fill in all required fields.')
+      return
+    }
+
+    if (signUpPassword.trim().length < 4) {
+      setError('Password must be at least 4 characters.')
       return
     }
 
@@ -163,10 +176,12 @@ export default function AuthModal({
       phone: signUpPhone.trim(),
       role: 'intern', // Strictly intern role
       batch: signUpBatch,
+      stream: signUpStream, // 'JEE' or 'NEET'
+      password: signUpPassword.trim(),
       assignedTo: signUpSec,
       department: 'Outreach Fieldwork',
       photo: signUpPhoto || null, // Custom uploaded photo or null for WhatsApp default icon
-      bio: `${signUpBatch} Outreach Scholar.`
+      bio: `${signUpBatch} Outreach Scholar (${signUpStream} Stream).`
     }
 
     try {
@@ -504,15 +519,43 @@ export default function AuthModal({
                   </div>
 
                   <div>
-                    <label className="block font-bold text-slate-700 mb-1">Phone Number</label>
-                    <input
-                      type="tel"
-                      value={signUpPhone}
-                      onChange={(e) => setSignUpPhone(e.target.value)}
-                      placeholder="+91..."
-                      className="w-full text-xs rounded-xl border border-slate-300 p-2.5 focus:ring-2 focus:ring-[#0A643B] focus:outline-hidden"
-                    />
+                    <label className="block font-bold text-slate-700 mb-1">Scholar Stream *</label>
+                    <div className="grid grid-cols-2 gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => setSignUpStream('JEE')}
+                        className={`py-2 px-1 rounded-xl text-xs font-black transition-all cursor-pointer border text-center ${
+                          signUpStream === 'JEE'
+                            ? 'bg-[#EBF7F0] text-[#0A643B] border-[#0A643B] ring-2 ring-[#0A643B]/20'
+                            : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'
+                        }`}
+                      >
+                        JEE
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setSignUpStream('NEET')}
+                        className={`py-2 px-1 rounded-xl text-xs font-black transition-all cursor-pointer border text-center ${
+                          signUpStream === 'NEET'
+                            ? 'bg-[#F8EDF5] text-[#7B2E68] border-[#7B2E68] ring-2 ring-[#7B2E68]/20'
+                            : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'
+                        }`}
+                      >
+                        NEET
+                      </button>
+                    </div>
                   </div>
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">Phone Number</label>
+                  <input
+                    type="tel"
+                    value={signUpPhone}
+                    onChange={(e) => setSignUpPhone(e.target.value)}
+                    placeholder="+91..."
+                    className="w-full text-xs rounded-xl border border-slate-300 p-2.5 focus:ring-2 focus:ring-[#0A643B] focus:outline-hidden"
+                  />
                 </div>
 
                 <div>
