@@ -6,7 +6,6 @@ export const INITIAL_USERS = [
     email: 'senior.sec@dakshana.org',
     phone: '+91 98765 43210',
     role: 'senior_sec',
-    password: 'dakshana2026',
     department: 'Central Coordination',
     photo: null,
     bio: 'Highest operational authority: coordinates Batch 1 & Batch 2 allocations, supervises the 3 Junior Secretaries, controls financial reimbursement cycles, and dispatches circulars.'
@@ -17,7 +16,6 @@ export const INITIAL_USERS = [
     title: 'Executive Director & Trustee',
     email: 'trustee@dakshana.org',
     role: 'management',
-    password: 'dakshana2026',
     department: 'Governing Board',
     photo: null,
     bio: 'Board-level governance, institutional audit oversight, and long-term strategy.'
@@ -28,7 +26,6 @@ export const INITIAL_USERS = [
     title: 'Trustee & Senior Advisor',
     email: 'ram.sharma@dakshana.org',
     role: 'management',
-    password: 'dakshana2026',
     department: 'Governing Board',
     photo: null,
     bio: 'Institutional governance, nationwide outreach expansion, and operational audit oversight.'
@@ -39,7 +36,6 @@ export const INITIAL_USERS = [
     title: 'Trustee & Academic Director',
     email: 'sunita.deshmukh@dakshana.org',
     role: 'management',
-    password: 'dakshana2026',
     department: 'Governing Board',
     photo: null,
     bio: 'Academic excellence, curriculum pedagogical standards, and scholarship policy governance.'
@@ -51,7 +47,6 @@ export const INITIAL_USERS = [
     email: 'priya.jsec@dakshana.org',
     phone: '+91 98765 43211',
     role: 'junior_sec',
-    password: 'dakshana2026',
     department: '',
     photo: null,
     bio: 'Supervises, mentors, and reviews monthly progress reports for assigned outreach scholars.'
@@ -63,7 +58,6 @@ export const INITIAL_USERS = [
     email: 'rohan.jsec@dakshana.org',
     phone: '+91 98765 43212',
     role: 'junior_sec',
-    password: 'dakshana2026',
     department: '',
     photo: null,
     bio: 'Supervises, mentors, and reviews progress reports for assigned outreach scholars.'
@@ -75,7 +69,6 @@ export const INITIAL_USERS = [
     email: 'sneha.jsec@dakshana.org',
     phone: '+91 98765 43213',
     role: 'junior_sec',
-    password: 'dakshana2026',
     department: '',
     photo: null,
     bio: 'Supervises, mentors, and reviews fieldwork documentation for assigned outreach scholars.'
@@ -89,7 +82,6 @@ export const INITIAL_USERS = [
     role: 'intern',
     batch: 'Batch 1',
     stream: 'JEE',
-    password: 'dakshana123',
     targetVisits: 16,
     assignedTo: 'user-jsec-1',
     department: 'Outreach Fieldwork',
@@ -104,7 +96,6 @@ export const INITIAL_USERS = [
     role: 'intern',
     batch: 'Batch 1',
     stream: 'NEET',
-    password: 'dakshana123',
     targetVisits: 14,
     assignedTo: 'user-jsec-1',
     department: 'Outreach Fieldwork',
@@ -119,7 +110,6 @@ export const INITIAL_USERS = [
     role: 'intern',
     batch: 'Batch 2',
     stream: 'JEE',
-    password: 'dakshana123',
     targetVisits: 18,
     assignedTo: 'user-jsec-2',
     department: 'Outreach Fieldwork',
@@ -134,7 +124,6 @@ export const INITIAL_USERS = [
     role: 'intern',
     batch: 'Batch 2',
     stream: 'NEET',
-    password: 'dakshana123',
     targetVisits: 15,
     assignedTo: 'user-jsec-2',
     department: 'Outreach Fieldwork',
@@ -149,7 +138,6 @@ export const INITIAL_USERS = [
     role: 'intern',
     batch: 'Batch 2',
     stream: 'JEE',
-    password: 'dakshana123',
     targetVisits: 12,
     assignedTo: 'user-jsec-3',
     department: 'Outreach Fieldwork',

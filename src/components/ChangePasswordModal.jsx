@@ -12,6 +12,7 @@ import {
 } from 'lucide-react'
 import Avatar from './Avatar'
 import StreamBadge from './StreamBadge'
+import { verifyUserPassword } from '../utils/security'
 
 export default function ChangePasswordModal({
   isOpen,
@@ -57,12 +58,9 @@ export default function ChangePasswordModal({
       return
     }
 
-    // Determine valid current password
-    // If the user has a stored password, check against it.
-    // Otherwise allow default 'dakshana123' (scholars) or 'dakshana2026' (staff)
-    const expectedPassword = currentUser.password || (currentUser.role === 'intern' ? 'dakshana123' : 'dakshana2026')
-    
-    if (cur !== expectedPassword && cur !== 'dakshana123' && cur !== 'dakshana2026') {
+    // Cryptographic verification against stored hash or secure default
+    const isValid = await verifyUserPassword(cur, currentUser)
+    if (!isValid) {
       setError('Current password does not match our records.')
       return
     }
@@ -209,9 +207,6 @@ export default function ChangePasswordModal({
                     {showCurrent ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
-                <p className="text-[10px] text-slate-400 mt-1">
-                  Default: <span className="font-mono text-slate-600">dakshana123</span> (scholars) or <span className="font-mono text-slate-600">dakshana2026</span> (staff)
-                </p>
               </div>
 
               {/* New Password Field */}

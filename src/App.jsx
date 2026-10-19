@@ -20,6 +20,7 @@ import ErrorBoundary from './components/ErrorBoundary'
 import { Radio, X, Bell, Bug } from 'lucide-react'
 import QueriesHub from './components/QueriesHub'
 import { parseDateToTimestamp } from './utils/dateUtils'
+import { hashCredential } from './utils/security'
 import {
   INITIAL_USERS,
   INITIAL_REPORTS,
@@ -399,7 +400,11 @@ export default function App() {
 
   const handleUpdatePassword = async (newPassword) => {
     if (!currentUser) return false
-    const updatedUser = { ...currentUser, password: newPassword }
+    const passwordHash = await hashCredential(newPassword)
+    
+    // Clean user object without plaintext password
+    const { password: _oldPwd, ...cleanCurrentUser } = currentUser
+    const updatedUser = { ...cleanCurrentUser, passwordHash }
     setCurrentUser(updatedUser)
 
     const sessionStr = localStorage.getItem('dakshana_session')
@@ -413,15 +418,21 @@ export default function App() {
     localStorage.setItem('dakshana_current_user', JSON.stringify(updatedUser))
 
     setAllUsers(prev => {
-      const updated = prev.map(u => u.id === currentUser.id ? { ...u, password: newPassword } : u)
+      const updated = prev.map(u => {
+        if (u.id === currentUser.id) {
+          const { password: _p, ...cleanU } = u
+          return { ...cleanU, passwordHash }
+        }
+        return u
+      })
       localStorage.setItem('dakshana_all_users', JSON.stringify(updated))
       return updated
     })
 
     try {
-      await dbUpdateProfile(currentUser.id, { password: newPassword })
+      await dbUpdateProfile(currentUser.id, { password_hash: passwordHash })
     } catch (err) {
-      console.warn('Could not sync password to Supabase:', err)
+      console.warn('Could not sync password hash to Supabase:', err)
     }
 
     return true

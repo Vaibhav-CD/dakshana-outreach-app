@@ -19,6 +19,7 @@ import {
 } from 'lucide-react'
 import logoImg from '../assets/logo.png'
 import Avatar from './Avatar'
+import { verifyUserPassword, verifyLeadershipPasskey, hashCredential, sanitizeInput } from '../utils/security'
 
 export default function AuthModal({
   isOpen,
@@ -73,8 +74,8 @@ export default function AuthModal({
     onClose()
   }
 
-  // --- Scholar Login Handler with Password Verification ---
-  const handleScholarSubmit = (e) => {
+  // --- Scholar Login Handler with Cryptographic Password Verification ---
+  const handleScholarSubmit = async (e) => {
     e.preventDefault()
     setError('')
 
@@ -95,9 +96,9 @@ export default function AuthModal({
       return
     }
 
-    // Verify password against stored credential or fallback
-    const validPassword = targetScholar.password || 'dakshana123'
-    if (scholarPassword.trim() !== validPassword && scholarPassword.trim() !== 'dakshana123') {
+    // Cryptographic verification (zero plaintext password requirement in source code)
+    const isValid = await verifyUserPassword(scholarPassword.trim(), targetScholar)
+    if (!isValid) {
       setError('Incorrect password. Please enter your valid password.')
       return
     }
@@ -106,11 +107,11 @@ export default function AuthModal({
     handleClose()
   }
 
-  // --- Leadership Passkey Verification ---
-  const handleVerifyPasskey = (e) => {
+  // --- Leadership Passkey Verification via Hash ---
+  const handleVerifyPasskey = async (e) => {
     e.preventDefault()
-    const trimmed = passkey.trim()
-    if (trimmed === 'dakshana2026' || trimmed === 'Dakshana2026' || trimmed === 'admin2026') {
+    const isValid = await verifyLeadershipPasskey(passkey)
+    if (isValid) {
       setIsLeadershipUnlocked(true)
       setError('')
       if (leadershipUsers.length > 0) {
@@ -121,8 +122,8 @@ export default function AuthModal({
     }
   }
 
-  // --- Leadership Login Handler ---
-  const handleStaffSubmit = (e) => {
+  // --- Leadership Login Handler via Hash ---
+  const handleStaffSubmit = async (e) => {
     e.preventDefault()
     setError('')
 
@@ -137,8 +138,8 @@ export default function AuthModal({
       return
     }
 
-    const validStaffPassword = targetStaff.password || 'dakshana2026'
-    if (staffPassword.trim() !== validStaffPassword && staffPassword.trim() !== 'dakshana2026') {
+    const isValid = await verifyUserPassword(staffPassword.trim(), targetStaff)
+    if (!isValid) {
       setError('Incorrect staff password.')
       return
     }
@@ -147,7 +148,7 @@ export default function AuthModal({
     handleClose()
   }
 
-  // --- New Scholar Sign-Up (Strictly Intern) ---
+  // --- New Scholar Sign-Up (Strictly Intern, Hashed Credential) ---
   const handleSignUpSubmit = async (e) => {
     e.preventDefault()
     if (!signUpName.trim() || !signUpEmail.trim() || !signUpPassword.trim()) {
@@ -169,18 +170,21 @@ export default function AuthModal({
     setIsSubmitting(true)
     setError('')
 
+    // Compute cryptographic hash - no plaintext passwords stored
+    const passwordHash = await hashCredential(signUpPassword.trim())
+
     const newScholar = {
-      name: signUpName.trim(),
+      name: sanitizeInput(signUpName),
       title: 'Outreach Scholar',
       email: signUpEmail.trim().toLowerCase(),
-      phone: signUpPhone.trim(),
+      phone: sanitizeInput(signUpPhone),
       role: 'intern', // Strictly intern role
       batch: signUpBatch,
       stream: signUpStream, // 'JEE' or 'NEET'
-      password: signUpPassword.trim(),
+      passwordHash: passwordHash,
       assignedTo: signUpSec,
       department: 'Outreach Fieldwork',
-      photo: signUpPhoto || null, // Custom uploaded photo or null for WhatsApp default icon
+      photo: signUpPhoto || null, // Custom uploaded photo or null for default icon
       bio: `${signUpBatch} Outreach Scholar (${signUpStream} Stream).`
     }
 
@@ -412,7 +416,7 @@ export default function AuthModal({
                       required
                       value={scholarPassword}
                       onChange={(e) => setScholarPassword(e.target.value)}
-                      placeholder="Enter your password (e.g. scholar123)"
+                      placeholder="Enter your password"
                       className="w-full text-xs rounded-xl border border-slate-300 pl-9 pr-3 py-2.5 focus:ring-2 focus:ring-[#0A643B] focus:outline-hidden"
                     />
                   </div>
@@ -630,7 +634,7 @@ export default function AuthModal({
                     required
                     value={passkey}
                     onChange={(e) => setPasskey(e.target.value)}
-                    placeholder="Enter passkey (e.g. dakshana2026)"
+                    placeholder="Enter secretariat passkey"
                     className="w-full text-xs rounded-xl border border-slate-300 p-2.5 text-center font-mono focus:ring-2 focus:ring-[#7B2E68] focus:outline-hidden"
                   />
                 </div>
@@ -670,7 +674,7 @@ export default function AuthModal({
                     required
                     value={staffPassword}
                     onChange={(e) => setStaffPassword(e.target.value)}
-                    placeholder="Enter password (e.g. dakshana2026)"
+                    placeholder="Enter leadership password"
                     className="w-full text-xs rounded-xl border border-slate-300 p-2.5 focus:ring-2 focus:ring-[#7B2E68] focus:outline-hidden"
                   />
                 </div>

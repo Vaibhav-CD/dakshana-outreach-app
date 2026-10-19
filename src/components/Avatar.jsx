@@ -40,7 +40,8 @@ export default function Avatar({
 
   // Do not show strangers' face photos (purges all unsplash mock photos)
   const isStrangerFace = typeof src === 'string' && src.includes('unsplash.com')
-  const isImageValid = src && typeof src === 'string' && src.trim().length > 0 && !hasError && !isStrangerFace
+  const isSafeProtocol = typeof src === 'string' && (src.startsWith('https://') || src.startsWith('http://') || src.startsWith('data:image/'))
+  const isImageValid = src && typeof src === 'string' && isSafeProtocol && src.trim().length > 0 && !hasError && !isStrangerFace
 
   if (isImageValid) {
     return (

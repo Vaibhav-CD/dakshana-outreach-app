@@ -113,7 +113,6 @@ export default function SeniorSecView({
       role: 'intern',
       batch: newInternBatch,
       stream: newInternStream,
-      password: 'dakshana123',
       assignedTo: newInternSec,
       targetVisits: parseInt(newInternTargetVisits, 10) || 15,
       department: 'Outreach Fieldwork',

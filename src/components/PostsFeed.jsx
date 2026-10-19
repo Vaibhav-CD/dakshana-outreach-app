@@ -441,7 +441,7 @@ export default function PostsFeed({
                 )}
 
                 {/* Attached Photo */}
-                {post.photoUrl && (
+                {post.photoUrl && (post.photoUrl.startsWith('https://') || post.photoUrl.startsWith('http://') || post.photoUrl.startsWith('data:image/')) && (
                   <div className="rounded-2xl overflow-hidden border border-slate-200 max-h-80 shadow-2xs">
                     <img
                       src={post.photoUrl}
