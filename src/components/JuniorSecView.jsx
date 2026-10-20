@@ -20,12 +20,14 @@ import {
   Wrench,
   MessageSquarePlus,
   Send,
-  Plus
+  Plus,
+  FileSpreadsheet
 } from 'lucide-react'
 
 import PodiumSpotlight from './PodiumSpotlight'
 import Avatar from './Avatar'
 import StreamBadge from './StreamBadge'
+import ProgressIntelligenceHub from './ProgressIntelligenceHub'
 import { formatDateWithRelative } from '../utils/dateUtils'
 
 export default function JuniorSecView({
@@ -47,6 +49,7 @@ export default function JuniorSecView({
   const [feedbackText, setFeedbackText] = useState('')
   const [newStatus, setNewStatus] = useState('reviewed')
   const [reportScope, setReportScope] = useState('my_wing') // 'my_wing' | 'all_wings'
+  const [reportViewMode, setReportViewMode] = useState('queue') // 'queue' | 'intelligence'
 
   // Suggestion modal state (submit to Senior Secretary)
   const [showSuggestionModal, setShowSuggestionModal] = useState(false)
@@ -337,6 +340,36 @@ export default function JuniorSecView({
         )}
       </div>
 
+      {/* View Switcher: Review Queue vs Progress Intelligence & Excel Export */}
+      <div className="flex bg-slate-100 p-1.5 rounded-2xl w-full sm:w-auto self-start border border-slate-200 text-xs font-bold">
+        <button
+          onClick={() => setReportViewMode('queue')}
+          className={`px-4 py-2 rounded-xl transition-all cursor-pointer flex items-center space-x-1.5 ${
+            reportViewMode === 'queue' ? 'bg-white text-slate-900 shadow-2xs font-black' : 'text-slate-600 hover:text-slate-900'
+          }`}
+        >
+          <Clock className="w-3.5 h-3.5 text-[#0A643B]" />
+          <span>Evaluation Queue & Scholars ({pendingReports.length} pending)</span>
+        </button>
+        <button
+          onClick={() => setReportViewMode('intelligence')}
+          className={`px-4 py-2 rounded-xl transition-all cursor-pointer flex items-center space-x-1.5 ${
+            reportViewMode === 'intelligence' ? 'bg-[#0A643B] text-white shadow-2xs font-black' : 'text-slate-600 hover:text-slate-900'
+          }`}
+        >
+          <FileSpreadsheet className="w-3.5 h-3.5" />
+          <span>Progress Intelligence & Excel Export</span>
+        </button>
+      </div>
+
+      {reportViewMode === 'intelligence' ? (
+        <ProgressIntelligenceHub
+          reports={myPowers.canViewAllReports && reportScope === 'all_wings' ? reports : filteredReportsList}
+          allUsers={allUsers}
+          currentUser={currentUser}
+          onUpdateReport={onUpdateReport}
+        />
+      ) : (
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
         {/* Left Column: Review Queue */}
@@ -541,6 +574,7 @@ export default function JuniorSecView({
         </div>
 
       </div>
+      )}
 
       {/* Review Modal */}
       {selectedReport && (

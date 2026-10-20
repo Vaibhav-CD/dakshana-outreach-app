@@ -1047,6 +1047,7 @@ export default function App() {
 
               {currentUser.role === 'management' && (
                 <ManagementView
+                  currentUser={currentUser}
                   allUsers={allUsers}
                   reports={reports}
                   sessions={sessions}

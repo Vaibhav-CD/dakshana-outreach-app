@@ -31,6 +31,7 @@ import {
 
 import PodiumSpotlight from './PodiumSpotlight'
 import Avatar from './Avatar'
+import ProgressIntelligenceHub from './ProgressIntelligenceHub'
 import { formatDateWithRelative } from '../utils/dateUtils'
 
 export default function SeniorSecView({
@@ -793,41 +794,14 @@ export default function SeniorSecView({
           </div>
         )}
 
-        {/* Tab 2: All Reports across organization */}
+        {/* Tab 2: All Reports across organization - Progress Intelligence & Excel Hub */}
         {activeTab === 'reports' && (
           <div className="p-6">
-            <div className="space-y-3">
-              {reports.map((rep) => (
-                <div key={rep.id} className="p-4 rounded-xl border border-slate-200 bg-slate-50 text-xs space-y-2">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <span className="font-bold text-slate-900 text-sm">{rep.internName}</span>
-                      <span className="ml-2 px-2 py-0.5 rounded-md font-bold text-[10px] bg-white border border-slate-200 text-slate-700">
-                        {rep.batch || 'Batch 1'}
-                      </span>
-                      <span className="text-slate-500 ml-2">({rep.monthYear})</span>
-                    </div>
-                    <span className={`px-2.5 py-0.5 rounded-full font-semibold ${
-                      rep.status === 'reviewed' 
-                        ? 'bg-[#EBF7F0] text-[#0A643B] border border-[#0A643B]/30' 
-                        : rep.status === 'revision_requested' 
-                        ? 'bg-[#F8EDF5] text-[#7B2E68] border border-[#7B2E68]/30' 
-                        : 'bg-amber-100 text-amber-800'
-                    }`}>
-                      {rep.status === 'reviewed' ? 'Reviewed & Approved' : rep.status === 'revision_requested' ? 'Revision Needed' : 'Pending Review'}
-                    </span>
-                  </div>
-                  <p className="text-slate-700 bg-white p-3 rounded-lg border border-slate-200">
-                    {rep.tasksCompleted}
-                  </p>
-                  {rep.reviewerFeedback && (
-                    <p className="text-[#0A643B] bg-[#EBF7F0] p-2.5 rounded-lg border border-[#0A643B]/20">
-                      <strong>Feedback ({rep.reviewedBy}):</strong> {rep.reviewerFeedback}
-                    </p>
-                  )}
-                </div>
-              ))}
-            </div>
+            <ProgressIntelligenceHub
+              reports={reports}
+              allUsers={allUsers}
+              currentUser={currentUser}
+            />
           </div>
         )}
 
