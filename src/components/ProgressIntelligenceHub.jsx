@@ -20,7 +20,8 @@ import {
   Layers,
   ArrowUpDown,
   BookOpen,
-  Award
+  Award,
+  UserCheck
 } from 'lucide-react'
 import Avatar from './Avatar'
 import StreamBadge from './StreamBadge'
@@ -29,7 +30,7 @@ import StreamBadge from './StreamBadge'
  * ProgressIntelligenceHub
  * 
  * Comprehensive Executive Progress Intelligence, AI Report Synthesis,
- * Multi-dimensional Filtering (Month, Batch, JEE/NEET Stream),
+ * Multi-dimensional Filtering (Month, Batch, JEE/NEET Stream, Junior Secretary),
  * and 1-Click Excel (.CSV) Data Extraction.
  */
 export default function ProgressIntelligenceHub({
@@ -42,6 +43,7 @@ export default function ProgressIntelligenceHub({
   const [selectedMonth, setSelectedMonth] = useState('all')
   const [selectedBatch, setSelectedBatch] = useState('all')
   const [selectedStream, setSelectedStream] = useState('all') // 'all' | 'JEE' | 'NEET'
+  const [selectedJuniorSec, setSelectedJuniorSec] = useState('all') // 'all' | juniorSecId
   const [selectedStatus, setSelectedStatus] = useState('all') // 'all' | 'reviewed' | 'submitted' | 'revision_requested'
   const [searchQuery, setSearchQuery] = useState('')
   const [viewMode, setViewMode] = useState('grid') // 'grid' | 'table'
@@ -76,17 +78,31 @@ export default function ProgressIntelligenceHub({
     return Array.from(months)
   }, [reports])
 
+  // Extract all Junior Secretaries for supervisor filtering
+  const juniorSecretaries = useMemo(() => {
+    const list = allUsers.filter(u => u.role === 'junior_sec')
+    if (list.length > 0) return list
+    return [
+      { id: 'user-jsec-1', name: 'Priya Sharma', department: 'Wing 1 (Foundational Numeracy)' },
+      { id: 'user-jsec-2', name: 'Rohan Verma', department: 'Wing 2 (Robotics & Literacy)' },
+      { id: 'user-jsec-3', name: 'Sneha Kulkarni', department: 'Wing 3 (Media & Cluster Outreach)' }
+    ]
+  }, [allUsers])
+
   // Enriched reports with stream, email, and supervisor info
   const enrichedReports = useMemo(() => {
     return reports.map(r => {
       const user = usersMap[r.internId] || usersMap[(r.internName || '').toLowerCase()] || {}
       const supervisor = usersMap[r.juniorSecId] || usersMap[user.assignedTo] || {}
+      const jsecId = r.juniorSecId || user.assignedTo || supervisor.id || ''
+      const supervisorName = supervisor.name || r.reviewedBy || 'Junior Secretary'
       return {
         ...r,
         stream: user.stream || 'JEE',
         email: user.email || `${(r.internName || 'scholar').toLowerCase().replace(/\s+/g, '.')}@dakshana.org`,
         batch: r.batch || user.batch || 'Batch 1',
-        supervisorName: supervisor.name || r.reviewedBy || 'Junior Secretary',
+        juniorSecId: jsecId,
+        supervisorName: supervisorName,
         hoursContributed: Number(r.hoursContributed) || 0
       }
     })
@@ -101,6 +117,12 @@ export default function ProgressIntelligenceHub({
       if (selectedBatch !== 'all' && r.batch !== selectedBatch) return false
       // Stream Filter (JEE / NEET)
       if (selectedStream !== 'all' && String(r.stream).toUpperCase() !== selectedStream.toUpperCase()) return false
+      // Junior Secretary Filter
+      if (selectedJuniorSec !== 'all') {
+        const matchId = r.juniorSecId === selectedJuniorSec
+        const matchName = (r.supervisorName || '').toLowerCase().includes(selectedJuniorSec.toLowerCase())
+        if (!matchId && !matchName) return false
+      }
       // Status Filter
       if (selectedStatus !== 'all' && r.status !== selectedStatus) return false
       // Search Query
@@ -114,7 +136,7 @@ export default function ProgressIntelligenceHub({
       }
       return true
     })
-  }, [enrichedReports, selectedMonth, selectedBatch, selectedStream, selectedStatus, searchQuery])
+  }, [enrichedReports, selectedMonth, selectedBatch, selectedStream, selectedJuniorSec, selectedStatus, searchQuery])
 
   // Aggregate Key Performance Metrics
   const metrics = useMemo(() => {
@@ -155,10 +177,12 @@ export default function ProgressIntelligenceHub({
       }
     }
 
+    const activeJsec = juniorSecretaries.find(j => j.id === selectedJuniorSec)
     const cohortLabel = [
       selectedMonth !== 'all' ? selectedMonth : 'All Recorded Cycles',
       selectedBatch !== 'all' ? selectedBatch : 'Combined Batches (1 & 2)',
-      selectedStream !== 'all' ? `${selectedStream} Stream` : 'Both JEE & NEET Streams'
+      selectedStream !== 'all' ? `${selectedStream} Stream` : 'Both JEE & NEET Streams',
+      selectedJuniorSec !== 'all' ? (activeJsec ? `${activeJsec.name}'s Wing` : 'Specific Wing') : 'All Junior Secretaries'
     ].join(' • ')
 
     // Extract achievements
@@ -186,7 +210,7 @@ export default function ProgressIntelligenceHub({
         ? `Expedite review for ${metrics.totalReports - metrics.reviewedCount} pending monthly report(s) before closing financial stipend approvals.`
         : 'All submitted reports in this view have been formally reviewed and verified.'
     }
-  }, [filteredReports, selectedMonth, selectedBatch, selectedStream, metrics])
+  }, [filteredReports, selectedMonth, selectedBatch, selectedStream, selectedJuniorSec, juniorSecretaries, metrics])
 
   // Copy Executive Summary to Clipboard
   const handleCopySummary = () => {
@@ -266,7 +290,8 @@ Generated via Dakshana Progress Intelligence Hub.`
 
     const link = document.createElement('a')
     const sanitizeFilenamePart = (s) => s.replace(/[^a-zA-Z0-9]/g, '_')
-    const filename = `Dakshana_Progress_Report_${sanitizeFilenamePart(selectedMonth)}_${sanitizeFilenamePart(selectedBatch)}_${sanitizeFilenamePart(selectedStream)}.csv`
+    const activeJsecName = juniorSecretaries.find(j => j.id === selectedJuniorSec)?.name || selectedJuniorSec
+    const filename = `Dakshana_Progress_Report_${sanitizeFilenamePart(selectedMonth)}_${sanitizeFilenamePart(selectedBatch)}_${sanitizeFilenamePart(selectedStream)}_${sanitizeFilenamePart(activeJsecName)}.csv`
     
     link.setAttribute('href', url)
     link.setAttribute('download', filename)
@@ -392,8 +417,8 @@ Generated via Dakshana Progress Intelligence Hub.`
 
         </div>
 
-        {/* Filter Dropdowns Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 pt-1">
+        {/* Filter Dropdowns Grid (5 Multi-Dimensional Filters) */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 pt-1">
           
           {/* A. Month Filter */}
           <div>
@@ -467,7 +492,27 @@ Generated via Dakshana Progress Intelligence Hub.`
             </div>
           </div>
 
-          {/* D. Status Filter */}
+          {/* D. Junior Secretary Filter */}
+          <div>
+            <label className="block text-xs font-bold text-slate-600 mb-1 flex items-center">
+              <UserCheck className="w-3.5 h-3.5 mr-1 text-[#0A643B]" />
+              <span>Junior Secretary</span>
+            </label>
+            <select
+              value={selectedJuniorSec}
+              onChange={(e) => setSelectedJuniorSec(e.target.value)}
+              className="w-full text-xs font-bold rounded-xl border border-slate-300 p-2.5 bg-white text-slate-800 focus:ring-2 focus:ring-[#0A643B] focus:outline-hidden"
+            >
+              <option value="all">All Junior Secretaries</option>
+              {juniorSecretaries.map(jsec => (
+                <option key={jsec.id} value={jsec.id}>
+                  {jsec.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* E. Status Filter */}
           <div>
             <label className="block text-xs font-bold text-slate-600 mb-1 flex items-center">
               <CheckCircle2 className="w-3.5 h-3.5 mr-1 text-[#0A643B]" />
@@ -500,12 +545,13 @@ Generated via Dakshana Progress Intelligence Hub.`
             />
           </div>
 
-          {(selectedMonth !== 'all' || selectedBatch !== 'all' || selectedStream !== 'all' || selectedStatus !== 'all' || searchQuery) && (
+          {(selectedMonth !== 'all' || selectedBatch !== 'all' || selectedStream !== 'all' || selectedJuniorSec !== 'all' || selectedStatus !== 'all' || searchQuery) && (
             <button
               onClick={() => {
                 setSelectedMonth('all')
                 setSelectedBatch('all')
                 setSelectedStream('all')
+                setSelectedJuniorSec('all')
                 setSelectedStatus('all')
                 setSearchQuery('')
               }}
@@ -623,7 +669,7 @@ Generated via Dakshana Progress Intelligence Hub.`
           </div>
           <h4 className="font-extrabold text-slate-900 text-base">No Matching Progress Reports</h4>
           <p className="text-xs text-slate-500 max-w-sm mx-auto">
-            No scholars or progress reports match the selected filters ({selectedMonth}, {selectedBatch}, {selectedStream}). Try broadening your filter selection.
+            No scholars or progress reports match the selected filters ({selectedMonth}, {selectedBatch}, {selectedStream}, {selectedJuniorSec !== 'all' ? (juniorSecretaries.find(j => j.id === selectedJuniorSec)?.name || 'Specific Junior Secretary') : 'All Supervisors'}). Try broadening your filter selection.
           </p>
         </div>
       ) : viewMode === 'grid' ? (
