@@ -7,7 +7,7 @@ import {
   Trash2,
   Check
 } from 'lucide-react'
-import Avatar, { WhatsAppSilhouette } from './Avatar'
+import Avatar, { DefaultSilhouette } from './Avatar'
 
 export default function EditProfilePhotoModal({
   isOpen,
@@ -34,7 +34,7 @@ export default function EditProfilePhotoModal({
     }
   }
 
-  const handleResetToWhatsAppDefault = () => {
+  const handleResetToDefault = () => {
     setPreviewPhoto(null)
   }
 
@@ -59,7 +59,7 @@ export default function EditProfilePhotoModal({
             </div>
             <div>
               <h3 className="font-extrabold text-slate-900 text-sm">Profile Picture</h3>
-              <p className="text-[11px] text-slate-400">Upload your personal photo or use WhatsApp default</p>
+              <p className="text-[11px] text-slate-400">Upload your personal photo or use standard default</p>
             </div>
           </div>
           <button onClick={onClose} className="text-slate-400 hover:text-slate-600 p-1 cursor-pointer">
@@ -80,9 +80,9 @@ export default function EditProfilePhotoModal({
             {previewPhoto && (
               <button
                 type="button"
-                onClick={handleResetToWhatsAppDefault}
+                onClick={handleResetToDefault}
                 className="absolute -top-1 -right-1 p-1.5 rounded-full bg-rose-600 text-white hover:bg-rose-700 shadow-md cursor-pointer"
-                title="Remove photo & use WhatsApp default icon"
+                title="Remove photo & use default avatar icon"
               >
                 <Trash2 className="w-3.5 h-3.5" />
               </button>
@@ -91,7 +91,7 @@ export default function EditProfilePhotoModal({
           
           <span className="font-extrabold text-slate-900 text-sm">{currentUser.name}</span>
           <span className="text-[11px] text-slate-500 font-medium mt-0.5">
-            {previewPhoto ? 'Custom photo active' : 'WhatsApp default silhouette active'}
+            {previewPhoto ? 'Custom photo active' : 'Default silhouette avatar active'}
           </span>
         </div>
 
@@ -107,21 +107,21 @@ export default function EditProfilePhotoModal({
             </label>
           </div>
 
-          {/* Option 2: Use WhatsApp Default Silhouette */}
+          {/* Option 2: Use Default Silhouette */}
           <div className="flex items-center justify-between p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 rounded-full overflow-hidden shadow-2xs flex-shrink-0">
-                <WhatsAppSilhouette />
+                <DefaultSilhouette />
               </div>
               <div>
-                <span className="font-bold text-slate-800 text-xs block">WhatsApp Default Type</span>
-                <span className="text-[11px] text-slate-500">Standard clean profile silhouette</span>
+                <span className="font-bold text-slate-800 text-xs block">Default Profile Silhouette</span>
+                <span className="text-[11px] text-slate-500">Standard clean profile avatar</span>
               </div>
             </div>
 
             <button
               type="button"
-              onClick={handleResetToWhatsAppDefault}
+              onClick={handleResetToDefault}
               className={`px-3 py-1.5 rounded-xl font-bold text-xs border transition-colors cursor-pointer ${
                 previewPhoto === null
                   ? 'bg-[#0A643B] text-white border-[#0A643B]'

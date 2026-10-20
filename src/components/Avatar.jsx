@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-export function WhatsAppSilhouette({ className = 'w-full h-full' }) {
+export function DefaultSilhouette({ className = 'w-full h-full' }) {
   return (
     <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
       <rect width="100" height="100" rx="50" fill="#CFD9DE" />
@@ -54,13 +54,13 @@ export default function Avatar({
     )
   }
 
-  // Universal WhatsApp Default Silhouette Profile
+  // Universal Clean Default Silhouette Profile
   return (
     <div
       className={`${currentSizeClass} rounded-full flex items-center justify-center select-none shadow-2xs flex-shrink-0 overflow-hidden border border-slate-200/60 ${className}`}
-      title={name || 'Default WhatsApp Avatar'}
+      title={name || 'Default Profile Avatar'}
     >
-      <WhatsAppSilhouette />
+      <DefaultSilhouette />
     </div>
   )
 }
