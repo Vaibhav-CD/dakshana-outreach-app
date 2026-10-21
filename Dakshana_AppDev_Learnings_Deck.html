@@ -117,7 +117,7 @@
         <span>Engineering Retrospective • Dakshana App</span>
         <button onclick="toggleNotes()" style="background:none; border:none; color:#4F46E5; font-weight:bold; cursor:pointer;">Show Notes</button>
         <div style="display: flex; gap: 6px;">
-          <span style="align-self: center; margin-right: 6px; font-weight: bold;">Slide 1 / 10</span>
+          <span style="align-self: center; margin-right: 6px; font-weight: bold;">Slide 1 / 11</span>
           <button class="btn-nav primary" onclick="nextSlide()">Next Slide →</button>
         </div>
       </div>
@@ -136,7 +136,7 @@
             <div class="learn-icon">👤</div>
             <div>
               <div class="learn-title">Removing Misleading Fake Avatars</div>
-              <div class="learn-desc">We originally used AI stock photos for users. User feedback correctly noted that fake faces mislead scholars; switching to clean, WhatsApp-style initials instantly felt authentic and trustworthy.</div>
+              <div class="learn-desc">We originally used AI stock photos for users. User feedback correctly noted that fake faces mislead scholars; switching to clean, universal scholar silhouettes and initials instantly felt authentic and trustworthy.</div>
             </div>
           </div>
           <div class="learn-card">
@@ -170,7 +170,7 @@
         <button onclick="toggleNotes()" style="background:none; border:none; color:#4F46E5; font-weight:bold; cursor:pointer;">Show Notes</button>
         <div style="display: flex; gap: 6px;">
           <button class="btn-nav" onclick="prevSlide()">← Prev</button>
-          <span style="align-self: center; margin: 0 6px; font-weight: bold;">Slide 2 / 10</span>
+          <span style="align-self: center; margin: 0 6px; font-weight: bold;">Slide 2 / 11</span>
           <button class="btn-nav primary" onclick="nextSlide()">Next Slide →</button>
         </div>
       </div>
@@ -245,7 +245,7 @@
         <button onclick="toggleNotes()" style="background:none; border:none; color:#4F46E5; font-weight:bold; cursor:pointer;">Show Notes</button>
         <div style="display: flex; gap: 6px;">
           <button class="btn-nav" onclick="prevSlide()">← Prev</button>
-          <span style="align-self: center; margin: 0 6px; font-weight: bold;">Slide 3 / 10</span>
+          <span style="align-self: center; margin: 0 6px; font-weight: bold;">Slide 3 / 11</span>
           <button class="btn-nav primary" onclick="nextSlide()">Next Slide →</button>
         </div>
       </div>
@@ -305,60 +305,60 @@
         <button onclick="toggleNotes()" style="background:none; border:none; color:#4F46E5; font-weight:bold; cursor:pointer;">Show Notes</button>
         <div style="display: flex; gap: 6px;">
           <button class="btn-nav" onclick="prevSlide()">← Prev</button>
-          <span style="align-self: center; margin: 0 6px; font-weight: bold;">Slide 4 / 10</span>
+          <span style="align-self: center; margin: 0 6px; font-weight: bold;">Slide 4 / 11</span>
           <button class="btn-nav primary" onclick="nextSlide()">Next Slide →</button>
         </div>
       </div>
     </div>
 
-    <!-- SLIDE 5: LESSON 4 - SECURITY & PRIVACY -->
+    <!-- SLIDE 5: LESSON 4 - SECURITY & CRYPTOGRAPHY -->
     <div class="slide" data-slide="5">
       <div class="slide-header">
         <span class="slide-eyebrow">Lesson 4: Security Engineering</span>
-        <h2 class="slide-title">Real-World Security & Role-Based Boundaries</h2>
-        <p class="slide-subtitle">Balancing rigorous access control with frictionless mobile usability.</p>
+        <h2 class="slide-title">Cryptographic Hygiene & Role-Based Boundaries</h2>
+        <p class="slide-subtitle">From resolving automated secret scanner alerts to Web Crypto API hashing and role boundaries.</p>
       </div>
       <div class="slide-body">
         <div class="col-left">
           <div class="learn-card">
+            <div class="learn-icon">🔐</div>
+            <div>
+              <div class="learn-title">Web Crypto API SHA-256 Hashing</div>
+              <div class="learn-desc">Replaced plain-text credential handling with one-way SHA-256 digests. Cleartext passwords are never exposed in UI inputs, state trees, or database inspect panels.</div>
+            </div>
+          </div>
+          <div class="learn-card">
+            <div class="learn-icon">🛡️</div>
+            <div>
+              <div class="learn-title">Automated Scanner Remediation (GitGuardian)</div>
+              <div class="learn-desc">Learned how automated security scanners flag hardcoded mock secrets. Cleaned all token references, secured environment keys, and fortified code repositories.</div>
+            </div>
+          </div>
+          <div class="learn-card">
             <div class="learn-icon">🔒</div>
             <div>
-              <div class="learn-title">Strict Registration Role Lock</div>
-              <div class="learn-desc">Public signups are hard-coded strictly to the <code>intern</code> role. Secretariat, Trustee, and Junior Secretary accounts cannot be self-created, eliminating privilege escalation.</div>
-            </div>
-          </div>
-          <div class="learn-card">
-            <div class="learn-icon">📱</div>
-            <div>
-              <div class="learn-title">Contextual Privacy Rules</div>
-              <div class="learn-desc">Learned to protect executive leadership by hiding Management personal phone numbers, while keeping Junior Secretary numbers visible for emergency scholar support.</div>
-            </div>
-          </div>
-          <div class="learn-card">
-            <div class="learn-icon">⏱️</div>
-            <div>
-              <div class="learn-title">2-Week Persistent Sessions</div>
-              <div class="learn-desc">Scholars shouldn't have to type passwords daily on mobile. Implementing timestamped 14-day persistent sessions gave security without annoying re-login prompts.</div>
+              <div class="learn-title">Role Locks & Contextual Privacy</div>
+              <div class="learn-desc">Public signups are strictly locked to the <code>intern</code> role; Management phone numbers are hidden from scholars while Junior Sec mentors remain accessible.</div>
             </div>
           </div>
         </div>
         <div class="col-right">
           <div class="quote-box">
-            "Security isn't just about encryption keys; it's about business rules. Designing who can delegate privileges, who sees phone numbers, and who can approve funds is where real-world software security lives."
+            "Real security requires defense-in-depth: one-way cryptographic hashing at the client, strict SQL row-level policies at the database, and zero credential leakage in code or UI."
             <span class="quote-author">— Security Engineering Principle</span>
           </div>
         </div>
       </div>
       <div class="speaker-drawer" id="notes-5">
         <strong>Discussion Point:</strong>
-        "If security is too painful, users bypass it. Our 2-week persistent session balance gave the Dakshana team rock-solid account isolation without making scholars re-enter passwords every morning."
+        "Modern developers must be alert to automated secret scanners like GitGuardian. By adopting Web Crypto API SHA-256 digests and eliminating cleartext secrets, we achieved enterprise compliance without external library bloat."
       </div>
       <div class="slide-footer">
         <span>Security & Access Control</span>
         <button onclick="toggleNotes()" style="background:none; border:none; color:#4F46E5; font-weight:bold; cursor:pointer;">Show Notes</button>
         <div style="display: flex; gap: 6px;">
           <button class="btn-nav" onclick="prevSlide()">← Prev</button>
-          <span style="align-self: center; margin: 0 6px; font-weight: bold;">Slide 5 / 10</span>
+          <span style="align-self: center; margin: 0 6px; font-weight: bold;">Slide 5 / 11</span>
           <button class="btn-nav primary" onclick="nextSlide()">Next Slide →</button>
         </div>
       </div>
@@ -417,7 +417,7 @@
         <button onclick="toggleNotes()" style="background:none; border:none; color:#4F46E5; font-weight:bold; cursor:pointer;">Show Notes</button>
         <div style="display: flex; gap: 6px;">
           <button class="btn-nav" onclick="prevSlide()">← Prev</button>
-          <span style="align-self: center; margin: 0 6px; font-weight: bold;">Slide 6 / 10</span>
+          <span style="align-self: center; margin: 0 6px; font-weight: bold;">Slide 6 / 11</span>
           <button class="btn-nav primary" onclick="nextSlide()">Next Slide →</button>
         </div>
       </div>
@@ -470,16 +470,69 @@
         <button onclick="toggleNotes()" style="background:none; border:none; color:#4F46E5; font-weight:bold; cursor:pointer;">Show Notes</button>
         <div style="display: flex; gap: 6px;">
           <button class="btn-nav" onclick="prevSlide()">← Prev</button>
-          <span style="align-self: center; margin: 0 6px; font-weight: bold;">Slide 7 / 10</span>
+          <span style="align-self: center; margin: 0 6px; font-weight: bold;">Slide 7 / 11</span>
           <button class="btn-nav primary" onclick="nextSlide()">Next Slide →</button>
         </div>
       </div>
     </div>
 
-    <!-- SLIDE 8: LESSON 7 - DEVOPS & BUNDLE OPTIMIZATION -->
+    <!-- SLIDE 8: LESSON 7 - DATA INTEROPERABILITY & EXECUTIVE SYNTHESIS -->
     <div class="slide" data-slide="8">
       <div class="slide-header">
-        <span class="slide-eyebrow">Lesson 7: Production DevOps</span>
+        <span class="slide-eyebrow">Lesson 7: Data Interoperability</span>
+        <h2 class="slide-title">Spreadsheet Interoperability & Executive Synthesis</h2>
+        <p class="slide-subtitle">Solving the gap between web applications and organizational spreadsheet workflows.</p>
+      </div>
+      <div class="slide-body">
+        <div class="col-left">
+          <div class="learn-card">
+            <div class="learn-icon">📊</div>
+            <div>
+              <div class="learn-title">UTF-8 BOM (<code>\uFEFF</code>) CSV Engineering</div>
+              <div class="learn-desc">Real-world stakeholders live in Microsoft Excel. Emitting CSVs without Byte Order Marks corrupted Indian names and symbols. Prepending <code>\uFEFF</code> ensures 1-click flawless opening across Excel, Sheets, and Numbers.</div>
+            </div>
+          </div>
+          <div class="learn-card">
+            <div class="learn-icon">🔍</div>
+            <div>
+              <div class="learn-title">Multi-Dimensional Reactive Slicing</div>
+              <div class="learn-desc">Engineered O(N) filtering across 5 vectors: Month, Batch, Dual Academic Stream (JEE `#0A643B` vs NEET `#7B2E68`), Junior Secretary supervision, and completion thresholds.</div>
+            </div>
+          </div>
+          <div class="learn-card">
+            <div class="learn-icon">🧠</div>
+            <div>
+              <div class="learn-title">AI Executive Synthesizer</div>
+              <div class="learn-desc">Leadership doesn't want to decipher 50 rows of data. Building real-time text synthesis that extracts top accomplishments and flag bottlenecks translates tracking into decisions.</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-right">
+          <div class="quote-box">
+            "Software does not live in an ivory tower. Designing seamless bridges to existing office tools (Excel, Sheets, PDFs) is what makes a custom web portal truly indispensable to leadership."
+            <span class="quote-author">— Data Engineering Insight</span>
+          </div>
+        </div>
+      </div>
+      <div class="speaker-drawer" id="notes-8">
+        <strong>Discussion Point:</strong>
+        "Never force leadership to change how they report to the board. By adding 1-click UTF-8 BOM Excel exports and multi-dimensional filters, the portal directly feeds into their monthly review spreadsheets without friction."
+      </div>
+      <div class="slide-footer">
+        <span>Data Interoperability & Analytics</span>
+        <button onclick="toggleNotes()" style="background:none; border:none; color:#4F46E5; font-weight:bold; cursor:pointer;">Show Notes</button>
+        <div style="display: flex; gap: 6px;">
+          <button class="btn-nav" onclick="prevSlide()">← Prev</button>
+          <span style="align-self: center; margin: 0 6px; font-weight: bold;">Slide 8 / 11</span>
+          <button class="btn-nav primary" onclick="nextSlide()">Next Slide →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 9: LESSON 8 - DEVOPS & BUNDLE OPTIMIZATION -->
+    <div class="slide" data-slide="9">
+      <div class="slide-header">
+        <span class="slide-eyebrow">Lesson 8: Production DevOps</span>
         <h2 class="slide-title">Shipping to Production with Zero Infrastructure Cost</h2>
         <p class="slide-subtitle">How modern tooling enables enterprise-grade deployments for non-profits.</p>
       </div>
@@ -529,7 +582,7 @@
           </div>
         </div>
       </div>
-      <div class="speaker-drawer" id="notes-8">
+      <div class="speaker-drawer" id="notes-9">
         <strong>Discussion Point:</strong>
         "For non-profit organizations like Dakshana, spending thousands on cloud servers is unnecessary. Modern static edge hosting paired with serverless databases provides enterprise performance with zero overhead."
       </div>
@@ -538,14 +591,14 @@
         <button onclick="toggleNotes()" style="background:none; border:none; color:#4F46E5; font-weight:bold; cursor:pointer;">Show Notes</button>
         <div style="display: flex; gap: 6px;">
           <button class="btn-nav" onclick="prevSlide()">← Prev</button>
-          <span style="align-self: center; margin: 0 6px; font-weight: bold;">Slide 8 / 10</span>
+          <span style="align-self: center; margin: 0 6px; font-weight: bold;">Slide 9 / 11</span>
           <button class="btn-nav primary" onclick="nextSlide()">Next Slide →</button>
         </div>
       </div>
     </div>
 
-    <!-- SLIDE 9: KEY SKILLS ACQUIRED SUMMARY -->
-    <div class="slide" data-slide="9">
+    <!-- SLIDE 10: KEY SKILLS ACQUIRED SUMMARY -->
+    <div class="slide" data-slide="10">
       <div class="slide-header">
         <span class="slide-eyebrow">Developer Toolkit</span>
         <h2 class="slide-title">Full-Stack Competencies Mastered</h2>
@@ -564,29 +617,29 @@
             <div class="learn-desc">PostgreSQL relational modeling, JSONB document fields, Row-Level Security (RLS) policies, PostgREST API integration, and UUID handling.</div>
           </div>
           <div class="learn-card" style="flex-direction: column; background: white;">
-            <div style="font-size: 20px;">⚙️</div>
-            <div class="learn-title">System & DevOps</div>
-            <div class="learn-desc">Dual-persistence offline syncing, PWA manifest engineering, Rollup bundle optimization, environment variable security, and CI/CD hosting.</div>
+            <div style="font-size: 20px;">🔐</div>
+            <div class="learn-title">Security & Interoperability</div>
+            <div class="learn-desc">Web Crypto SHA-256 digests, GitGuardian secret scanning remediation, dual-stream styling, and RFC 4180 UTF-8 BOM Excel exports.</div>
           </div>
         </div>
       </div>
-      <div class="speaker-drawer" id="notes-9">
+      <div class="speaker-drawer" id="notes-10">
         <strong>Discussion Point:</strong>
-        "Notice the breadth of skills here: UI/UX empathy, core computer science data modeling, cybersecurity policies, and continuous deployment. This is what true full-stack software development looks like."
+        "Notice the breadth of skills here: UI/UX empathy, core computer science data modeling, cybersecurity policies, Excel data engineering, and continuous deployment. This is what true full-stack software development looks like."
       </div>
       <div class="slide-footer">
         <span>Competencies & Skill Inventory</span>
         <button onclick="toggleNotes()" style="background:none; border:none; color:#4F46E5; font-weight:bold; cursor:pointer;">Show Notes</button>
         <div style="display: flex; gap: 6px;">
           <button class="btn-nav" onclick="prevSlide()">← Prev</button>
-          <span style="align-self: center; margin: 0 6px; font-weight: bold;">Slide 9 / 10</span>
+          <span style="align-self: center; margin: 0 6px; font-weight: bold;">Slide 10 / 11</span>
           <button class="btn-nav primary" onclick="nextSlide()">Next Slide →</button>
         </div>
       </div>
     </div>
 
-    <!-- SLIDE 10: CONCLUSION -->
-    <div class="slide" data-slide="10">
+    <!-- SLIDE 11: CONCLUSION -->
+    <div class="slide" data-slide="11">
       <div class="slide-header">
         <span class="slide-eyebrow">Final Thought</span>
         <h2 class="slide-title">Software Engineering is Problem Solving</h2>
@@ -619,7 +672,7 @@
           </div>
         </div>
       </div>
-      <div class="speaker-drawer" id="notes-10">
+      <div class="speaker-drawer" id="notes-11">
         <strong>Closing Retrospective Remark:</strong>
         "At the end of the day, all our state management, database schemas, and CSS styling serve one ultimate purpose: helping Dakshana scholars inspire young minds without operational friction. Thank you!"
       </div>
@@ -628,7 +681,7 @@
         <button onclick="toggleNotes()" style="background:none; border:none; color:#4F46E5; font-weight:bold; cursor:pointer;">Show Notes</button>
         <div style="display: flex; gap: 6px;">
           <button class="btn-nav" onclick="prevSlide()">← Prev</button>
-          <span style="align-self: center; margin: 0 6px; font-weight: bold;">Slide 10 / 10</span>
+          <span style="align-self: center; margin: 0 6px; font-weight: bold;">Slide 11 / 11</span>
           <button class="btn-nav primary" onclick="goToSlide(1)">Restart Deck ↺</button>
         </div>
       </div>
@@ -638,7 +691,7 @@
 
   <script>
     let currentSlide = 1;
-    const totalSlides = 10;
+    const totalSlides = 11;
     function showSlide(n) {
       if (n > totalSlides) n = totalSlides;
       if (n < 1) n = 1;

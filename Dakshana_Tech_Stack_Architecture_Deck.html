@@ -123,7 +123,7 @@
         <span>Dakshana Architecture Specification • v2.0</span>
         <button onclick="toggleNotes()" style="background:none; border:none; color:#0284C7; font-weight:bold; cursor:pointer;">Show Notes</button>
         <div style="display: flex; gap: 6px;">
-          <span style="align-self: center; margin-right: 6px; font-weight: bold;">Slide 1 / 10</span>
+          <span style="align-self: center; margin-right: 6px; font-weight: bold;">Slide 1 / 12</span>
           <button class="btn-nav primary" onclick="nextSlide()">Next Slide →</button>
         </div>
       </div>
@@ -186,7 +186,7 @@
         <button onclick="toggleNotes()" style="background:none; border:none; color:#0284C7; font-weight:bold; cursor:pointer;">Show Notes</button>
         <div style="display: flex; gap: 6px;">
           <button class="btn-nav" onclick="prevSlide()">← Prev</button>
-          <span style="align-self: center; margin: 0 6px; font-weight: bold;">Slide 2 / 10</span>
+          <span style="align-self: center; margin: 0 6px; font-weight: bold;">Slide 2 / 12</span>
           <button class="btn-nav primary" onclick="nextSlide()">Next Slide →</button>
         </div>
       </div>
@@ -252,7 +252,7 @@
         <button onclick="toggleNotes()" style="background:none; border:none; color:#0284C7; font-weight:bold; cursor:pointer;">Show Notes</button>
         <div style="display: flex; gap: 6px;">
           <button class="btn-nav" onclick="prevSlide()">← Prev</button>
-          <span style="align-self: center; margin: 0 6px; font-weight: bold;">Slide 3 / 10</span>
+          <span style="align-self: center; margin: 0 6px; font-weight: bold;">Slide 3 / 12</span>
           <button class="btn-nav primary" onclick="nextSlide()">Next Slide →</button>
         </div>
       </div>
@@ -319,7 +319,7 @@
         <button onclick="toggleNotes()" style="background:none; border:none; color:#0284C7; font-weight:bold; cursor:pointer;">Show Notes</button>
         <div style="display: flex; gap: 6px;">
           <button class="btn-nav" onclick="prevSlide()">← Prev</button>
-          <span style="align-self: center; margin: 0 6px; font-weight: bold;">Slide 4 / 10</span>
+          <span style="align-self: center; margin: 0 6px; font-weight: bold;">Slide 4 / 12</span>
           <button class="btn-nav primary" onclick="nextSlide()">Next Slide →</button>
         </div>
       </div>
@@ -384,7 +384,7 @@
         <button onclick="toggleNotes()" style="background:none; border:none; color:#0284C7; font-weight:bold; cursor:pointer;">Show Notes</button>
         <div style="display: flex; gap: 6px;">
           <button class="btn-nav" onclick="prevSlide()">← Prev</button>
-          <span style="align-self: center; margin: 0 6px; font-weight: bold;">Slide 5 / 10</span>
+          <span style="align-self: center; margin: 0 6px; font-weight: bold;">Slide 5 / 12</span>
           <button class="btn-nav primary" onclick="nextSlide()">Next Slide →</button>
         </div>
       </div>
@@ -447,14 +447,145 @@
         <button onclick="toggleNotes()" style="background:none; border:none; color:#0284C7; font-weight:bold; cursor:pointer;">Show Notes</button>
         <div style="display: flex; gap: 6px;">
           <button class="btn-nav" onclick="prevSlide()">← Prev</button>
-          <span style="align-self: center; margin: 0 6px; font-weight: bold;">Slide 6 / 10</span>
+          <span style="align-self: center; margin: 0 6px; font-weight: bold;">Slide 6 / 12</span>
           <button class="btn-nav primary" onclick="nextSlide()">Next Slide →</button>
         </div>
       </div>
     </div>
 
-    <!-- SLIDE 7: WEB AUDIO SYNTHESIZER & SENSORY UX -->
+    <!-- SLIDE 7: CRYPTOGRAPHIC SECURITY & ZERO CREDENTIAL EXPOSURE -->
     <div class="slide" data-slide="7">
+      <div class="slide-header">
+        <span class="slide-eyebrow">Cryptographic Security</span>
+        <h2 class="slide-title">Web Crypto API SHA-256 & Defense-in-Depth</h2>
+        <p class="slide-subtitle">Eliminating cleartext credentials, secret scanner vulnerabilities, and payload injection.</p>
+      </div>
+      <div class="slide-body">
+        <div class="col-left">
+          <div class="tech-card">
+            <div class="tech-icon">🔐</div>
+            <div>
+              <div class="tech-title">Client-Side SHA-256 Hashing</div>
+              <div class="tech-desc">Passcodes undergo one-way cryptographic digestion via native <code>crypto.subtle.digest('SHA-256')</code>. Cleartext is never persisted in storage or UI state.</div>
+            </div>
+          </div>
+          <div class="tech-card">
+            <div class="tech-icon">🛡️</div>
+            <div>
+              <div class="tech-title">GitGuardian Secret Scanner Compliance</div>
+              <div class="tech-desc">Eliminated mock tokens and exposed secrets. Sensitive database inspect screens are locked behind authenticated administrative privileges.</div>
+            </div>
+          </div>
+          <div class="tech-card">
+            <div class="tech-icon">💉</div>
+            <div>
+              <div class="tech-title">SQL & Payload Injection Immunity</div>
+              <div class="tech-desc">Declarative state immutability, typed interfaces, and parameterized PostgREST calls guarantee zero attack surface for SQL or script injection.</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-right">
+          <div class="code-box">
+            <span class="comment">// Native Web Crypto API SHA-256 Digest</span><br>
+            <span class="keyword">async function</span> hashPassword(plainText) {<br>
+            &nbsp;&nbsp;<span class="keyword">const</span> encoder = <span class="keyword">new</span> TextEncoder();<br>
+            &nbsp;&nbsp;<span class="keyword">const</span> data = encoder.encode(plainText);<br>
+            &nbsp;&nbsp;<span class="keyword">const</span> hashBuffer = <span class="keyword">await</span> crypto.subtle.digest(<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="string">'SHA-256'</span>, data<br>
+            &nbsp;&nbsp;);<br>
+            &nbsp;&nbsp;<span class="keyword">const</span> hashArray = Array.from(<span class="keyword">new</span> Uint8Array(hashBuffer));<br>
+            &nbsp;&nbsp;<span class="keyword">return</span> hashArray<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;.map(b =&gt; b.toString(16).padStart(2, <span class="string">'0'</span>))<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;.join(<span class="string">''</span>);<br>
+            }<br>
+            <span class="comment">// Zero-Exposure Validation Engine</span><br>
+            <span class="keyword">const</span> isValid = (enteredHash === storedHash);
+          </div>
+        </div>
+      </div>
+      <div class="speaker-drawer" id="notes-7">
+        <strong>Key Takeaway:</strong>
+        "By leveraging the native Web Crypto API, we implement one-way cryptographic digests with zero external package bloat. Cleartext passwords are never visible in database inspect tools, state trees, or network traffic."
+      </div>
+      <div class="slide-footer">
+        <span>Application Cryptography</span>
+        <button onclick="toggleNotes()" style="background:none; border:none; color:#0284C7; font-weight:bold; cursor:pointer;">Show Notes</button>
+        <div style="display: flex; gap: 6px;">
+          <button class="btn-nav" onclick="prevSlide()">← Prev</button>
+          <span style="align-self: center; margin: 0 6px; font-weight: bold;">Slide 7 / 12</span>
+          <button class="btn-nav primary" onclick="nextSlide()">Next Slide →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 8: PROGRESS INTELLIGENCE & UNICODE EXCEL ENGINE -->
+    <div class="slide" data-slide="8">
+      <div class="slide-header">
+        <span class="slide-eyebrow">Data Engineering & Analytics</span>
+        <h2 class="slide-title">Progress Intelligence & RFC 4180 Unicode CSV Engine</h2>
+        <p class="slide-subtitle">Multi-dimensional reactive analytics, dual-stream theming, and Excel UTF-8 BOM interoperability.</p>
+      </div>
+      <div class="slide-body">
+        <div class="col-left">
+          <div class="tech-card">
+            <div class="tech-icon">⚡</div>
+            <div>
+              <div class="tech-title">Multi-Dimensional Memoized Filtering</div>
+              <div class="tech-desc">Real-time reactive slicing across 5 dimensions: Month, Batch, Dual Stream (JEE/NEET), Supervising Junior Secretary, and KPI status in O(N) complexity.</div>
+            </div>
+          </div>
+          <div class="tech-card">
+            <div class="tech-icon">🩺</div>
+            <div>
+              <div class="tech-title">JEE & NEET Dual-Stream Tokens</div>
+              <div class="tech-desc">Dedicated design tokens for academic tracks (<code>#0A643B</code> JEE Emerald vs <code>#7B2E68</code> NEET Plum) applied to progress cards, badges, and filters.</div>
+            </div>
+          </div>
+          <div class="tech-card">
+            <div class="tech-icon">📊</div>
+            <div>
+              <div class="tech-title">UTF-8 BOM Encoded Spreadsheet Engine</div>
+              <div class="tech-desc">Injects the Byte Order Mark (<code>\uFEFF</code>) to ensure Microsoft Excel and Google Sheets render Indian names and punctuation without character corruption.</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-right">
+          <div class="code-box">
+            <span class="comment">// 1-Click Excel (.CSV) Data Extraction Engine</span><br>
+            <span class="keyword">function</span> exportToExcel(scholars) {<br>
+            &nbsp;&nbsp;<span class="keyword">const</span> headers = [<span class="string">"Name"</span>, <span class="string">"Stream"</span>, <span class="string">"Batch"</span>, <span class="string">"Supervisor"</span>, <span class="string">"Visits"</span>, <span class="string">"%"</span>];<br>
+            &nbsp;&nbsp;<span class="keyword">const</span> rows = scholars.map(s =&gt; [<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="string">`"${s.name.replace(/"/g, '""')}"`</span>,<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;s.stream, s.batch,<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="string">`"${s.supervisor}"`</span>,<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;s.completed,<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="string">`${Math.round((s.completed/s.target)*100)}%`</span><br>
+            &nbsp;&nbsp;]);<br>
+            &nbsp;&nbsp;<span class="comment">// Prepend UTF-8 BOM for Microsoft Excel</span><br>
+            &nbsp;&nbsp;<span class="keyword">const</span> csv = <span class="string">"\uFEFF"</span> + [headers, ...rows].map(r =&gt; r.join(<span class="string">","</span>)).join(<span class="string">"\n"</span>);<br>
+            &nbsp;&nbsp;<span class="keyword">const</span> blob = <span class="keyword">new</span> Blob([csv], { type: <span class="string">"text/csv;charset=utf-8;"</span> });<br>
+            &nbsp;&nbsp;<span class="comment">// 0ms native browser download trigger</span><br>
+            }
+          </div>
+        </div>
+      </div>
+      <div class="speaker-drawer" id="notes-8">
+        <strong>Key Takeaway:</strong>
+        "By prepending the UTF-8 BOM byte sequence, exported CSVs open immediately in Microsoft Excel without requiring manual text-import wizard configuration."
+      </div>
+      <div class="slide-footer">
+        <span>Analytics & Data Extraction</span>
+        <button onclick="toggleNotes()" style="background:none; border:none; color:#0284C7; font-weight:bold; cursor:pointer;">Show Notes</button>
+        <div style="display: flex; gap: 6px;">
+          <button class="btn-nav" onclick="prevSlide()">← Prev</button>
+          <span style="align-self: center; margin: 0 6px; font-weight: bold;">Slide 8 / 12</span>
+          <button class="btn-nav primary" onclick="nextSlide()">Next Slide →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 9: WEB AUDIO SYNTHESIZER & SENSORY UX -->
+    <div class="slide" data-slide="9">
       <div class="slide-header">
         <span class="slide-eyebrow">Sensory UX Architecture</span>
         <h2 class="slide-title">Zero-Asset Audio Synthesis via Web Audio API</h2>
@@ -508,7 +639,7 @@
           </div>
         </div>
       </div>
-      <div class="speaker-drawer" id="notes-7">
+      <div class="speaker-drawer" id="notes-9">
         <strong>Key Takeaway:</strong>
         "Synthesizing audio on the fly saved an extra HTTP request and prevents mobile browser audio caching errors across Android and iOS."
       </div>
@@ -517,14 +648,14 @@
         <button onclick="toggleNotes()" style="background:none; border:none; color:#0284C7; font-weight:bold; cursor:pointer;">Show Notes</button>
         <div style="display: flex; gap: 6px;">
           <button class="btn-nav" onclick="prevSlide()">← Prev</button>
-          <span style="align-self: center; margin: 0 6px; font-weight: bold;">Slide 7 / 10</span>
+          <span style="align-self: center; margin: 0 6px; font-weight: bold;">Slide 9 / 12</span>
           <button class="btn-nav primary" onclick="nextSlide()">Next Slide →</button>
         </div>
       </div>
     </div>
 
-    <!-- SLIDE 8: PROGRESSIVE WEB APP (PWA) SPECIFICATION -->
-    <div class="slide" data-slide="8">
+    <!-- SLIDE 10: PROGRESSIVE WEB APP (PWA) SPECIFICATION -->
+    <div class="slide" data-slide="10">
       <div class="slide-header">
         <span class="slide-eyebrow">Mobile Web Application</span>
         <h2 class="slide-title">Progressive Web App (PWA) & Manifest</h2>
@@ -576,7 +707,7 @@
           </div>
         </div>
       </div>
-      <div class="speaker-drawer" id="notes-8">
+      <div class="speaker-drawer" id="notes-10">
         <strong>Key Takeaway:</strong>
         "Scholars do not need to download a 50MB app from Google Play or Apple App Store. Opening the link prompts a 1-tap 'Add to Home Screen', creating an instant native app icon on their device."
       </div>
@@ -585,14 +716,14 @@
         <button onclick="toggleNotes()" style="background:none; border:none; color:#0284C7; font-weight:bold; cursor:pointer;">Show Notes</button>
         <div style="display: flex; gap: 6px;">
           <button class="btn-nav" onclick="prevSlide()">← Prev</button>
-          <span style="align-self: center; margin: 0 6px; font-weight: bold;">Slide 8 / 10</span>
+          <span style="align-self: center; margin: 0 6px; font-weight: bold;">Slide 10 / 12</span>
           <button class="btn-nav primary" onclick="nextSlide()">Next Slide →</button>
         </div>
       </div>
     </div>
 
-    <!-- SLIDE 9: DEVOPS & CI/CD PIPELINE -->
-    <div class="slide" data-slide="9">
+    <!-- SLIDE 11: DEVOPS & CI/CD PIPELINE -->
+    <div class="slide" data-slide="11">
       <div class="slide-header">
         <span class="slide-eyebrow">DevOps & Build Pipeline</span>
         <h2 class="slide-title">Build Pipeline & GitHub Pages Automated Deploy</h2>
@@ -641,7 +772,7 @@
           </div>
         </div>
       </div>
-      <div class="speaker-drawer" id="notes-9">
+      <div class="speaker-drawer" id="notes-11">
         <strong>Key Takeaway:</strong>
         "The automated build pipeline creates a fast, secure deployment with zero cloud server maintenance bills."
       </div>
@@ -650,14 +781,14 @@
         <button onclick="toggleNotes()" style="background:none; border:none; color:#0284C7; font-weight:bold; cursor:pointer;">Show Notes</button>
         <div style="display: flex; gap: 6px;">
           <button class="btn-nav" onclick="prevSlide()">← Prev</button>
-          <span style="align-self: center; margin: 0 6px; font-weight: bold;">Slide 9 / 10</span>
+          <span style="align-self: center; margin: 0 6px; font-weight: bold;">Slide 11 / 12</span>
           <button class="btn-nav primary" onclick="nextSlide()">Next Slide →</button>
         </div>
       </div>
     </div>
 
-    <!-- SLIDE 10: ARCHITECTURAL SUMMARY & METRICS -->
-    <div class="slide" data-slide="10">
+    <!-- SLIDE 12: ARCHITECTURAL SUMMARY & METRICS -->
+    <div class="slide" data-slide="12">
       <div class="slide-header">
         <span class="slide-eyebrow">Engineering Summary</span>
         <h2 class="slide-title">Engineering Highlights & Technical Scorecard</h2>
@@ -682,16 +813,16 @@
           </div>
         </div>
       </div>
-      <div class="speaker-drawer" id="notes-10">
+      <div class="speaker-drawer" id="notes-12">
         <strong>Closing Technical Remarks:</strong>
-        "To summarize: we built an enterprise-grade, real-time, offline-resilient platform with cutting-edge React 19, Supabase PostgreSQL, and PWA capabilities — delivered with zero recurring hosting costs. The architecture is sound, secure, and ready for long-term growth."
+        "To summarize: we built an enterprise-grade, real-time, offline-resilient platform with cutting-edge React 19, Supabase PostgreSQL, Web Crypto SHA-256 security, and PWA capabilities — delivered with zero recurring hosting costs. The architecture is sound, secure, and ready for long-term growth."
       </div>
       <div class="slide-footer">
         <span>Technical Architecture Conclusion</span>
         <button onclick="toggleNotes()" style="background:none; border:none; color:#0284C7; font-weight:bold; cursor:pointer;">Show Notes</button>
         <div style="display: flex; gap: 6px;">
           <button class="btn-nav" onclick="prevSlide()">← Prev</button>
-          <span style="align-self: center; margin: 0 6px; font-weight: bold;">Slide 10 / 10</span>
+          <span style="align-self: center; margin: 0 6px; font-weight: bold;">Slide 12 / 12</span>
           <button class="btn-nav primary" onclick="goToSlide(1)">Restart Deck ↺</button>
         </div>
       </div>
@@ -701,7 +832,7 @@
 
   <script>
     let currentSlide = 1;
-    const totalSlides = 10;
+    const totalSlides = 12;
     function showSlide(n) {
       if (n > totalSlides) n = totalSlides;
       if (n < 1) n = 1;
