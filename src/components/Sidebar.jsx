@@ -13,7 +13,8 @@ import {
   Camera,
   HelpCircle,
   Bug,
-  Key
+  Key,
+  Clock
 } from 'lucide-react'
 import logoImg from '../assets/logo.png'
 import Avatar from './Avatar'
@@ -30,7 +31,9 @@ export default function Sidebar({
   onOpenFeedback,
   onOpenChangePassword,
   isMobileOpen,
-  setIsMobileOpen
+  setIsMobileOpen,
+  countdown,
+  onOpenSetEndDateModal
 }) {
   const getRoleBadge = (role) => {
     switch (role) {
@@ -193,6 +196,33 @@ export default function Sidebar({
           )
         })}
       </nav>
+
+      {/* Internship Timeline Countdown in Sidebar */}
+      {countdown && countdown.isValid && (
+        <div className="mx-3 my-2 p-3 rounded-2xl bg-gradient-to-br from-emerald-50 via-teal-50 to-[#F8EDF5] border border-emerald-200/80 shadow-2xs">
+          <div className="flex items-center justify-between text-[10px] font-extrabold uppercase text-[#0A643B] mb-1">
+            <span className="flex items-center">
+              <Clock className="w-3 h-3 mr-1 text-[#7B2E68]" />
+              Days Remaining
+            </span>
+            <span className="text-slate-500 font-bold">{countdown.totalDays}d left</span>
+          </div>
+          <div className="text-xs font-black text-slate-900 leading-snug">
+            {countdown.formatted}
+          </div>
+          <div className="mt-1.5 flex items-center justify-between text-[10px] text-slate-500 font-medium">
+            <span>Target: {countdown.endDateFormatted}</span>
+            {currentUser && (currentUser.role === 'senior_sec' || currentUser.role === 'management' || currentUser.role === 'junior_sec') && onOpenSetEndDateModal && (
+              <button
+                onClick={onOpenSetEndDateModal}
+                className="text-[10px] font-bold text-[#0A643B] hover:underline cursor-pointer"
+              >
+                Change Date
+              </button>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Bottom Footer Section with Permanent Sign Out */}
       <div className="p-3 border-t border-slate-100 bg-slate-50/50 space-y-2">

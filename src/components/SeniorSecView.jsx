@@ -26,7 +26,8 @@ import {
   Send,
   X,
   Archive,
-  ClipboardList
+  ClipboardList,
+  Calendar
 } from 'lucide-react'
 
 import PodiumSpotlight from './PodiumSpotlight'
@@ -53,7 +54,9 @@ export default function SeniorSecView({
   onAssignTask,
   suggestions = [],
   onRectifySuggestion,
-  onAddSuggestion
+  onAddSuggestion,
+  countdown,
+  onOpenSetEndDateModal
 }) {
   const [activeTab, setActiveTab] = useState('assignments') // 'assignments' | 'directives' | 'reports' | 'maintenance' | 'delegation'
   const [selectedBatchFilter, setSelectedBatchFilter] = useState('all') // 'all' | 'Batch 1' | 'Batch 2'
@@ -261,6 +264,16 @@ export default function SeniorSecView({
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
+            {onOpenSetEndDateModal && (
+              <button
+                onClick={onOpenSetEndDateModal}
+                className="px-3.5 py-2.5 rounded-xl bg-white/15 hover:bg-white/25 border border-white/25 text-white font-bold text-xs flex items-center shadow-xs transition-all cursor-pointer"
+                title="Configure the official end date of the internship"
+              >
+                <Calendar className="w-4 h-4 mr-1.5 text-emerald-200" />
+                <span>Configure End Date</span>
+              </button>
+            )}
             <button
               onClick={() => setActiveTab('delegation')}
               className="px-3.5 py-2.5 rounded-xl bg-white/15 hover:bg-white/25 border border-white/25 text-white font-bold text-xs flex items-center shadow-xs transition-all cursor-pointer"

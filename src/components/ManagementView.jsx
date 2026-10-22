@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
-import { Award, TrendingUp, Download, LayoutDashboard, FileSpreadsheet } from 'lucide-react'
+import { Award, TrendingUp, Download, LayoutDashboard, FileSpreadsheet, Calendar } from 'lucide-react'
 import ProgressIntelligenceHub from './ProgressIntelligenceHub'
 
-export default function ManagementView({ allUsers, reports, sessions = [], assignedTasks = [], currentUser }) {
+export default function ManagementView({ allUsers, reports, sessions = [], assignedTasks = [], currentUser, countdown, onOpenSetEndDateModal }) {
   const [activeSubTab, setActiveSubTab] = useState('intelligence') // 'intelligence' | 'governance'
   const interns = allUsers.filter(u => u.role === 'intern')
   const juniorSecs = allUsers.filter(u => u.role === 'junior_sec')
@@ -28,25 +28,37 @@ export default function ManagementView({ allUsers, reports, sessions = [], assig
           </div>
 
           {/* Sub-tab navigation */}
-          <div className="flex bg-white/10 backdrop-blur-md p-1 rounded-2xl border border-white/20 text-xs font-bold">
-            <button
-              onClick={() => setActiveSubTab('intelligence')}
-              className={`px-3.5 py-2 rounded-xl transition-all cursor-pointer flex items-center space-x-1.5 ${
-                activeSubTab === 'intelligence' ? 'bg-white text-purple-950 shadow-md font-black' : 'text-purple-100 hover:text-white'
-              }`}
-            >
-              <FileSpreadsheet className="w-4 h-4 text-[#7B2E68]" />
-              <span>Progress Intelligence & Excel</span>
-            </button>
-            <button
-              onClick={() => setActiveSubTab('governance')}
-              className={`px-3.5 py-2 rounded-xl transition-all cursor-pointer flex items-center space-x-1.5 ${
-                activeSubTab === 'governance' ? 'bg-white text-purple-950 shadow-md font-black' : 'text-purple-100 hover:text-white'
-              }`}
-            >
-              <TrendingUp className="w-4 h-4 text-purple-600" />
-              <span>Governance Hierarchy</span>
-            </button>
+          <div className="flex flex-wrap items-center gap-2">
+            {onOpenSetEndDateModal && (
+              <button
+                onClick={onOpenSetEndDateModal}
+                className="px-3.5 py-2 rounded-2xl bg-white/15 hover:bg-white/25 border border-white/25 text-white font-bold text-xs flex items-center shadow-xs transition-all cursor-pointer"
+                title="Configure the official end date of the internship"
+              >
+                <Calendar className="w-4 h-4 mr-1.5 text-purple-200" />
+                <span>Configure End Date</span>
+              </button>
+            )}
+            <div className="flex bg-white/10 backdrop-blur-md p-1 rounded-2xl border border-white/20 text-xs font-bold">
+              <button
+                onClick={() => setActiveSubTab('intelligence')}
+                className={`px-3.5 py-2 rounded-xl transition-all cursor-pointer flex items-center space-x-1.5 ${
+                  activeSubTab === 'intelligence' ? 'bg-white text-purple-950 shadow-md font-black' : 'text-purple-100 hover:text-white'
+                }`}
+              >
+                <FileSpreadsheet className="w-4 h-4 text-[#7B2E68]" />
+                <span>Progress Intelligence & Excel</span>
+              </button>
+              <button
+                onClick={() => setActiveSubTab('governance')}
+                className={`px-3.5 py-2 rounded-xl transition-all cursor-pointer flex items-center space-x-1.5 ${
+                  activeSubTab === 'governance' ? 'bg-white text-purple-950 shadow-md font-black' : 'text-purple-100 hover:text-white'
+                }`}
+              >
+                <TrendingUp className="w-4 h-4 text-purple-600" />
+                <span>Governance Hierarchy</span>
+              </button>
+            </div>
           </div>
         </div>
 

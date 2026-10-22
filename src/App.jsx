@@ -16,10 +16,12 @@ import EditProfilePhotoModal from './components/EditProfilePhotoModal'
 import AuthModal from './components/AuthModal'
 import ChangePasswordModal from './components/ChangePasswordModal'
 import FeedbackModal from './components/FeedbackModal'
+import SetEndDateModal from './components/SetEndDateModal'
+import InternshipCountdownBanner from './components/InternshipCountdownBanner'
 import ErrorBoundary from './components/ErrorBoundary'
 import { Radio, X, Bell, Bug } from 'lucide-react'
 import QueriesHub from './components/QueriesHub'
-import { parseDateToTimestamp } from './utils/dateUtils'
+import { parseDateToTimestamp, calculateInternshipCountdown } from './utils/dateUtils'
 import { hashCredential } from './utils/security'
 import {
   INITIAL_USERS,
@@ -269,6 +271,18 @@ export default function App() {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false)
   const [selectedInternForModal, setSelectedInternForModal] = useState(null)
+
+  // 16. Internship Target End Date & Countdown State
+  const [internshipEndDate, setInternshipEndDate] = useState(() => {
+    return localStorage.getItem('dakshana_internship_end_date') || '2027-04-30'
+  })
+  const [internshipStartDate, setInternshipStartDate] = useState(() => {
+    return localStorage.getItem('dakshana_internship_start_date') || '2026-06-01'
+  })
+  const [isSetEndDateModalOpen, setIsSetEndDateModalOpen] = useState(false)
+
+  // Reactive countdown calculation: "X months, Y days remaining"
+  const countdown = calculateInternshipCountdown(internshipEndDate, internshipStartDate)
 
   // Cloud Sync from Supabase on App Mount
   useEffect(() => {
@@ -930,6 +944,30 @@ export default function App() {
     playNoticeChime()
   }
 
+  const handleUpdateInternshipEndDate = (newDate, shouldBroadcast = true) => {
+    if (!newDate) return
+    setInternshipEndDate(newDate)
+    localStorage.setItem('dakshana_internship_end_date', newDate)
+
+    const updatedCountdown = calculateInternshipCountdown(newDate, internshipStartDate)
+
+    if (shouldBroadcast && currentUser && (currentUser.role === 'senior_sec' || currentUser.role === 'management' || currentUser.role === 'junior_sec')) {
+      const newBroadcast = {
+        id: `bc-${Date.now()}`,
+        title: 'Official Internship Target End Date Updated',
+        message: `The Secretariat has configured the official internship target completion date to ${updatedCountdown.endDateFullFormatted}. Time remaining: ${updatedCountdown.formatted} (${updatedCountdown.totalDays} total days left). Plan your school visits and session logs accordingly.`,
+        sender: currentUser.name || 'Senior Secretary',
+        senderRole: currentUser.role || 'senior_sec',
+        senderTitle: currentUser.role === 'senior_sec' ? 'Senior Secretary' : currentUser.role === 'management' ? 'Management' : 'Junior Secretary',
+        date: 'Today • Just now',
+        audience: 'all',
+        priority: 'high',
+        isNew: true
+      }
+      handleSendBroadcast(newBroadcast)
+    }
+  }
+
   // Start everything from a dedicated full-screen login page if no active user session
   if (!currentUser) {
     return (
@@ -960,6 +998,8 @@ export default function App() {
         onOpenChangePassword={() => setIsChangePasswordOpen(true)}
         isMobileOpen={isMobileSidebarOpen}
         setIsMobileOpen={setIsMobileSidebarOpen}
+        countdown={countdown}
+        onOpenSetEndDateModal={() => setIsSetEndDateModalOpen(true)}
       />
 
       {/* 2. Main Content Viewport */}
@@ -982,6 +1022,8 @@ export default function App() {
           broadcasts={visibleBroadcasts}
           onSelectNotice={handleSelectNotice}
           onMarkAllNoticesRead={handleMarkAllNoticesRead}
+          countdown={countdown}
+          onOpenSetEndDateModal={() => setIsSetEndDateModalOpen(true)}
         />
 
         {/* Dynamic Page Main Content */}
@@ -990,7 +1032,14 @@ export default function App() {
           
           {/* TAB 1: DASHBOARD */}
           {activeTab === 'dashboard' && currentUser && (
-            <>
+            <div className="space-y-6">
+              {/* Prominent Internship Days Remaining Countdown Banner for Everyone */}
+              <InternshipCountdownBanner
+                countdown={countdown}
+                currentUser={currentUser}
+                onOpenSetEndDateModal={() => setIsSetEndDateModalOpen(true)}
+              />
+
               {currentUser.role === 'senior_sec' && (
                 <SeniorSecView
                   currentUser={currentUser}
@@ -1012,6 +1061,8 @@ export default function App() {
                   suggestions={suggestions}
                   onRectifySuggestion={handleRectifySuggestion}
                   onAddSuggestion={handleAddSuggestion}
+                  countdown={countdown}
+                  onOpenSetEndDateModal={() => setIsSetEndDateModalOpen(true)}
                 />
               )}
 
@@ -1030,6 +1081,8 @@ export default function App() {
                   assignedTasks={assignedTasks}
                   onToggleTaskDone={handleToggleTaskDone}
                   onAddSuggestion={handleAddSuggestion}
+                  countdown={countdown}
+                  onOpenSetEndDateModal={() => setIsSetEndDateModalOpen(true)}
                 />
               )}
 
@@ -1042,6 +1095,7 @@ export default function App() {
                   onSubmitReport={handleSubmitReport}
                   onSelectIntern={(intern) => setSelectedInternForModal(intern)}
                   onAddSuggestion={handleAddSuggestion}
+                  countdown={countdown}
                 />
               )}
 
@@ -1055,9 +1109,11 @@ export default function App() {
                   onToggleTaskDone={handleToggleTaskDone}
                   onAssignTask={handleAssignTask}
                   suggestions={suggestions}
+                  countdown={countdown}
+                  onOpenSetEndDateModal={() => setIsSetEndDateModalOpen(true)}
                 />
               )}
-            </>
+            </div>
           )}
 
           {/* TAB 2: NOTICES & CIRCULARS */}
@@ -1224,6 +1280,15 @@ export default function App() {
         activeTab={activeTab}
         onSubmitFeedback={handleAddSuggestion}
         onNavigateToMaintenance={() => handleSetActiveTab('dashboard')}
+      />
+
+      {/* Configure Internship End Date & Timeline Modal */}
+      <SetEndDateModal
+        isOpen={isSetEndDateModalOpen}
+        onClose={() => setIsSetEndDateModalOpen(false)}
+        currentEndDate={internshipEndDate}
+        onSaveEndDate={handleUpdateInternshipEndDate}
+        canBroadcast={currentUser?.role === 'senior_sec' || currentUser?.role === 'management'}
       />
 
       {/* Floating 1-Click Bug / Feedback Desk Button */}

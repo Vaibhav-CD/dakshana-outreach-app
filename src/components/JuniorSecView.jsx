@@ -43,7 +43,9 @@ export default function JuniorSecView({
   onSelectIntern,
   assignedTasks = [],
   onToggleTaskDone,
-  onAddSuggestion
+  onAddSuggestion,
+  countdown,
+  onOpenSetEndDateModal
 }) {
   const [selectedReport, setSelectedReport] = useState(null)
   const [feedbackText, setFeedbackText] = useState('')
@@ -147,6 +149,20 @@ export default function JuniorSecView({
             </div>
             <h2 className="text-2xl font-bold">Welcome, {currentUser.name}</h2>
             <p className="text-emerald-100 text-sm mt-1">Junior Secretary • Outreach Operations</p>
+            {countdown?.formatted && (
+              <button
+                type="button"
+                onClick={onOpenSetEndDateModal}
+                className="mt-2.5 inline-flex items-center space-x-1.5 px-3 py-1 rounded-lg bg-white/15 hover:bg-white/25 border border-white/20 text-xs text-white transition-all cursor-pointer text-left"
+                title="Click to view or adjust internship timeline"
+              >
+                <Clock className="w-3.5 h-3.5 text-emerald-200" />
+                <span>Internship Countdown: <strong className="text-amber-200 font-bold">{countdown.formatted}</strong></span>
+                {countdown.totalDays !== undefined && (
+                  <span className="text-[11px] text-emerald-200 ml-1">({countdown.totalDays} days left)</span>
+                )}
+              </button>
+            )}
           </div>
           <div className="flex flex-col sm:flex-row items-center gap-3">
             <div className="flex space-x-3 text-center">

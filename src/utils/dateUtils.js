@@ -146,3 +146,133 @@ export function parseDateToTimestamp(dateInput) {
 
   return 0
 }
+
+export function getDaysInMonth(year, monthIndex) {
+  return new Date(year, monthIndex + 1, 0).getDate()
+}
+
+/**
+ * Calculates remaining duration until internship end date.
+ * Formats strictly as: "X months, Y days remaining" (e.g. "6 months, 8 days remaining").
+ * Handles calendar variations and past target dates cleanly.
+ *
+ * @param {string} targetDateStr - Target end date in 'YYYY-MM-DD' format (e.g. '2027-04-30')
+ * @param {string} [startDateStr='2026-06-01'] - Program cycle start date
+ * @returns {object} Countdown breakdown and formatted string
+ */
+export function calculateInternshipCountdown(targetDateStr, startDateStr = '2026-06-01') {
+  if (!targetDateStr) {
+    return {
+      isValid: false,
+      formatted: 'Date not set',
+      formattedShort: 'Not set',
+      totalDays: 0,
+      months: 0,
+      days: 0,
+      isCompleted: false,
+      endDateFormatted: 'Not set',
+      endDateFullFormatted: 'Not set',
+      progressPct: 0
+    }
+  }
+
+  const parts = targetDateStr.split('-').map(Number)
+  const tYear = parts[0]
+  const tMonth = parts[1]
+  const tDay = parts[2]
+  const target = new Date(tYear, tMonth - 1, tDay)
+
+  const now = new Date()
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+
+  const diffTime = target.getTime() - today.getTime()
+  const totalDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+
+  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+  const fullMonthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+  const endDateFormatted = `${tDay} ${monthNames[tMonth - 1]} ${tYear}`
+  const endDateFullFormatted = `${tDay} ${fullMonthNames[tMonth - 1]} ${tYear}`
+
+  if (totalDays <= 0) {
+    return {
+      isValid: true,
+      isCompleted: true,
+      totalDays: 0,
+      months: 0,
+      days: 0,
+      formatted: 'Internship Completed',
+      formattedShort: 'Completed',
+      endDateFormatted,
+      endDateFullFormatted,
+      targetDateStr,
+      progressPct: 100
+    }
+  }
+
+  // Count full calendar months
+  let months = (tYear - today.getFullYear()) * 12 + ((tMonth - 1) - today.getMonth())
+  
+  const targetMonthIndex = today.getMonth() + months
+  const targetYear = today.getFullYear() + Math.floor(targetMonthIndex / 12)
+  const normMonthIndex = ((targetMonthIndex % 12) + 12) % 12
+  const maxDaysInTargetMonth = getDaysInMonth(targetYear, normMonthIndex)
+  const clampedDay = Math.min(today.getDate(), maxDaysInTargetMonth)
+
+  let milestoneDate = new Date(targetYear, normMonthIndex, clampedDay)
+
+  if (milestoneDate > target) {
+    months--
+    const prevMonthIndex = today.getMonth() + months
+    const prevYear = today.getFullYear() + Math.floor(prevMonthIndex / 12)
+    const normPrevMonth = ((prevMonthIndex % 12) + 12) % 12
+    const maxDaysPrev = getDaysInMonth(prevYear, normPrevMonth)
+    const clampedPrevDay = Math.min(today.getDate(), maxDaysPrev)
+    milestoneDate = new Date(prevYear, normPrevMonth, clampedPrevDay)
+  }
+
+  const remainingMs = target.getTime() - milestoneDate.getTime()
+  const days = Math.round(remainingMs / (1000 * 60 * 60 * 24))
+
+  let formatted = ''
+  let formattedShort = ''
+
+  if (months > 0 && days > 0) {
+    const monthText = months === 1 ? 'month' : 'months'
+    const dayText = days === 1 ? 'day' : 'days'
+    formatted = `${months} ${monthText}, ${days} ${dayText} remaining`
+    formattedShort = `${months} mo, ${days} d left`
+  } else if (months > 0 && days === 0) {
+    const monthText = months === 1 ? 'month' : 'months'
+    formatted = `${months} ${monthText} remaining`
+    formattedShort = `${months} mo left`
+  } else {
+    const dayText = days === 1 ? 'day' : 'days'
+    formatted = `${days} ${dayText} remaining`
+    formattedShort = `${days} d left`
+  }
+
+  let progressPct = 0
+  if (startDateStr) {
+    const sParts = startDateStr.split('-').map(Number)
+    const start = new Date(sParts[0], sParts[1] - 1, sParts[2])
+    const totalDuration = target.getTime() - start.getTime()
+    const elapsed = today.getTime() - start.getTime()
+    if (totalDuration > 0) {
+      progressPct = Math.min(100, Math.max(0, Math.round((elapsed / totalDuration) * 100)))
+    }
+  }
+
+  return {
+    isValid: true,
+    isCompleted: false,
+    totalDays,
+    months,
+    days,
+    formatted,
+    formattedShort,
+    endDateFormatted,
+    endDateFullFormatted,
+    targetDateStr,
+    progressPct
+  }
+}

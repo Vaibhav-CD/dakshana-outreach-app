@@ -11,7 +11,8 @@ export default function InternView({
   sessions = [],
   onSubmitReport,
   onSelectIntern,
-  onAddSuggestion
+  onAddSuggestion,
+  countdown
 }) {
   const [tasks, setTasks] = useState('')
   const [challenges, setChallenges] = useState('')
@@ -129,6 +130,12 @@ export default function InternView({
                   {currentUser.batch || 'Batch 1'}
                 </span>
                 <StreamBadge stream={currentUser.stream} size="sm" />
+                {countdown && countdown.isValid && (
+                  <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-white/20 text-white border border-white/30 flex items-center" title={`Target: ${countdown.endDateFullFormatted} (${countdown.totalDays} days left)`}>
+                    <Clock className="w-2.5 h-2.5 mr-1 text-emerald-200 animate-pulse" />
+                    <span>⏳ {countdown.formatted}</span>
+                  </span>
+                )}
               </div>
               <h2 className="text-2xl font-bold mt-1">{currentUser.name}</h2>
               <p className="text-emerald-100 text-xs">Outreach Scholar • Field Operations</p>
