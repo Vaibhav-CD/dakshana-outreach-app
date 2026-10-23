@@ -214,7 +214,10 @@ export default function Sidebar({
             <span>Target: {countdown.endDateFormatted}</span>
             {currentUser && (currentUser.role === 'senior_sec' || currentUser.role === 'management' || currentUser.role === 'junior_sec') && onOpenSetEndDateModal && (
               <button
-                onClick={onOpenSetEndDateModal}
+                onClick={() => {
+                  if (setIsMobileOpen) setIsMobileOpen(false)
+                  if (onOpenSetEndDateModal) onOpenSetEndDateModal()
+                }}
                 className="text-[10px] font-bold text-[#0A643B] hover:underline cursor-pointer"
               >
                 Change Date

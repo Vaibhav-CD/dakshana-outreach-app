@@ -17,7 +17,6 @@ import AuthModal from './components/AuthModal'
 import ChangePasswordModal from './components/ChangePasswordModal'
 import FeedbackModal from './components/FeedbackModal'
 import SetEndDateModal from './components/SetEndDateModal'
-import InternshipCountdownBanner from './components/InternshipCountdownBanner'
 import ErrorBoundary from './components/ErrorBoundary'
 import { Radio, X, Bell, Bug } from 'lucide-react'
 import QueriesHub from './components/QueriesHub'
@@ -1022,8 +1021,6 @@ export default function App() {
           broadcasts={visibleBroadcasts}
           onSelectNotice={handleSelectNotice}
           onMarkAllNoticesRead={handleMarkAllNoticesRead}
-          countdown={countdown}
-          onOpenSetEndDateModal={() => setIsSetEndDateModalOpen(true)}
         />
 
         {/* Dynamic Page Main Content */}
@@ -1033,13 +1030,6 @@ export default function App() {
           {/* TAB 1: DASHBOARD */}
           {activeTab === 'dashboard' && currentUser && (
             <div className="space-y-6">
-              {/* Prominent Internship Days Remaining Countdown Banner for Everyone */}
-              <InternshipCountdownBanner
-                countdown={countdown}
-                currentUser={currentUser}
-                onOpenSetEndDateModal={() => setIsSetEndDateModalOpen(true)}
-              />
-
               {currentUser.role === 'senior_sec' && (
                 <SeniorSecView
                   currentUser={currentUser}
@@ -1081,8 +1071,6 @@ export default function App() {
                   assignedTasks={assignedTasks}
                   onToggleTaskDone={handleToggleTaskDone}
                   onAddSuggestion={handleAddSuggestion}
-                  countdown={countdown}
-                  onOpenSetEndDateModal={() => setIsSetEndDateModalOpen(true)}
                 />
               )}
 
@@ -1095,7 +1083,6 @@ export default function App() {
                   onSubmitReport={handleSubmitReport}
                   onSelectIntern={(intern) => setSelectedInternForModal(intern)}
                   onAddSuggestion={handleAddSuggestion}
-                  countdown={countdown}
                 />
               )}
 

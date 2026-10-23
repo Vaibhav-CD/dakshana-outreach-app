@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Menu, LogOut, LogIn, Bell, CheckCircle2, Camera, Radio, Bug, Key, Clock, Calendar } from 'lucide-react'
+import { Menu, LogOut, LogIn, Bell, CheckCircle2, Camera, Radio, Bug, Key } from 'lucide-react'
 import logoImg from '../assets/logo.png'
 import Avatar from './Avatar'
 import StreamBadge from './StreamBadge'
@@ -17,9 +17,7 @@ export default function Header({
   onMarkAllNoticesRead,
   onOpenPhotoModal,
   onOpenFeedback,
-  onOpenChangePassword,
-  countdown,
-  onOpenSetEndDateModal
+  onOpenChangePassword
 }) {
   const [showNotifMenu, setShowNotifMenu] = useState(false)
 
@@ -87,16 +85,6 @@ export default function Header({
             <div className="lg:hidden flex items-center space-x-2">
               <img src={logoImg} className="w-8 h-8 rounded-full border border-[#0A643B]/30" alt="Logo" />
               <span className="font-extrabold text-[#0A643B] text-sm">Dakshana</span>
-              {countdown && countdown.isValid && (
-                <button
-                  onClick={onOpenSetEndDateModal}
-                  className="inline-flex items-center text-[9px] font-extrabold text-[#7B2E68] bg-[#F8EDF5] border border-[#7B2E68]/30 px-2 py-0.5 rounded-full truncate max-w-[140px]"
-                  title={`End Date: ${countdown.endDateFullFormatted} • Click to configure`}
-                >
-                  <Clock className="w-2.5 h-2.5 mr-1 text-[#7B2E68]" />
-                  <span className="truncate">{countdown.formattedShort}</span>
-                </button>
-              )}
             </div>
 
             {/* Desktop page breadcrumb */}
@@ -109,17 +97,6 @@ export default function Header({
                   <span className="w-1.5 h-1.5 rounded-full bg-[#0A643B] mr-1.5 animate-pulse"></span>
                   Cloud Synced
                 </span>
-                {countdown && countdown.isValid && (
-                  <button
-                    onClick={onOpenSetEndDateModal}
-                    className="inline-flex items-center text-[11px] font-extrabold text-[#7B2E68] bg-[#F8EDF5] hover:bg-[#F1DCEB] border border-[#7B2E68]/30 px-2.5 py-0.5 rounded-full transition-all cursor-pointer shadow-2xs group"
-                    title={`Internship End Date: ${countdown.endDateFullFormatted} (${countdown.totalDays} days left) • Click to configure`}
-                  >
-                    <Clock className="w-3 h-3 text-[#7B2E68] mr-1.5 animate-pulse" />
-                    <span>⏳ {countdown.formatted}</span>
-                    <span className="text-[10px] text-slate-500 group-hover:text-[#7B2E68] ml-1.5 font-bold">({countdown.totalDays}d)</span>
-                  </button>
-                )}
               </div>
               <p className="text-[11px] text-slate-500 font-medium">
                 Dakshana Outreach Internship Program 2026–27
