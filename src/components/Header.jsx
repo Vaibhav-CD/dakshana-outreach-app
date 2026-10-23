@@ -4,6 +4,12 @@ import logoImg from '../assets/logo.png'
 import Avatar from './Avatar'
 import StreamBadge from './StreamBadge'
 import { formatDateWithRelative, parseDateToTimestamp } from '../utils/dateUtils'
+import {
+  getNotificationPermission,
+  requestNotificationPermission,
+  sendPhoneNotification,
+  isNotificationSupported
+} from '../utils/notifications'
 
 export default function Header({
   currentUser,
@@ -20,6 +26,31 @@ export default function Header({
   onOpenChangePassword
 }) {
   const [showNotifMenu, setShowNotifMenu] = useState(false)
+  const [notifPerm, setNotifPerm] = useState(() => getNotificationPermission())
+  const [testSent, setTestSent] = useState(false)
+
+  const handleRequestPermission = async () => {
+    const res = await requestNotificationPermission()
+    setNotifPerm(res)
+    if (res === 'granted') {
+      sendPhoneNotification({
+        title: 'Dakshana Notifications Active',
+        body: 'You will now receive official circular alerts directly on your phone!',
+        noticeId: 'welcome'
+      })
+    }
+  }
+
+  const handleTestNotification = async (e) => {
+    e.stopPropagation()
+    setTestSent(true)
+    await sendPhoneNotification({
+      title: 'Dakshana Circular Alert',
+      body: 'Test Alert: Your phone notifications are working perfectly!',
+      noticeId: 'test'
+    })
+    setTimeout(() => setTestSent(false), 3000)
+  }
 
   // Ensure latest circulars and notices appear at the top
   const safeBroadcasts = Array.isArray(broadcasts) ? broadcasts.filter(Boolean) : []
@@ -151,6 +182,45 @@ export default function Header({
                             </button>
                           )}
                         </div>
+
+                        {/* Native Phone Notification Permission Bar */}
+                        {isNotificationSupported() && (
+                          <div className="px-3.5 py-2.5 bg-gradient-to-r from-emerald-50 via-teal-50 to-[#F8EDF5] border-b border-emerald-100 flex items-center justify-between text-xs">
+                            {notifPerm === 'granted' ? (
+                              <div className="flex items-center justify-between w-full">
+                                <span className="text-[11px] text-[#0A643B] font-bold flex items-center">
+                                  <CheckCircle2 className="w-3.5 h-3.5 mr-1 text-[#0A643B]" />
+                                  Phone Alerts Active
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={handleTestNotification}
+                                  className="text-[10px] font-extrabold text-[#0A643B] bg-white hover:bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md transition-all cursor-pointer shadow-2xs"
+                                >
+                                  {testSent ? '✓ Sent to Phone!' : 'Test Phone Alert'}
+                                </button>
+                              </div>
+                            ) : notifPerm === 'denied' ? (
+                              <span className="text-[10px] text-slate-500 font-medium">
+                                Phone alerts blocked in browser settings
+                              </span>
+                            ) : (
+                              <div className="flex items-center justify-between w-full">
+                                <span className="text-[11px] text-slate-800 font-bold flex items-center">
+                                  <Bell className="w-3.5 h-3.5 mr-1 text-[#0A643B] animate-bounce" />
+                                  Get Phone Alerts for Notices
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={handleRequestPermission}
+                                  className="text-[10px] font-bold text-white bg-[#0A643B] hover:bg-[#074D2D] px-2.5 py-1 rounded-lg transition-all cursor-pointer shadow-2xs whitespace-nowrap"
+                                >
+                                  Turn On
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        )}
 
                         <div className="max-h-80 overflow-y-auto divide-y divide-slate-100">
                           {sortedBroadcasts.length > 0 ? (

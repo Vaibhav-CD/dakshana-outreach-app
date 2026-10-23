@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Megaphone, Send, CheckCircle2, Bell, Radio } from 'lucide-react'
 import { formatDateWithRelative, parseDateToTimestamp } from '../utils/dateUtils'
+import { sendPhoneNotification, requestNotificationPermission } from '../utils/notifications'
 
 export default function BroadcastCenter({ currentUser, broadcasts = [], onSendBroadcast, delegatedPowers = {} }) {
   // Senior Secretary, Management & Delegated Junior Secretaries (with canBroadcast) have broadcast dispatching powers
@@ -12,6 +13,18 @@ export default function BroadcastCenter({ currentUser, broadcasts = [], onSendBr
   const [broadcastMessage, setBroadcastMessage] = useState('')
   const [isSending, setIsSending] = useState(false)
   const [sendSuccess, setSendSuccess] = useState(false)
+  const [testSent, setTestSent] = useState(false)
+
+  const handleTestPhoneAlert = async () => {
+    await requestNotificationPermission()
+    setTestSent(true)
+    await sendPhoneNotification({
+      title: 'Dakshana Circular Alert',
+      body: 'Official Notice Test: Your phone will receive live notifications whenever new circulars are dispatched!',
+      noticeId: 'center-test'
+    })
+    setTimeout(() => setTestSent(false), 3500)
+  }
 
   // Smart audience visibility based on user role and batch
   const safeBroadcasts = Array.isArray(broadcasts) ? broadcasts.filter(Boolean) : []
@@ -105,6 +118,16 @@ export default function BroadcastCenter({ currentUser, broadcasts = [], onSendBr
             Targeted announcements system. Transmit circulars batch-wise (Batch 1 or Batch 2), to Junior Secretaries, or to the entire cohort.
           </p>
         </div>
+
+        <button
+          type="button"
+          onClick={handleTestPhoneAlert}
+          className="px-4 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-[#0A643B] text-xs font-bold transition-all shadow-2xs flex items-center cursor-pointer whitespace-nowrap"
+          title="Send an immediate test notification to verify your phone's notifications"
+        >
+          <Bell className="w-3.5 h-3.5 mr-1.5 text-[#0A643B]" />
+          <span>{testSent ? '✓ Sent to Phone Notification Bar!' : 'Test Phone Alert'}</span>
+        </button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">

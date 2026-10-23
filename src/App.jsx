@@ -22,6 +22,7 @@ import { Radio, X, Bell, Bug } from 'lucide-react'
 import QueriesHub from './components/QueriesHub'
 import { parseDateToTimestamp, calculateInternshipCountdown } from './utils/dateUtils'
 import { hashCredential } from './utils/security'
+import { sendPhoneNotification } from './utils/notifications'
 import {
   INITIAL_USERS,
   INITIAL_REPORTS,
@@ -943,6 +944,14 @@ export default function App() {
     // Notify immediately with high-priority audio & visual alert
     setActiveNoticeToast(newBroadcast)
     playNoticeChime()
+
+    // Dispatch Native System Notification directly into phone / OS notification shade
+    sendPhoneNotification({
+      title: `${newBroadcast.senderTitle || 'Dakshana Secretariat'}: ${newBroadcast.title}`,
+      body: newBroadcast.message,
+      noticeId: newBroadcast.id,
+      url: '/'
+    }).catch(console.error)
   }
 
   const handleUpdateInternshipEndDate = (newDate, shouldBroadcast = true) => {
