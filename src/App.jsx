@@ -182,9 +182,9 @@ export default function App() {
       try { return JSON.parse(saved) } catch (e) { }
     }
     return {
-      'user-jsec-1': { canManageReimbursements: false, canReassignBatches: false, canBroadcast: false, canViewAllReports: false },
-      'user-jsec-2': { canManageReimbursements: false, canReassignBatches: false, canBroadcast: false, canViewAllReports: false },
-      'user-jsec-3': { canManageReimbursements: false, canReassignBatches: false, canBroadcast: false, canViewAllReports: false }
+      'user-jsec-1': { canManageReimbursements: false, canReassignBatches: false, canBroadcast: false, canViewAllReports: false, canChangeEndDate: false },
+      'user-jsec-2': { canManageReimbursements: false, canReassignBatches: false, canBroadcast: false, canViewAllReports: false, canChangeEndDate: false },
+      'user-jsec-3': { canManageReimbursements: false, canReassignBatches: false, canBroadcast: false, canViewAllReports: false, canChangeEndDate: false }
     }
   })
 
@@ -752,7 +752,8 @@ export default function App() {
         canManageReimbursements: false,
         canReassignBatches: false,
         canBroadcast: false,
-        canViewAllReports: false
+        canViewAllReports: false,
+        canChangeEndDate: false
       }
       const updated = {
         ...prev,
@@ -774,7 +775,8 @@ export default function App() {
           canManageReimbursements: grantAll,
           canReassignBatches: grantAll,
           canBroadcast: grantAll,
-          canViewAllReports: grantAll
+          canViewAllReports: grantAll,
+          canChangeEndDate: grantAll
         }
       }
       localStorage.setItem('dakshana_delegated_powers', JSON.stringify(updated))
@@ -945,6 +947,18 @@ export default function App() {
 
   const handleUpdateInternshipEndDate = (newDate, shouldBroadcast = true) => {
     if (!newDate) return
+
+    // Verify authorization: Senior Sec, Management, or specially privileged Junior Sec
+    const isAuthorized = currentUser && (
+      currentUser.role === 'senior_sec' ||
+      currentUser.role === 'management' ||
+      (currentUser.role === 'junior_sec' && Boolean(delegatedPowers?.[currentUser.id]?.canChangeEndDate))
+    )
+    if (!isAuthorized) {
+      alert('Restricted: You do not have the executive privilege to change the internship end date.')
+      return
+    }
+
     setInternshipEndDate(newDate)
     localStorage.setItem('dakshana_internship_end_date', newDate)
 
@@ -999,6 +1013,7 @@ export default function App() {
         setIsMobileOpen={setIsMobileSidebarOpen}
         countdown={countdown}
         onOpenSetEndDateModal={() => setIsSetEndDateModalOpen(true)}
+        delegatedPowers={delegatedPowers}
       />
 
       {/* 2. Main Content Viewport */}
@@ -1071,6 +1086,7 @@ export default function App() {
                   assignedTasks={assignedTasks}
                   onToggleTaskDone={handleToggleTaskDone}
                   onAddSuggestion={handleAddSuggestion}
+                  onOpenSetEndDateModal={() => setIsSetEndDateModalOpen(true)}
                 />
               )}
 
@@ -1275,7 +1291,11 @@ export default function App() {
         onClose={() => setIsSetEndDateModalOpen(false)}
         currentEndDate={internshipEndDate}
         onSaveEndDate={handleUpdateInternshipEndDate}
-        canBroadcast={currentUser?.role === 'senior_sec' || currentUser?.role === 'management'}
+        canBroadcast={
+          currentUser?.role === 'senior_sec' ||
+          currentUser?.role === 'management' ||
+          (currentUser?.role === 'junior_sec' && Boolean(delegatedPowers?.[currentUser?.id]?.canChangeEndDate || delegatedPowers?.[currentUser?.id]?.canBroadcast))
+        }
       />
 
       {/* Floating 1-Click Bug / Feedback Desk Button */}

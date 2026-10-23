@@ -243,6 +243,13 @@ export default function SeniorSecView({
       desc: 'Can view and evaluate monthly reports across all wings (not restricted solely to their assigned wing).',
       icon: Layers,
       color: 'text-amber-800 bg-amber-50 border-amber-200'
+    },
+    {
+      key: 'canChangeEndDate',
+      title: 'Internship Timeline & End Date Configuration',
+      desc: 'Can configure the official target completion date and dispatch timeline circular notices to the cohort.',
+      icon: Calendar,
+      color: 'text-emerald-800 bg-emerald-50 border-emerald-300'
     }
   ]
 

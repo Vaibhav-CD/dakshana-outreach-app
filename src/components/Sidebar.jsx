@@ -33,7 +33,8 @@ export default function Sidebar({
   isMobileOpen,
   setIsMobileOpen,
   countdown,
-  onOpenSetEndDateModal
+  onOpenSetEndDateModal,
+  delegatedPowers = {}
 }) {
   const getRoleBadge = (role) => {
     switch (role) {
@@ -212,7 +213,11 @@ export default function Sidebar({
           </div>
           <div className="mt-1.5 flex items-center justify-between text-[10px] text-slate-500 font-medium">
             <span>Target: {countdown.endDateFormatted}</span>
-            {currentUser && (currentUser.role === 'senior_sec' || currentUser.role === 'management' || currentUser.role === 'junior_sec') && onOpenSetEndDateModal && (
+            {currentUser && (
+              currentUser.role === 'senior_sec' ||
+              currentUser.role === 'management' ||
+              (currentUser.role === 'junior_sec' && Boolean(delegatedPowers?.[currentUser.id]?.canChangeEndDate))
+            ) && onOpenSetEndDateModal && (
               <button
                 onClick={() => {
                   if (setIsMobileOpen) setIsMobileOpen(false)

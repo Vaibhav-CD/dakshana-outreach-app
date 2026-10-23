@@ -21,7 +21,8 @@ import {
   MessageSquarePlus,
   Send,
   Plus,
-  FileSpreadsheet
+  FileSpreadsheet,
+  Calendar
 } from 'lucide-react'
 
 import PodiumSpotlight from './PodiumSpotlight'
@@ -43,7 +44,8 @@ export default function JuniorSecView({
   onSelectIntern,
   assignedTasks = [],
   onToggleTaskDone,
-  onAddSuggestion
+  onAddSuggestion,
+  onOpenSetEndDateModal
 }) {
   const [selectedReport, setSelectedReport] = useState(null)
   const [feedbackText, setFeedbackText] = useState('')
@@ -168,6 +170,17 @@ export default function JuniorSecView({
               <MessageSquarePlus className="w-3.5 h-3.5 mr-1.5 text-[#0A643B]" />
               Suggest Improvement
             </button>
+
+            {myPowers.canChangeEndDate && onOpenSetEndDateModal && (
+              <button
+                onClick={onOpenSetEndDateModal}
+                className="px-3.5 py-2 rounded-xl bg-white/15 hover:bg-white/25 border border-white/25 text-white text-xs font-bold transition-all shadow-xs flex items-center cursor-pointer whitespace-nowrap"
+                title="Privileged Authority: Configure official internship end date"
+              >
+                <Calendar className="w-3.5 h-3.5 mr-1.5 text-emerald-200" />
+                Configure End Date
+              </button>
+            )}
           </div>
         </div>
 
@@ -203,6 +216,12 @@ export default function JuniorSecView({
                 <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-white/20 border border-white/30 text-white font-semibold">
                   <Layers className="w-3.5 h-3.5 mr-1.5 text-amber-200" />
                   Cross-Wing Report Evaluation
+                </span>
+              )}
+              {myPowers.canChangeEndDate && (
+                <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-white/20 border border-white/30 text-white font-semibold">
+                  <Calendar className="w-3.5 h-3.5 mr-1.5 text-emerald-200" />
+                  Timeline & End Date Authority
                 </span>
               )}
             </div>
