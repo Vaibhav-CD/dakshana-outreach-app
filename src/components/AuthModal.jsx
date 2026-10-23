@@ -18,6 +18,7 @@ import {
   Clock
 } from 'lucide-react'
 import logoImg from '../assets/logo.png'
+import classroomBg from '../assets/dakshana-classroom-bg.jpg'
 import Avatar from './Avatar'
 import { verifyUserPassword, verifyLeadershipPasskey, hashCredential, sanitizeInput } from '../utils/security'
 
@@ -37,6 +38,25 @@ export default function AuthModal({
   const [isLeadershipUnlocked, setIsLeadershipUnlocked] = useState(false)
   const [passkey, setPasskey] = useState('')
   const [error, setError] = useState('')
+
+  // Classroom wallpaper background opacity: 0 (off), 0.10 (subtle), 0.16 (default), 0.25 (prominent)
+  const [bgOpacity, setBgOpacity] = useState(() => {
+    try {
+      const saved = localStorage.getItem('dakshana_login_bg_opacity')
+      return saved !== null ? parseFloat(saved) : 0.16
+    } catch {
+      return 0.16
+    }
+  })
+
+  const handleSetBgOpacity = (val) => {
+    setBgOpacity(val)
+    try {
+      localStorage.setItem('dakshana_login_bg_opacity', val.toString())
+    } catch {
+      // ignore
+    }
+  }
 
   // Selected profile for scholar sign-in
   const [selectedScholarId, setSelectedScholarId] = useState('')
@@ -207,6 +227,26 @@ export default function AuthModal({
           : 'fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 select-none'
       }
     >
+      {/* Background classroom image merged with low opacity into dark emerald palette */}
+      {isFullScreen && (
+        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden select-none">
+          <img
+            src={classroomBg}
+            alt="Dakshana Classroom Scholars"
+            aria-hidden="true"
+            style={{ opacity: bgOpacity }}
+            className="w-full h-full object-cover object-center scale-105 transform mix-blend-luminosity filter contrast-125 brightness-95 transition-opacity duration-500"
+          />
+          {/* Subtle multi-layer vignette and gradient overlays to merge seamlessly */}
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-[#063B22]/75 to-[#063B22]/85 mix-blend-multiply" />
+          <div className="absolute inset-0 bg-gradient-to-br from-[#063B22]/70 via-transparent to-[#7B2E68]/30" />
+          <div
+            className="absolute inset-0"
+            style={{ background: 'radial-gradient(circle at center, transparent 35%, rgba(6, 59, 34, 0.4) 75%, rgba(2, 6, 23, 0.75) 100%)' }}
+          />
+        </div>
+      )}
+
       {/* Decorative ambient blurred shapes in full-screen mode */}
       {isFullScreen && (
         <>
@@ -700,9 +740,38 @@ export default function AuthModal({
       </div>
 
       {isFullScreen && (
-        <footer className="mt-6 text-center text-xs text-emerald-100/60 relative z-10 font-medium">
-          Dakshana Foundation • Outreach Fieldwork Internship Portal 2026–27
-        </footer>
+        <div className="mt-6 flex flex-col items-center space-y-2.5 relative z-10">
+          <footer className="text-center text-xs text-emerald-100/70 font-medium">
+            Dakshana Foundation • Outreach Fieldwork Internship Portal 2026–27
+          </footer>
+
+          {/* Interactive live tuner to preview different opacity levels */}
+          <div className="inline-flex items-center space-x-1 p-1 rounded-full bg-slate-900/70 backdrop-blur-md border border-white/15 text-[11px] text-slate-300 shadow-lg">
+            <span className="px-2 text-emerald-300 font-bold flex items-center">
+              <Camera className="w-3 h-3 mr-1" />
+              Classroom Wallpaper:
+            </span>
+            {[
+              { label: 'Off', val: 0 },
+              { label: '10% Subtle', val: 0.10 },
+              { label: '16% (Default)', val: 0.16 },
+              { label: '25% Clear', val: 0.25 }
+            ].map(preset => (
+              <button
+                key={preset.val}
+                type="button"
+                onClick={() => handleSetBgOpacity(preset.val)}
+                className={`px-2.5 py-0.5 rounded-full transition-all cursor-pointer font-semibold ${
+                  bgOpacity === preset.val
+                    ? 'bg-[#0A643B] text-white shadow-xs font-bold'
+                    : 'text-slate-400 hover:text-white hover:bg-white/10'
+                }`}
+              >
+                {preset.label}
+              </button>
+            ))}
+          </div>
+        </div>
       )}
     </div>
   )
