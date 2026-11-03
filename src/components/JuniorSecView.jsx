@@ -30,6 +30,7 @@ import Avatar from './Avatar'
 import StreamBadge from './StreamBadge'
 import ProgressIntelligenceHub from './ProgressIntelligenceHub'
 import { formatDateWithRelative } from '../utils/dateUtils'
+import { sanitizeInput } from '../utils/security'
 
 export default function JuniorSecView({
   currentUser,
@@ -77,8 +78,8 @@ export default function JuniorSecView({
 
     const newSug = {
       id: `sug-${Date.now()}`,
-      title: sugTitle.trim(),
-      description: sugDesc.trim(),
+      title: sanitizeInput(sugTitle.trim()),
+      description: sanitizeInput(sugDesc.trim()),
       submittedBy: `${currentUser.name} (Junior Secretary)`,
       submittedRole: 'junior_sec',
       category: sugCategory,
@@ -123,7 +124,7 @@ export default function JuniorSecView({
 
     onUpdateReport(selectedReport.id, {
       status: newStatus,
-      reviewerFeedback: feedbackText,
+      reviewerFeedback: sanitizeInput(feedbackText),
       reviewedBy: currentUser.name,
       reviewedAt: new Date().toISOString()
     })

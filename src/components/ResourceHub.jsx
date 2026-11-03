@@ -12,6 +12,7 @@ import {
   X,
   Link as LinkIcon
 } from 'lucide-react'
+import { safeUrl, sanitizeInput } from '../utils/security'
 
 const DEFAULT_OFFICIAL_RESOURCES = [
   {
@@ -75,17 +76,32 @@ export default function ResourceHub({ currentUser }) {
     e.preventDefault()
     if (!newTitle.trim() || !newUrl.trim()) return
 
+    const sanitizedTitle = sanitizeInput(newTitle)
+    const sanitizedBadge = sanitizeInput(newBadge) || 'Extra Resource'
+    const sanitizedDescription = sanitizeInput(newDescription) || 'Outreach internship reference link.'
+    const sanitizedNote = sanitizeInput(newNote) || 'Added for outreach fieldwork.'
+
+    let candidateUrl = newUrl.trim()
+    if (!candidateUrl.startsWith('http://') && !candidateUrl.startsWith('https://')) {
+      candidateUrl = `https://${candidateUrl}`
+    }
+    const cleanUrl = safeUrl(candidateUrl, '#')
+    if (cleanUrl === '#') {
+      alert('Invalid or untrusted URL provided.')
+      return
+    }
+
     const newRes = {
       id: `res-extra-${Date.now()}`,
-      title: newTitle.trim(),
-      badge: newBadge.trim() || 'Extra Resource',
+      title: sanitizedTitle,
+      badge: sanitizedBadge,
       badgeColor: 'bg-emerald-50 text-emerald-800 border-emerald-200',
       iconBg: 'bg-emerald-50 text-[#0A643B] border-emerald-200',
       buttonBg: 'bg-[#0A643B] hover:bg-[#074D2D] text-white',
       cardBorder: 'hover:border-[#0A643B]',
-      url: newUrl.trim().startsWith('http') ? newUrl.trim() : `https://${newUrl.trim()}`,
-      description: newDescription.trim() || 'Outreach internship reference link.',
-      usageNote: newNote.trim() || 'Added for outreach fieldwork.',
+      url: cleanUrl,
+      description: sanitizedDescription,
+      usageNote: sanitizedNote,
       isOfficial: false,
       addedAt: new Date().toLocaleDateString()
     }
@@ -283,11 +299,11 @@ export default function ResourceHub({ currentUser }) {
                 {/* URL Pill */}
                 <div className="bg-slate-50 border border-slate-200 rounded-xl p-2.5 mb-4 flex items-center justify-between">
                   <span className="text-xs font-mono text-slate-700 truncate mr-2 select-all">
-                    {item.url}
+                    {safeUrl(item.url, '#')}
                   </span>
                   <button
                     type="button"
-                    onClick={() => handleCopy(item.url, item.id)}
+                    onClick={() => handleCopy(safeUrl(item.url, '#'), item.id)}
                     className="p-1.5 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-200/60 transition-colors cursor-pointer flex items-center text-[11px] font-medium flex-shrink-0"
                     title="Copy URL to clipboard"
                   >
@@ -313,7 +329,7 @@ export default function ResourceHub({ currentUser }) {
 
               {/* Direct Open Button */}
               <a
-                href={item.url}
+                href={safeUrl(item.url, '#')}
                 target="_blank"
                 rel="noopener noreferrer"
                 className={`w-full py-3 px-4 rounded-xl font-bold text-xs flex items-center justify-center transition-all shadow-xs hover:shadow-md cursor-pointer ${item.buttonBg}`}

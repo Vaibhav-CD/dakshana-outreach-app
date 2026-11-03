@@ -8,6 +8,7 @@ import {
   Check
 } from 'lucide-react'
 import Avatar, { DefaultSilhouette } from './Avatar'
+import { compressImage } from '../utils/security'
 
 export default function EditProfilePhotoModal({
   isOpen,
@@ -22,15 +23,17 @@ export default function EditProfilePhotoModal({
 
   const [previewPhoto, setPreviewPhoto] = useState(initialPhoto)
   const [isSaving, setIsSaving] = useState(false)
+  const [uploadError, setUploadError] = useState('')
 
-  const handleFileUpload = (e) => {
+  const handleFileUpload = async (e) => {
     const file = e.target.files?.[0]
-    if (file) {
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setPreviewPhoto(reader.result)
-      }
-      reader.readAsDataURL(file)
+    if (!file) return
+    setUploadError('')
+    try {
+      const compressed = await compressImage(file, 400, 400, 0.8)
+      setPreviewPhoto(compressed)
+    } catch (err) {
+      setUploadError(err.message || 'Failed to process image. Please upload a valid JPG or PNG file.')
     }
   }
 
@@ -93,6 +96,11 @@ export default function EditProfilePhotoModal({
           <span className="text-[11px] text-slate-500 font-medium mt-0.5">
             {previewPhoto ? 'Custom photo active' : 'Default silhouette avatar active'}
           </span>
+          {uploadError && (
+            <div className="mt-2.5 p-2 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold">
+              {uploadError}
+            </div>
+          )}
         </div>
 
         {/* Options */}

@@ -3,6 +3,7 @@ import { FileText, Clock, AlertCircle, CheckCircle, Send, MessageSquare, Calenda
 import PodiumSpotlight from './PodiumSpotlight'
 import Avatar from './Avatar'
 import StreamBadge from './StreamBadge'
+import { sanitizeInput } from '../utils/security'
 
 export default function InternView({
   currentUser,
@@ -33,8 +34,8 @@ export default function InternView({
 
     const newSug = {
       id: `sug-${Date.now()}`,
-      title: sugTitle.trim(),
-      description: sugDesc.trim(),
+      title: sanitizeInput(sugTitle.trim()),
+      description: sanitizeInput(sugDesc.trim()),
       submittedBy: `${currentUser.name} (Outreach Scholar, ${currentUser.batch || 'Batch 1'})`,
       submittedRole: 'intern',
       category: sugCategory,
@@ -74,10 +75,10 @@ export default function InternView({
       batch: currentUser.batch || 'Batch 1',
       juniorSecId: currentUser.assignedTo || 'user-jsec-1',
       monthYear: month,
-      tasksCompleted: tasks,
+      tasksCompleted: sanitizeInput(tasks),
       hoursContributed: 0,
-      challengesFaced: challenges,
-      nextMonthGoals: nextGoals,
+      challengesFaced: sanitizeInput(challenges),
+      nextMonthGoals: sanitizeInput(nextGoals),
       status: 'submitted',
       reviewerFeedback: '',
       reviewedBy: null,

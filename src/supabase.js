@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
+import { sanitizeInput } from './utils/security'
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://zbtvjqxmwrucnetzrywx.supabase.co'
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpidHZqcXhtd3J1Y25ldHpyeXd4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE5MDMwNjQsImV4cCI6MjEwNzQ3OTA2NH0.ewBkHNm5hHb72m3ls7FCi2NJrIzIa7I3D90ouapIDAI'
@@ -57,7 +58,9 @@ export async function dbFetchProfiles() {
       phone: d.phone,
       photo: d.photo_url || null,
       assignedTo: d.assigned_to,
-      bio: d.bio
+      bio: d.bio,
+      passwordHash: d.password_hash || null,
+      targetVisits: d.target_visits || 15
     }))
   } catch (err) {
     console.warn('Network error fetching profiles from Supabase:', err)
@@ -69,17 +72,19 @@ export async function dbCreateProfile(user) {
   if (!supabase) return { data: null, error: new Error('Supabase client not initialized') }
   try {
     const payload = {
-      full_name: user.name,
+      full_name: sanitizeInput(user.name),
       email: user.email.toLowerCase().trim(),
       // Strict Security: All user self-registrations are strictly Outreach Scholars (intern role).
       // Secretariat, Trustee and Junior Secretary accounts cannot be created via public registration.
       role: 'intern',
       batch: user.batch || 'Batch 1',
       department: user.department || 'General Outreach',
-      phone: user.phone || null,
+      phone: user.phone ? sanitizeInput(user.phone) : null,
       photo_url: user.photo || null,
-      bio: user.bio || null,
-      assigned_to: toValidUuid(user.assignedTo)
+      bio: user.bio ? sanitizeInput(user.bio) : null,
+      assigned_to: toValidUuid(user.assignedTo),
+      password_hash: user.passwordHash || null,
+      target_visits: user.targetVisits || 15
     }
 
     // Only assign id if it is already a valid UUID
@@ -102,15 +107,21 @@ export async function dbCreateProfile(user) {
 }
 
 export async function dbUpdateProfile(id, updates) {
-  if (!supabase) return null
+  if (!supabase || !id) return null
   try {
     const targetId = toValidUuid(id) || id
     const payload = {}
-    if (updates.name) payload.full_name = updates.name
+    if (updates.name) payload.full_name = sanitizeInput(updates.name)
     if (updates.batch) payload.batch = updates.batch
     if (updates.assignedTo !== undefined) payload.assigned_to = toValidUuid(updates.assignedTo)
     if (updates.photo_url !== undefined) payload.photo_url = updates.photo_url
     if (updates.photo !== undefined) payload.photo_url = updates.photo
+    if (updates.password_hash !== undefined) payload.password_hash = updates.password_hash
+    if (updates.passwordHash !== undefined) payload.password_hash = updates.passwordHash
+    if (updates.target_visits !== undefined) payload.target_visits = updates.target_visits
+    if (updates.targetVisits !== undefined) payload.target_visits = updates.targetVisits
+
+    if (Object.keys(payload).length === 0) return { data: null, error: null }
     const { data, error } = await supabase.from('profiles').update(payload).eq('id', targetId)
     return { data, error }
   } catch (err) {
@@ -153,17 +164,17 @@ export async function dbCreateReport(report) {
     const internUuid = toValidUuid(report.internId) || report.internId
     const { data, error } = await supabase.from('monthly_reports').insert([{
       intern_id: internUuid,
-      intern_name: report.internName,
+      intern_name: sanitizeInput(report.internName),
       batch: report.batch || 'Batch 1',
       junior_sec_id: toValidUuid(report.juniorSecId),
       month_year: report.monthYear,
-      tasks_completed: report.tasksCompleted,
-      hours_contributed: report.hoursContributed,
-      challenges_faced: report.challengesFaced || '',
-      next_month_goals: report.nextMonthGoals || '',
+      tasks_completed: sanitizeInput(report.tasksCompleted),
+      hours_contributed: Math.max(0, parseInt(report.hoursContributed, 10) || 0),
+      challenges_faced: sanitizeInput(report.challengesFaced || ''),
+      next_month_goals: sanitizeInput(report.nextMonthGoals || ''),
       status: report.status || 'submitted',
-      reviewer_feedback: report.reviewerFeedback || '',
-      reviewed_by: report.reviewedBy || null
+      reviewer_feedback: sanitizeInput(report.reviewerFeedback || ''),
+      reviewed_by: sanitizeInput(report.reviewedBy || '') || null
     }]).select().single()
     return { data, error }
   } catch (err) {
@@ -173,13 +184,15 @@ export async function dbCreateReport(report) {
 }
 
 export async function dbUpdateReport(id, updates) {
-  if (!supabase) return null
+  if (!supabase || !id) return null
   try {
     const payload = {}
     if (updates.status) payload.status = updates.status
-    if (updates.reviewerFeedback !== undefined) payload.reviewer_feedback = updates.reviewerFeedback
-    if (updates.reviewedBy !== undefined) payload.reviewed_by = updates.reviewedBy
+    if (updates.reviewerFeedback !== undefined) payload.reviewer_feedback = sanitizeInput(updates.reviewerFeedback)
+    if (updates.reviewedBy !== undefined) payload.reviewed_by = sanitizeInput(updates.reviewedBy)
     if (updates.reviewedAt) payload.reviewed_at = updates.reviewedAt
+
+    if (Object.keys(payload).length === 0) return { data: null, error: null }
     const { data, error } = await supabase.from('monthly_reports').update(payload).eq('id', id)
     return { data, error }
   } catch (err) {
@@ -219,12 +232,12 @@ export async function dbCreateClaim(claim) {
     const internUuid = toValidUuid(claim.internId) || claim.internId
     const { data, error } = await supabase.from('reimbursement_claims').insert([{
       intern_id: internUuid,
-      intern_name: claim.internName,
+      intern_name: sanitizeInput(claim.internName),
       batch: claim.batch || 'Batch 1',
       month_year: claim.monthYear,
-      amount: claim.amount,
-      upi_or_bank: claim.upiOrBank,
-      purpose: claim.purpose,
+      amount: Math.max(0, parseFloat(claim.amount) || 0),
+      upi_or_bank: sanitizeInput(claim.upiOrBank),
+      purpose: sanitizeInput(claim.purpose),
       status: claim.status || 'pending'
     }]).select().single()
     return { data, error }
@@ -235,12 +248,14 @@ export async function dbCreateClaim(claim) {
 }
 
 export async function dbUpdateClaim(id, updates) {
-  if (!supabase) return null
+  if (!supabase || !id) return null
   try {
     const payload = {}
     if (updates.status) payload.status = updates.status
-    if (updates.approvedBy !== undefined) payload.approved_by = updates.approvedBy
+    if (updates.approvedBy !== undefined) payload.approved_by = sanitizeInput(updates.approvedBy)
     if (updates.paidAt !== undefined) payload.paid_at = updates.paidAt
+
+    if (Object.keys(payload).length === 0) return { data: null, error: null }
     const { data, error } = await supabase.from('reimbursement_claims').update(payload).eq('id', id)
     return { data, error }
   } catch (err) {
@@ -274,10 +289,10 @@ export async function dbCreateBroadcast(b) {
   if (!supabase) return null
   try {
     const { data, error } = await supabase.from('broadcast_messages').insert([{
-      sender: b.sender,
-      title: b.title,
-      message: b.message,
-      audience: b.audience
+      sender: sanitizeInput(b.sender),
+      title: sanitizeInput(b.title),
+      message: sanitizeInput(b.message),
+      audience: b.audience || 'all'
     }]).select().single()
     return { data, error }
   } catch (err) {
@@ -331,18 +346,18 @@ export async function dbCreatePost(post) {
     const payload = {
       id: post.id || undefined,
       author_id: String(post.authorId),
-      author_name: post.authorName,
+      author_name: sanitizeInput(post.authorName),
       author_photo: post.authorPhoto || null,
       batch: post.batch || 'Batch 1',
-      wing: post.wing || 'Outreach Wing',
-      title: post.title || 'Outreach Milestone Update',
-      content: post.content || '',
+      wing: sanitizeInput(post.wing || 'Outreach Wing'),
+      title: sanitizeInput(post.title || 'Outreach Milestone Update'),
+      content: sanitizeInput(post.content || ''),
       photo_url: post.photoUrl || null,
-      school_name: post.schoolName || null,
+      school_name: post.schoolName ? sanitizeInput(post.schoolName) : null,
       is_completed: Boolean(post.isCompleted),
-      visits_logged: post.visitsLogged || (post.isCompleted ? 1 : 0),
-      students_reached: post.studentsReached || 0,
-      cheers_count: post.cheersCount || 1,
+      visits_logged: Math.max(0, parseInt(post.visitsLogged, 10) || (post.isCompleted ? 1 : 0)),
+      students_reached: Math.max(0, parseInt(post.studentsReached, 10) || 0),
+      cheers_count: Math.max(0, parseInt(post.cheersCount, 10) || 1),
       comments: Array.isArray(post.comments) ? post.comments : []
     }
     const { data, error } = await supabase.from('posts').insert([payload]).select().single()
@@ -358,7 +373,7 @@ export async function dbCreatePost(post) {
 }
 
 export async function dbAddCommentToPost(postId, comment) {
-  if (!supabase) return null
+  if (!supabase || !postId) return null
   try {
     const { data: post, error: fetchErr } = await supabase
       .from('posts')
@@ -368,7 +383,12 @@ export async function dbAddCommentToPost(postId, comment) {
     if (fetchErr || !post) return null
 
     const existingComments = Array.isArray(post.comments) ? post.comments : []
-    const updatedComments = [...existingComments, comment]
+    const cleanComment = {
+      ...comment,
+      authorName: sanitizeInput(comment.authorName || 'Scholar'),
+      text: sanitizeInput(comment.text || '')
+    }
+    const updatedComments = [...existingComments, cleanComment]
 
     const { data, error } = await supabase
       .from('posts')

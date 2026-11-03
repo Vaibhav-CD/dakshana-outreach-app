@@ -18,6 +18,7 @@ import {
   Calendar
 } from 'lucide-react'
 import Avatar from './Avatar'
+import { compressImage, sanitizeInput } from '../utils/security'
 import StreamBadge from './StreamBadge'
 import { formatDateWithRelative, parseDateToTimestamp } from '../utils/dateUtils'
 
@@ -53,15 +54,16 @@ export default function PostsFeed({
     { label: 'Reading Circle', url: 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=800&auto=format&fit=crop&q=80' }
   ]
 
-  const handleFileUpload = (e) => {
+  const handleFileUpload = async (e) => {
     const file = e.target.files?.[0]
     if (file) {
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setLocalImagePreview(reader.result)
-        setPhotoUrl(reader.result)
+      try {
+        const compressed = await compressImage(file, 800, 800, 0.75)
+        setLocalImagePreview(compressed)
+        setPhotoUrl(compressed)
+      } catch (err) {
+        alert(err.message || 'Please upload a valid JPG or PNG image.')
       }
-      reader.readAsDataURL(file)
     }
   }
 
@@ -78,10 +80,10 @@ export default function PostsFeed({
       stream: currentUser.stream || 'JEE',
       wing: currentUser.department || 'Outreach Wing',
       createdAt: new Date().toISOString(),
-      title: title.trim() || 'Outreach Milestone Update',
-      content: content.trim(),
+      title: sanitizeInput(title) || 'Outreach Milestone Update',
+      content: sanitizeInput(content),
       photoUrl: photoUrl || localImagePreview || selectedPresetPhoto || null,
-      schoolName: isCompleted ? schoolName.trim() : null,
+      schoolName: isCompleted ? sanitizeInput(schoolName) : null,
       isCompleted: Boolean(isCompleted),
       visitsLogged: isCompleted ? 1 : 0,
       studentsReached: 0,
@@ -117,7 +119,7 @@ export default function PostsFeed({
       id: `c-${Date.now()}`,
       authorName: currentUser.name,
       role: currentUser.role,
-      text: newCommentText.trim(),
+      text: sanitizeInput(newCommentText),
       time: 'Just now'
     }
 

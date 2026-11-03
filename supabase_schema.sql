@@ -40,8 +40,14 @@ CREATE TABLE IF NOT EXISTS public.profiles (
     bio TEXT,
     department TEXT,
     assigned_to UUID,
+    password_hash TEXT,
+    target_visits INTEGER DEFAULT 15,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
+
+-- Migrations for existing setups
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS password_hash TEXT;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS target_visits INTEGER DEFAULT 15;
 
 -- 3. Monthly Progress Reports Table
 CREATE TABLE IF NOT EXISTS public.monthly_reports (

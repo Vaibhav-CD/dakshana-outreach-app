@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Megaphone, Send, CheckCircle2, Bell, Radio } from 'lucide-react'
 import { formatDateWithRelative, parseDateToTimestamp } from '../utils/dateUtils'
 import { sendPhoneNotification, requestNotificationPermission } from '../utils/notifications'
+import { sanitizeInput } from '../utils/security'
 
 export default function BroadcastCenter({ currentUser, broadcasts = [], onSendBroadcast, delegatedPowers = {} }) {
   // Senior Secretary, Management & Delegated Junior Secretaries (with canBroadcast) have broadcast dispatching powers
@@ -69,8 +70,8 @@ export default function BroadcastCenter({ currentUser, broadcasts = [], onSendBr
       sender: currentUser.name,
       senderRole: currentUser.role,
       senderTitle: currentUser.role === 'junior_sec' ? 'Junior Secretary' : currentUser.role === 'senior_sec' ? 'Senior Secretary' : 'Management',
-      title: broadcastTitle,
-      message: broadcastMessage,
+      title: sanitizeInput(broadcastTitle),
+      message: sanitizeInput(broadcastMessage),
       audience: targetAudience,
       date: nowIso,
       createdAt: nowIso,

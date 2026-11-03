@@ -18,6 +18,7 @@ import {
 } from 'lucide-react'
 import Avatar from './Avatar'
 import { formatDateWithRelative } from '../utils/dateUtils'
+import { sanitizeInput } from '../utils/security'
 
 export default function QueriesHub({
   currentUser,
@@ -61,8 +62,8 @@ export default function QueriesHub({
       authorRole: currentUser.role,
       batch: currentUser.batch || 'Batch 1',
       category: category,
-      title: title.trim(),
-      content: content.trim(),
+      title: sanitizeInput(title),
+      content: sanitizeInput(content),
       status: 'open',
       createdAt: 'Just now',
       upvotes: 1,
@@ -89,7 +90,7 @@ export default function QueriesHub({
       id: `ans-${Date.now()}`,
       authorName: currentUser.name,
       authorRole: currentUser.role,
-      text: replyText.trim(),
+      text: sanitizeInput(replyText),
       isOfficial: isLeadership,
       createdAt: 'Just now'
     }

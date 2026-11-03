@@ -20,6 +20,7 @@ import {
   ChevronRight,
   Lock
 } from 'lucide-react'
+import { safeUrl, sanitizeInput } from '../utils/security'
 
 export default function ReimbursementModule({
   currentUser,
@@ -64,10 +65,10 @@ export default function ReimbursementModule({
     e.preventDefault()
     if (onUpdateCycleSettings) {
       onUpdateCycleSettings({
-        formUrl: editFormUrl,
-        deadline: editDeadline,
-        monthYear: editMonthYear,
-        messageText: editMessageText
+        formUrl: safeUrl(editFormUrl, 'https://bit.ly/Reimbursement_OutreachInternship'),
+        deadline: sanitizeInput(editDeadline),
+        monthYear: sanitizeInput(editMonthYear),
+        messageText: sanitizeInput(editMessageText)
       })
     }
     setIsEditingNotice(false)
@@ -83,7 +84,11 @@ export default function ReimbursementModule({
 
   const handleSubmitClaim = (e) => {
     e.preventDefault()
-    if (!claimAmount || !upiDetails) return
+    const parsedAmount = Math.max(0, parseFloat(claimAmount) || 0)
+    if (!parsedAmount || !upiDetails.trim()) {
+      alert('Please provide a valid claim amount and UPI / Bank details.')
+      return
+    }
 
     setIsSubmitting(true)
     const newClaim = {
@@ -91,9 +96,9 @@ export default function ReimbursementModule({
       internId: currentUser.id,
       internName: currentUser.name,
       monthYear: cycle.monthYear,
-      amount: parseFloat(claimAmount),
-      upiOrBank: upiDetails,
-      purpose: purpose,
+      amount: parsedAmount,
+      upiOrBank: sanitizeInput(upiDetails),
+      purpose: sanitizeInput(purpose),
       status: 'pending',
       approvedBy: null,
       paidAt: null
@@ -290,7 +295,7 @@ export default function ReimbursementModule({
                 </div>
 
                 <a
-                  href={formUrl}
+                  href={safeUrl(formUrl)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="px-6 py-3 rounded-xl bg-[#0A643B] hover:bg-[#074D2D] text-white font-bold text-sm shadow-md hover:shadow-lg transition-all flex items-center whitespace-nowrap cursor-pointer flex-shrink-0"

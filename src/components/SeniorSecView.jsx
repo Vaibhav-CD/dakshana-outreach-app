@@ -34,6 +34,7 @@ import PodiumSpotlight from './PodiumSpotlight'
 import Avatar from './Avatar'
 import ProgressIntelligenceHub from './ProgressIntelligenceHub'
 import { formatDateWithRelative } from '../utils/dateUtils'
+import { sanitizeInput } from '../utils/security'
 
 export default function SeniorSecView({
   currentUser,
@@ -112,13 +113,13 @@ export default function SeniorSecView({
 
     onAddIntern({
       id: `user-intern-${Date.now()}`,
-      name: newInternName,
-      email: newInternEmail,
+      name: sanitizeInput(newInternName.trim()),
+      email: sanitizeInput(newInternEmail.trim()).toLowerCase(),
       role: 'intern',
       batch: newInternBatch,
       stream: newInternStream,
       assignedTo: newInternSec,
-      targetVisits: parseInt(newInternTargetVisits, 10) || 15,
+      targetVisits: Math.max(1, parseInt(newInternTargetVisits, 10) || 15),
       department: 'Outreach Fieldwork',
       photo: null,
       title: 'Outreach Scholar',
@@ -156,8 +157,8 @@ export default function SeniorSecView({
     const targetJsec = juniorSecs.find(j => j.id === newTaskJsecId) || juniorSecs[0]
     const newTask = {
       id: `task-jsec-${Date.now()}`,
-      title: newTaskTitle.trim(),
-      description: newTaskDesc.trim() || 'Directive assigned for immediate execution.',
+      title: sanitizeInput(newTaskTitle.trim()),
+      description: sanitizeInput(newTaskDesc.trim()) || 'Directive assigned for immediate execution.',
       assignedToId: targetJsec ? targetJsec.id : 'user-jsec-1',
       assignedToName: targetJsec ? targetJsec.name : 'Junior Secretary',
       assignedToRole: 'junior_sec',
@@ -181,7 +182,7 @@ export default function SeniorSecView({
     if (!rectifyingIssue) return
 
     if (onRectifySuggestion) {
-      onRectifySuggestion(rectifyingIssue.id, rectificationNote.trim() || 'Issue rectified and updated in system.')
+      onRectifySuggestion(rectifyingIssue.id, sanitizeInput(rectificationNote.trim()) || 'Issue rectified and updated in system.')
     }
     setActionSuccessNotice(`Issue "${rectifyingIssue.title}" has been rectified and moved to archive!`)
     setRectifyingIssue(null)
@@ -195,8 +196,8 @@ export default function SeniorSecView({
 
     const newSug = {
       id: `sug-${Date.now()}`,
-      title: newSugTitle.trim(),
-      description: newSugDesc.trim(),
+      title: sanitizeInput(newSugTitle.trim()),
+      description: sanitizeInput(newSugDesc.trim()),
       submittedBy: currentUser?.name ? `${currentUser.name} (Senior Secretary)` : 'Senior Secretary',
       submittedRole: 'senior_sec',
       category: newSugCategory,

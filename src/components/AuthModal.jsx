@@ -20,7 +20,7 @@ import {
 import logoImg from '../assets/logo.png'
 import classroomBg from '../assets/dakshana-classroom-bg.jpg'
 import Avatar from './Avatar'
-import { verifyUserPassword, verifyLeadershipPasskey, hashCredential, sanitizeInput } from '../utils/security'
+import { verifyUserPassword, verifyLeadershipPasskey, hashCredential, sanitizeInput, compressImage } from '../utils/security'
 
 export default function AuthModal({
   isOpen,
@@ -480,13 +480,17 @@ export default function AuthModal({
                       <span>Upload</span>
                       <input
                         type="file"
-                        accept="image/*"
-                        onChange={(e) => {
+                        accept="image/jpeg,image/png,image/webp"
+                        onChange={async (e) => {
                           const file = e.target.files?.[0]
                           if (file) {
-                            const reader = new FileReader()
-                            reader.onloadend = () => setSignUpPhoto(reader.result)
-                            reader.readAsDataURL(file)
+                            try {
+                              const compressed = await compressImage(file, 400, 400, 0.8)
+                              setSignUpPhoto(compressed)
+                              setError('')
+                            } catch (err) {
+                              setError(err.message || 'Invalid image file.')
+                            }
                           }
                         }}
                         className="hidden"

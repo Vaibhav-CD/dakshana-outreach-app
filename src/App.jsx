@@ -298,7 +298,14 @@ export default function App() {
 
         if (cloudProfiles && cloudProfiles.length > 0) {
           setAllUsers(prev => {
-            const combined = [...cloudProfiles]
+            const combined = cloudProfiles.map(cp => {
+              const existing = prev.find(u => u.id === cp.id || u.email.toLowerCase() === cp.email.toLowerCase())
+              return {
+                ...existing,
+                ...cp,
+                passwordHash: cp.passwordHash || existing?.passwordHash || null
+              }
+            })
             INITIAL_USERS.slice(0, 5).forEach(lead => {
               if (!combined.some(u => u.email === lead.email)) combined.unshift(lead)
             })
@@ -308,9 +315,13 @@ export default function App() {
 
           setCurrentUser(prevUser => {
             if (!prevUser) return prevUser
-            const matching = cloudProfiles.find(p => p.id === prevUser.id || p.email === prevUser.email)
+            const matching = cloudProfiles.find(p => p.id === prevUser.id || p.email.toLowerCase() === prevUser.email.toLowerCase())
             if (matching) {
-              const updated = { ...prevUser, ...matching }
+              const updated = {
+                ...prevUser,
+                ...matching,
+                passwordHash: matching.passwordHash || prevUser.passwordHash || null
+              }
               const sessionStr = localStorage.getItem('dakshana_session')
               if (sessionStr) {
                 try {
@@ -372,14 +383,16 @@ export default function App() {
 
   const handleUserLogin = (selectedUser) => {
     const now = Date.now()
+    // Sanitize user object: strictly purge any legacy plaintext password before storing
+    const { password: _p, ...cleanUser } = selectedUser
     const sessionData = {
-      user: selectedUser,
+      user: cleanUser,
       loggedInAt: now,
       expiresAt: now + TWO_WEEKS_MS
     }
-    setCurrentUser(selectedUser)
+    setCurrentUser(cleanUser)
     localStorage.setItem('dakshana_session', JSON.stringify(sessionData))
-    localStorage.setItem('dakshana_current_user', JSON.stringify(selectedUser))
+    localStorage.setItem('dakshana_current_user', JSON.stringify(cleanUser))
     setIsAuthModalOpen(false)
   }
 
@@ -519,6 +532,17 @@ export default function App() {
   }
 
   const handleReassignIntern = (internId, newJuniorSecId) => {
+    // Role check: Senior Sec, Management, or Junior Sec with delegated canReassignBatches
+    const canReassign = currentUser && (
+      currentUser.role === 'senior_sec' ||
+      currentUser.role === 'management' ||
+      (currentUser.role === 'junior_sec' && Boolean(delegatedPowers?.[currentUser.id]?.canReassignBatches))
+    )
+    if (!canReassign) {
+      alert('Access Denied: You do not have authorization to reassign scholars across wings.')
+      return
+    }
+
     setAllUsers(prev => {
       const updated = prev.map(user => {
         if (user.id === internId) {
@@ -545,6 +569,17 @@ export default function App() {
   }
 
   const handleUpdateInternBatch = (internId, newBatch) => {
+    // Role check: Senior Sec, Management, or Junior Sec with delegated canReassignBatches
+    const canUpdateBatch = currentUser && (
+      currentUser.role === 'senior_sec' ||
+      currentUser.role === 'management' ||
+      (currentUser.role === 'junior_sec' && Boolean(delegatedPowers?.[currentUser.id]?.canReassignBatches))
+    )
+    if (!canUpdateBatch) {
+      alert('Access Denied: You do not have authorization to modify scholar cohort batches.')
+      return
+    }
+
     setAllUsers(prev => {
       const updated = prev.map(user => {
         if (user.id === internId) {
@@ -582,6 +617,18 @@ export default function App() {
   }
 
   const handleUpdateInternStream = (internId, newStream) => {
+    // Role check: Senior Sec, Management, delegated Junior Sec, or self
+    const canUpdateStream = currentUser && (
+      currentUser.role === 'senior_sec' ||
+      currentUser.role === 'management' ||
+      (currentUser.role === 'junior_sec' && Boolean(delegatedPowers?.[currentUser.id]?.canReassignBatches)) ||
+      currentUser.id === internId
+    )
+    if (!canUpdateStream) {
+      alert('Access Denied: You do not have authorization to modify stream allocations.')
+      return
+    }
+
     setAllUsers(prev => {
       const updated = prev.map(user => {
         if (user.id === internId) {
@@ -613,6 +660,17 @@ export default function App() {
   }
 
   const handleUpdateInternTargetVisits = (internId, newTarget) => {
+    // Role check: Only supervisors and leadership can modify visit milestones
+    const canUpdateTarget = currentUser && (
+      currentUser.role === 'senior_sec' ||
+      currentUser.role === 'management' ||
+      currentUser.role === 'junior_sec'
+    )
+    if (!canUpdateTarget) {
+      alert('Access Denied: Only supervisors and leadership can modify visit targets.')
+      return
+    }
+
     const parsedTarget = Math.max(1, parseInt(newTarget, 10) || 15)
 
     setAllUsers(prev => {
@@ -682,6 +740,17 @@ export default function App() {
   }
 
   const handleUpdateReport = (reportId, updates) => {
+    // Role check: Only supervisors and leadership can review reports
+    const canReview = currentUser && (
+      currentUser.role === 'senior_sec' ||
+      currentUser.role === 'management' ||
+      currentUser.role === 'junior_sec'
+    )
+    if (!canReview) {
+      alert('Access Denied: Scholars cannot self-review or modify monthly reports once submitted.')
+      return
+    }
+
     setReports(prev => {
       const updated = prev.map(rep => {
         if (rep.id === reportId) {
@@ -696,6 +765,16 @@ export default function App() {
   }
 
   const handleToggleCycle = () => {
+    const canManageCycle = currentUser && (
+      currentUser.role === 'senior_sec' ||
+      currentUser.role === 'management' ||
+      (currentUser.role === 'junior_sec' && Boolean(delegatedPowers?.[currentUser.id]?.canManageReimbursements))
+    )
+    if (!canManageCycle) {
+      alert('Access Denied: You do not have authority to configure the reimbursement cycle.')
+      return
+    }
+
     setCycle(prev => {
       const updated = {
         ...prev,
@@ -708,6 +787,16 @@ export default function App() {
   }
 
   const handleUpdateCycleSettings = (updates) => {
+    const canManageCycle = currentUser && (
+      currentUser.role === 'senior_sec' ||
+      currentUser.role === 'management' ||
+      (currentUser.role === 'junior_sec' && Boolean(delegatedPowers?.[currentUser.id]?.canManageReimbursements))
+    )
+    if (!canManageCycle) {
+      alert('Access Denied: You do not have authority to modify reimbursement window settings.')
+      return
+    }
+
     setCycle(prev => {
       const updated = { ...prev, ...updates }
       localStorage.setItem('dakshana_reimbursement_cycle', JSON.stringify(updated))
@@ -725,6 +814,16 @@ export default function App() {
   }
 
   const handleUpdateClaimStatus = (claimId, newStatus, approverName) => {
+    const canApprove = currentUser && (
+      currentUser.role === 'senior_sec' ||
+      currentUser.role === 'management' ||
+      (currentUser.role === 'junior_sec' && Boolean(delegatedPowers?.[currentUser.id]?.canManageReimbursements))
+    )
+    if (!canApprove) {
+      alert('Access Denied: You do not have authority to approve or disburse reimbursement claims.')
+      return
+    }
+
     setClaims(prev => {
       const updated = prev.map(c => {
         if (c.id === claimId) {
@@ -748,6 +847,12 @@ export default function App() {
   }
 
   const handleTogglePrivilege = (juniorSecId, privilegeKey) => {
+    // Strict Authority: Solely Senior Secretary has power to delegate executive privileges
+    if (currentUser?.role !== 'senior_sec') {
+      alert('Access Denied: Only Senior Secretary has command authority to delegate privileges.')
+      return
+    }
+
     setDelegatedPowers(prev => {
       const secPowers = prev[juniorSecId] || {
         canManageReimbursements: false,
@@ -769,6 +874,12 @@ export default function App() {
   }
 
   const handleBulkPrivilege = (juniorSecId, grantAll) => {
+    // Strict Authority: Solely Senior Secretary has power to delegate executive privileges
+    if (currentUser?.role !== 'senior_sec') {
+      alert('Access Denied: Only Senior Secretary has command authority to delegate privileges.')
+      return
+    }
+
     setDelegatedPowers(prev => {
       const updated = {
         ...prev,
@@ -934,6 +1045,17 @@ export default function App() {
   }
 
   const handleSendBroadcast = (newBroadcast) => {
+    // Role check: Senior Sec, Management, or Junior Sec with delegated canBroadcast
+    const canBroadcast = currentUser && (
+      currentUser.role === 'senior_sec' ||
+      currentUser.role === 'management' ||
+      (currentUser.role === 'junior_sec' && Boolean(delegatedPowers?.[currentUser.id]?.canBroadcast))
+    )
+    if (!canBroadcast) {
+      alert('Access Denied: You do not have authorization to transmit official broadcasts.')
+      return
+    }
+
     setBroadcasts(prev => {
       const updated = [newBroadcast, ...prev]
       localStorage.setItem('dakshana_broadcasts', JSON.stringify(updated))

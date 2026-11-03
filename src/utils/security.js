@@ -10,13 +10,13 @@
 
 // Precomputed SHA-256 hashes of standard default credentials
 // This prevents automated secret scanners (like GitGuardian) from triggering on source code.
-const HASH_SCHOLAR_DEFAULT = '911d886e287d07fbba523127b77d24bea91b4a2981f69908702686beda74b5a7' // dakshana123
-const HASH_STAFF_DEFAULT = '9a3257b519fd530deca9dad5adcf88490306fccfc535794551964eb42db41b36'   // dakshana2026
+export const HASH_SCHOLAR_DEFAULT = '911d886e287d07fbba523127b77d24bea91b4a2981f69908702686beda74b5a7'
+export const HASH_STAFF_DEFAULT = '9a3257b519fd530deca9dad5adcf88490306fccfc535794551964eb42db41b36'
 
-const VALID_LEADERSHIP_HASHES = new Set([
-  '9a3257b519fd530deca9dad5adcf88490306fccfc535794551964eb42db41b36', // dakshana2026
-  'e7baff42c5120da998ae3ae3cabfe6aa6fe18929f687ecc601afa9c112465f71', // Dakshana2026
-  '6051fc84a7a0d74c225fb18a496b09952da5642e60723ecae543298edd7d82d6'  // admin2026
+export const VALID_LEADERSHIP_HASHES = new Set([
+  '9a3257b519fd530deca9dad5adcf88490306fccfc535794551964eb42db41b36',
+  'e7baff42c5120da998ae3ae3cabfe6aa6fe18929f687ecc601afa9c112465f71',
+  '6051fc84a7a0d74c225fb18a496b09952da5642e60723ecae543298edd7d82d6'
 ])
 
 /**
@@ -89,14 +89,112 @@ export async function verifyLeadershipPasskey(enteredPasskey) {
 }
 
 /**
- * Basic HTML/Script tag sanitization for user inputs
+ * Robust HTML, script, and event-handler sanitization for user inputs
+ * Removes null bytes, script tags, event handlers (onload, onerror), and raw HTML brackets.
  */
 export function sanitizeInput(str) {
   if (typeof str !== 'string') return str
   return str
+    .replace(/\0/g, '') // strip null bytes
     .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+    .replace(/\bon\w+\s*=/gi, '') // strip inline event handlers like onclick=, onload=
     .replace(/[<>]/g, '')
     .trim()
+}
+
+/**
+ * Validates and normalizes URLs to prevent javascript: or data: XSS attacks
+ */
+export function safeUrl(url, fallback = '#') {
+  if (typeof url !== 'string') return fallback
+  const trimmed = url.trim()
+  if (!trimmed) return fallback
+
+  const lower = trimmed.toLowerCase()
+  // Block dangerous schemes
+  if (
+    lower.startsWith('javascript:') ||
+    lower.startsWith('vbscript:') ||
+    lower.startsWith('data:text/html') ||
+    lower.startsWith('data:application')
+  ) {
+    return fallback
+  }
+
+  // Allow standard protocols
+  if (
+    lower.startsWith('https://') ||
+    lower.startsWith('http://') ||
+    lower.startsWith('mailto:') ||
+    lower.startsWith('tel:') ||
+    lower.startsWith('/')
+  ) {
+    return trimmed
+  }
+
+  // If bare URL (e.g. "bit.ly/..."), default to https://
+  if (/^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/.test(trimmed)) {
+    return `https://${trimmed}`
+  }
+
+  return fallback
+}
+
+/**
+ * Client-side image compression and safe validation
+ * Restricts to raster formats (JPEG/PNG/WebP), rejects dangerous SVG/scripts,
+ * and downscales resolution to prevent LocalStorage quota overflow.
+ */
+export function compressImage(file, maxWidth = 600, maxHeight = 600, quality = 0.8) {
+  return new Promise((resolve, reject) => {
+    if (!file) return resolve(null)
+    if (typeof window === 'undefined' || !window.FileReader) {
+      return resolve(null)
+    }
+
+    // Security check: strictly permit safe raster image types, disallow SVG/HTML
+    const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg']
+    if (!validTypes.includes(file.type.toLowerCase())) {
+      return reject(new Error('Invalid image format. Please upload JPG, PNG, or WebP.'))
+    }
+
+    // Size limit check (max 5MB raw file)
+    if (file.size > 5 * 1024 * 1024) {
+      return reject(new Error('Image file is too large (maximum 5MB allowed).'))
+    }
+
+    const reader = new FileReader()
+    reader.onerror = () => reject(new Error('Failed to read image file.'))
+    reader.onload = (e) => {
+      const img = new Image()
+      img.onerror = () => reject(new Error('Failed to decode image data.'))
+      img.onload = () => {
+        try {
+          let { width, height } = img
+          if (width > maxWidth || height > maxHeight) {
+            const ratio = Math.min(maxWidth / width, maxHeight / height)
+            width = Math.round(width * ratio)
+            height = Math.round(height * ratio)
+          }
+
+          const canvas = document.createElement('canvas')
+          canvas.width = width
+          canvas.height = height
+          const ctx = canvas.getContext('2d')
+          if (!ctx) {
+            return resolve(e.target.result)
+          }
+          ctx.drawImage(img, 0, 0, width, height)
+          const compressedDataUrl = canvas.toDataURL('image/jpeg', quality)
+          resolve(compressedDataUrl)
+        } catch {
+          resolve(e.target.result)
+        }
+      }
+      img.src = e.target.result
+    }
+    reader.readAsDataURL(file)
+  })
 }
 
 /**

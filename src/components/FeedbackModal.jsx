@@ -16,6 +16,7 @@ import {
   ChevronRight,
   ExternalLink
 } from 'lucide-react'
+import { sanitizeInput } from '../utils/security'
 
 export default function FeedbackModal({
   isOpen,
@@ -58,13 +59,16 @@ export default function FeedbackModal({
     setIsSubmitting(true)
 
     const ticketId = `sug-${Date.now()}`
+    const cleanDesc = sanitizeInput(description)
+    const cleanSteps = sanitizeInput(stepsToReproduce)
+    const cleanNotes = sanitizeInput(screenshotNote)
     const fullDescription = activeType === 'bug'
-      ? `${description.trim()}${stepsToReproduce.trim() ? `\n\n[Steps to Reproduce]: ${stepsToReproduce.trim()}` : ''}${screenshotNote.trim() ? `\n[Notes / Screenshot]: ${screenshotNote.trim()}` : ''}\n\n[Client Environment]: ${clientEnv.browser} on ${clientEnv.platform} (${clientEnv.screen}) • Page: ${clientEnv.activePage}`
-      : `${description.trim()}\n\n[Context]: Page: ${clientEnv.activePage} • Device: ${clientEnv.browser}`
+      ? `${cleanDesc}${cleanSteps ? `\n\n[Steps to Reproduce]: ${cleanSteps}` : ''}${cleanNotes ? `\n[Notes / Screenshot]: ${cleanNotes}` : ''}\n\n[Client Environment]: ${clientEnv.browser} on ${clientEnv.platform} (${clientEnv.screen}) • Page: ${clientEnv.activePage}`
+      : `${cleanDesc}\n\n[Context]: Page: ${clientEnv.activePage} • Device: ${clientEnv.browser}`
 
     const newIssue = {
       id: ticketId,
-      title: `${activeType === 'bug' ? '🐛 [BUG] ' : '💡 [SUGGESTION] '}${title.trim()}`,
+      title: `${activeType === 'bug' ? '🐛 [BUG] ' : '💡 [SUGGESTION] '}${sanitizeInput(title)}`,
       description: fullDescription,
       submittedBy: currentUser ? `${currentUser.name} (${currentUser.title || currentUser.role})` : 'Anonymous Scholar',
       submittedRole: currentUser?.role || 'intern',
