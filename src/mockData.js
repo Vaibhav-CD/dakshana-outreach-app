@@ -47,7 +47,7 @@ export const INITIAL_USERS = [
     email: 'aditi.jsec@dakshana.org',
     phone: '+91 98765 43211',
     role: 'junior_sec',
-    department: 'Panel 1 (Foundational Numeracy)',
+    department: 'Panel 1',
     photo: null,
     bio: 'Supervises, mentors, and reviews monthly progress reports for assigned outreach scholars in Panel 1.'
   },
@@ -58,7 +58,7 @@ export const INITIAL_USERS = [
     email: 'nitish.jsec@dakshana.org',
     phone: '+91 98765 43212',
     role: 'junior_sec',
-    department: 'Panel 2 (Robotics & Literacy)',
+    department: 'Panel 2',
     photo: null,
     bio: 'Supervises, mentors, and reviews progress reports for assigned outreach scholars in Panel 2.'
   },
@@ -69,7 +69,7 @@ export const INITIAL_USERS = [
     email: 'sakshi.jsec@dakshana.org',
     phone: '+91 98765 43213',
     role: 'junior_sec',
-    department: 'Panel 3 (Media & Cluster Outreach)',
+    department: 'Panel 3',
     photo: null,
     bio: 'Supervises, mentors, and reviews fieldwork documentation for assigned outreach scholars in Panel 3.'
   },

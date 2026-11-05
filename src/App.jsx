@@ -93,12 +93,16 @@ export default function App() {
           if (now < session.expiresAt) {
             // Valid session within 2 weeks!
             const jsecMap = {
-              'user-jsec-1': { name: 'Aditi Devliya', title: 'Junior Secretary (Panel 1)', email: 'aditi.jsec@dakshana.org', department: 'Panel 1 (Foundational Numeracy)' },
-              'user-jsec-2': { name: 'Nitish Gupta', title: 'Junior Secretary (Panel 2)', email: 'nitish.jsec@dakshana.org', department: 'Panel 2 (Robotics & Literacy)' },
-              'user-jsec-3': { name: 'Sakshi Athole', title: 'Junior Secretary (Panel 3)', email: 'sakshi.jsec@dakshana.org', department: 'Panel 3 (Media & Cluster Outreach)' }
+              'user-jsec-1': { name: 'Aditi Devliya', title: 'Junior Secretary (Panel 1)', department: 'Panel 1' },
+              'user-jsec-2': { name: 'Nitish Gupta', title: 'Junior Secretary (Panel 2)', department: 'Panel 2' },
+              'user-jsec-3': { name: 'Sakshi Athole', title: 'Junior Secretary (Panel 3)', department: 'Panel 3' }
             }
             if (jsecMap[session.user?.id]) {
-              session.user = { ...session.user, ...jsecMap[session.user.id] }
+              session.user = { 
+                ...session.user, 
+                ...jsecMap[session.user.id],
+                email: session.user.email || (session.user.id === 'user-jsec-1' ? 'aditi.jsec@dakshana.org' : session.user.id === 'user-jsec-2' ? 'nitish.jsec@dakshana.org' : 'sakshi.jsec@dakshana.org')
+              }
               localStorage.setItem('dakshana_session', JSON.stringify(session))
             }
             return session.user
@@ -140,26 +144,35 @@ export default function App() {
             'user-jsec-1': {
               name: 'Aditi Devliya',
               title: 'Junior Secretary (Panel 1)',
-              email: 'aditi.jsec@dakshana.org',
-              department: 'Panel 1 (Foundational Numeracy)',
+              defaultEmail: 'aditi.jsec@dakshana.org',
+              department: 'Panel 1',
               bio: 'Supervises, mentors, and reviews monthly progress reports for assigned outreach scholars in Panel 1.'
             },
             'user-jsec-2': {
               name: 'Nitish Gupta',
               title: 'Junior Secretary (Panel 2)',
-              email: 'nitish.jsec@dakshana.org',
-              department: 'Panel 2 (Robotics & Literacy)',
+              defaultEmail: 'nitish.jsec@dakshana.org',
+              department: 'Panel 2',
               bio: 'Supervises, mentors, and reviews progress reports for assigned outreach scholars in Panel 2.'
             },
             'user-jsec-3': {
               name: 'Sakshi Athole',
               title: 'Junior Secretary (Panel 3)',
-              email: 'sakshi.jsec@dakshana.org',
-              department: 'Panel 3 (Media & Cluster Outreach)',
+              defaultEmail: 'sakshi.jsec@dakshana.org',
+              department: 'Panel 3',
               bio: 'Supervises, mentors, and reviews fieldwork documentation for assigned outreach scholars in Panel 3.'
             }
           }
-          parsed = parsed.map(u => jsecMap[u.id] ? { ...u, ...jsecMap[u.id] } : u)
+          parsed = parsed.map(u => {
+            if (jsecMap[u.id]) {
+              const info = jsecMap[u.id]
+              const emailToUse = (u.email && !u.email.includes('priya') && !u.email.includes('rohan') && !u.email.includes('sneha'))
+                ? u.email
+                : info.defaultEmail
+              return { ...u, name: info.name, title: info.title, department: info.department, bio: info.bio, email: emailToUse }
+            }
+            return u
+          })
           localStorage.setItem('dakshana_all_users', JSON.stringify(parsed))
           return parsed
         }
@@ -433,11 +446,11 @@ export default function App() {
     setIsAuthModalOpen(false)
   }
 
-  const handleUpdatePhoto = async (newPhotoUrl) => {
-    if (!currentUser) return
-    const updatedUser = { ...currentUser, photo: newPhotoUrl }
+  const handleUpdateProfile = async (updates) => {
+    if (!currentUser || !updates) return
+    const updatedUser = { ...currentUser, ...updates }
     setCurrentUser(updatedUser)
-    
+
     // Update persistent 2-week session
     const sessionStr = localStorage.getItem('dakshana_session')
     if (sessionStr) {
@@ -450,16 +463,32 @@ export default function App() {
     localStorage.setItem('dakshana_current_user', JSON.stringify(updatedUser))
 
     setAllUsers(prev => {
-      const updated = prev.map(u => u.id === currentUser.id ? { ...u, photo: newPhotoUrl } : u)
+      const updated = prev.map(u => u.id === currentUser.id ? { ...u, ...updates } : u)
       localStorage.setItem('dakshana_all_users', JSON.stringify(updated))
       return updated
     })
 
     try {
-      await dbUpdateProfile(currentUser.id, { photo_url: newPhotoUrl })
+      const dbPayload = {}
+      if (updates.photo !== undefined) dbPayload.photo_url = updates.photo
+      if (updates.email !== undefined) dbPayload.email = updates.email
+      if (updates.phone !== undefined) dbPayload.phone = updates.phone
+      if (Object.keys(dbPayload).length > 0) {
+        await dbUpdateProfile(currentUser.id, dbPayload)
+      }
     } catch (err) {
-      console.warn('Could not sync photo to Supabase:', err)
+      console.warn('Could not sync profile update to Supabase:', err)
     }
+  }
+
+  const handleUpdatePhoto = async (newPhotoUrl) => {
+    return handleUpdateProfile({ photo: newPhotoUrl })
+  }
+
+  const handleUpdateEmail = async (newEmail) => {
+    if (!newEmail || typeof newEmail !== 'string') return
+    const cleanEmail = sanitizeInput(newEmail.trim().toLowerCase())
+    return handleUpdateProfile({ email: cleanEmail })
   }
 
   const handleUpdatePassword = async (newPassword) => {
@@ -1255,6 +1284,7 @@ export default function App() {
                   onToggleTaskDone={handleToggleTaskDone}
                   onAddSuggestion={handleAddSuggestion}
                   onOpenSetEndDateModal={() => setIsSetEndDateModalOpen(true)}
+                  onUpdateEmail={handleUpdateEmail}
                 />
               )}
 
@@ -1433,6 +1463,7 @@ export default function App() {
         onClose={() => setIsPhotoModalOpen(false)}
         currentUser={currentUser}
         onUpdatePhoto={handleUpdatePhoto}
+        onUpdateEmail={handleUpdateEmail}
       />
 
       {/* Change Password Modal (Strictly Accessible When Logged In) */}

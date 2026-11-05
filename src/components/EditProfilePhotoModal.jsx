@@ -5,7 +5,8 @@ import {
   Upload,
   User,
   Trash2,
-  Check
+  Check,
+  Mail
 } from 'lucide-react'
 import Avatar, { DefaultSilhouette } from './Avatar'
 import { compressImage } from '../utils/security'
@@ -14,7 +15,8 @@ export default function EditProfilePhotoModal({
   isOpen,
   onClose,
   currentUser,
-  onUpdatePhoto
+  onUpdatePhoto,
+  onUpdateEmail
 }) {
   if (!isOpen || !currentUser) return null
 
@@ -22,6 +24,7 @@ export default function EditProfilePhotoModal({
   const initialPhoto = isStrangerFace ? null : (currentUser.photo || null)
 
   const [previewPhoto, setPreviewPhoto] = useState(initialPhoto)
+  const [email, setEmail] = useState(currentUser.email || '')
   const [isSaving, setIsSaving] = useState(false)
   const [uploadError, setUploadError] = useState('')
 
@@ -46,6 +49,9 @@ export default function EditProfilePhotoModal({
     if (onUpdatePhoto) {
       await onUpdatePhoto(previewPhoto)
     }
+    if (onUpdateEmail && email.trim() && email.trim().toLowerCase() !== (currentUser.email || '').toLowerCase()) {
+      await onUpdateEmail(email.trim().toLowerCase())
+    }
     setIsSaving(false)
     onClose()
   }
@@ -61,8 +67,8 @@ export default function EditProfilePhotoModal({
               <Camera className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="font-extrabold text-slate-900 text-sm">Profile Picture</h3>
-              <p className="text-[11px] text-slate-400">Upload your personal photo or use standard default</p>
+              <h3 className="font-extrabold text-slate-900 text-sm">Profile Details</h3>
+              <p className="text-[11px] text-slate-400">Update your personal photo and public display email</p>
             </div>
           </div>
           <button onClick={onClose} className="text-slate-400 hover:text-slate-600 p-1 cursor-pointer">
@@ -140,6 +146,27 @@ export default function EditProfilePhotoModal({
             </button>
           </div>
 
+          {/* Option 3: Editable Display Email */}
+          <div className="pt-3 border-t border-slate-100">
+            <label className="block font-bold text-slate-700 text-xs mb-1">
+              Public Display Email Address
+            </label>
+            <div className="relative">
+              <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="e.g. yourname.jsec@dakshana.org"
+                className="w-full text-xs font-semibold rounded-xl border border-slate-300 pl-9 pr-3 py-2.5 focus:ring-2 focus:ring-[#0A643B] focus:outline-hidden"
+              />
+            </div>
+            <span className="text-[10px] text-slate-500 mt-1 block">
+              Displayed to assigned scholars and colleagues in the directory and reports.
+            </span>
+          </div>
+
         </div>
 
         {/* Modal Footer */}
@@ -158,7 +185,7 @@ export default function EditProfilePhotoModal({
             className="px-5 py-2 rounded-xl bg-[#0A643B] hover:bg-[#074D2D] text-white font-bold text-xs cursor-pointer shadow-xs transition-colors flex items-center"
           >
             <Check className="w-4 h-4 mr-1.5" />
-            {isSaving ? 'Saving...' : 'Apply Avatar'}
+            {isSaving ? 'Saving...' : 'Save Profile Changes'}
           </button>
         </div>
 

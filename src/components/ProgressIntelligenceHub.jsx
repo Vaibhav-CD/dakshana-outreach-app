@@ -83,9 +83,9 @@ export default function ProgressIntelligenceHub({
     const list = allUsers.filter(u => u.role === 'junior_sec')
     if (list.length > 0) return list
     return [
-      { id: 'user-jsec-1', name: 'Aditi Devliya', department: 'Panel 1 (Foundational Numeracy)' },
-      { id: 'user-jsec-2', name: 'Nitish Gupta', department: 'Panel 2 (Robotics & Literacy)' },
-      { id: 'user-jsec-3', name: 'Sakshi Athole', department: 'Panel 3 (Media & Cluster Outreach)' }
+      { id: 'user-jsec-1', name: 'Aditi Devliya', department: 'Panel 1' },
+      { id: 'user-jsec-2', name: 'Nitish Gupta', department: 'Panel 2' },
+      { id: 'user-jsec-3', name: 'Sakshi Athole', department: 'Panel 3' }
     ]
   }, [allUsers])
 
