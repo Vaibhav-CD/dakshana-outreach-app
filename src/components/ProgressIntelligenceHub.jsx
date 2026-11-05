@@ -83,9 +83,9 @@ export default function ProgressIntelligenceHub({
     const list = allUsers.filter(u => u.role === 'junior_sec')
     if (list.length > 0) return list
     return [
-      { id: 'user-jsec-1', name: 'Priya Sharma', department: 'Wing 1 (Foundational Numeracy)' },
-      { id: 'user-jsec-2', name: 'Rohan Verma', department: 'Wing 2 (Robotics & Literacy)' },
-      { id: 'user-jsec-3', name: 'Sneha Kulkarni', department: 'Wing 3 (Media & Cluster Outreach)' }
+      { id: 'user-jsec-1', name: 'Aditi Devliya', department: 'Panel 1 (Foundational Numeracy)' },
+      { id: 'user-jsec-2', name: 'Nitish Gupta', department: 'Panel 2 (Robotics & Literacy)' },
+      { id: 'user-jsec-3', name: 'Sakshi Athole', department: 'Panel 3 (Media & Cluster Outreach)' }
     ]
   }, [allUsers])
 
@@ -182,7 +182,7 @@ export default function ProgressIntelligenceHub({
       selectedMonth !== 'all' ? selectedMonth : 'All Recorded Cycles',
       selectedBatch !== 'all' ? selectedBatch : 'Combined Batches (1 & 2)',
       selectedStream !== 'all' ? `${selectedStream} Stream` : 'Both JEE & NEET Streams',
-      selectedJuniorSec !== 'all' ? (activeJsec ? `${activeJsec.name}'s Wing` : 'Specific Wing') : 'All Junior Secretaries'
+      selectedJuniorSec !== 'all' ? (activeJsec ? `${activeJsec.name}'s Panel` : 'Specific Panel') : 'All Junior Secretaries'
     ].join(' • ')
 
     // Extract achievements

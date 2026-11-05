@@ -163,7 +163,7 @@ export default function TeamShowcase({ allUsers, onSelectIntern }) {
                   <div>
                     <h4 className="text-base font-bold text-slate-900">{jsec.name}</h4>
                     <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#EBF7F0] text-[#0A643B] border border-[#0A643B]/30 inline-block mt-0.5">
-                      Junior Secretary
+                      {jsec.department || jsec.title || 'Junior Secretary'}
                     </span>
                   </div>
                 </div>

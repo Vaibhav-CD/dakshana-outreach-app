@@ -595,7 +595,7 @@ export default function AuthModal({
                     className="w-full text-xs rounded-xl border border-slate-300 p-2.5 bg-white focus:ring-2 focus:ring-[#0A643B] focus:outline-hidden"
                   >
                     {juniorSecs.map(j => (
-                      <option key={j.id} value={j.id}>{j.name} — Junior Secretary</option>
+                      <option key={j.id} value={j.id}>{j.name} — {j.department || j.title || 'Junior Secretary'}</option>
                     ))}
                   </select>
                 </div>
@@ -686,7 +686,7 @@ export default function AuthModal({
                   >
                     {leadershipUsers.map(staff => (
                       <option key={staff.id} value={staff.id}>
-                        {staff.name} — {staff.title}
+                        {staff.name} — {staff.department ? (staff.department.includes('Panel') ? `${staff.title} • ${staff.department}` : staff.title) : staff.title}
                       </option>
                     ))}
                   </select>

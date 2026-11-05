@@ -92,6 +92,15 @@ export default function App() {
           const now = Date.now()
           if (now < session.expiresAt) {
             // Valid session within 2 weeks!
+            const jsecMap = {
+              'user-jsec-1': { name: 'Aditi Devliya', title: 'Junior Secretary (Panel 1)', email: 'aditi.jsec@dakshana.org', department: 'Panel 1 (Foundational Numeracy)' },
+              'user-jsec-2': { name: 'Nitish Gupta', title: 'Junior Secretary (Panel 2)', email: 'nitish.jsec@dakshana.org', department: 'Panel 2 (Robotics & Literacy)' },
+              'user-jsec-3': { name: 'Sakshi Athole', title: 'Junior Secretary (Panel 3)', email: 'sakshi.jsec@dakshana.org', department: 'Panel 3 (Media & Cluster Outreach)' }
+            }
+            if (jsecMap[session.user?.id]) {
+              session.user = { ...session.user, ...jsecMap[session.user.id] }
+              localStorage.setItem('dakshana_session', JSON.stringify(session))
+            }
             return session.user
           } else {
             console.log('Session expired after 2 weeks. Redirecting to login page.')
@@ -124,8 +133,36 @@ export default function App() {
     const saved = localStorage.getItem('dakshana_all_users')
     if (saved) {
       try {
-        const parsed = JSON.parse(saved)
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed
+        let parsed = JSON.parse(saved)
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          // Migration map to ensure latest Junior Secretary names & panels are synced
+          const jsecMap = {
+            'user-jsec-1': {
+              name: 'Aditi Devliya',
+              title: 'Junior Secretary (Panel 1)',
+              email: 'aditi.jsec@dakshana.org',
+              department: 'Panel 1 (Foundational Numeracy)',
+              bio: 'Supervises, mentors, and reviews monthly progress reports for assigned outreach scholars in Panel 1.'
+            },
+            'user-jsec-2': {
+              name: 'Nitish Gupta',
+              title: 'Junior Secretary (Panel 2)',
+              email: 'nitish.jsec@dakshana.org',
+              department: 'Panel 2 (Robotics & Literacy)',
+              bio: 'Supervises, mentors, and reviews progress reports for assigned outreach scholars in Panel 2.'
+            },
+            'user-jsec-3': {
+              name: 'Sakshi Athole',
+              title: 'Junior Secretary (Panel 3)',
+              email: 'sakshi.jsec@dakshana.org',
+              department: 'Panel 3 (Media & Cluster Outreach)',
+              bio: 'Supervises, mentors, and reviews fieldwork documentation for assigned outreach scholars in Panel 3.'
+            }
+          }
+          parsed = parsed.map(u => jsecMap[u.id] ? { ...u, ...jsecMap[u.id] } : u)
+          localStorage.setItem('dakshana_all_users', JSON.stringify(parsed))
+          return parsed
+        }
       } catch (e) { }
     }
     return INITIAL_USERS
@@ -306,7 +343,7 @@ export default function App() {
                 passwordHash: cp.passwordHash || existing?.passwordHash || null
               }
             })
-            INITIAL_USERS.slice(0, 5).forEach(lead => {
+            INITIAL_USERS.slice(0, 7).forEach(lead => {
               if (!combined.some(u => u.email === lead.email)) combined.unshift(lead)
             })
             localStorage.setItem('dakshana_all_users', JSON.stringify(combined))

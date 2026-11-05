@@ -42,36 +42,36 @@ export const INITIAL_USERS = [
   },
   {
     id: 'user-jsec-1',
-    name: 'Priya Sharma',
-    title: 'Junior Secretary',
-    email: 'priya.jsec@dakshana.org',
+    name: 'Aditi Devliya',
+    title: 'Junior Secretary (Panel 1)',
+    email: 'aditi.jsec@dakshana.org',
     phone: '+91 98765 43211',
     role: 'junior_sec',
-    department: '',
+    department: 'Panel 1 (Foundational Numeracy)',
     photo: null,
-    bio: 'Supervises, mentors, and reviews monthly progress reports for assigned outreach scholars.'
+    bio: 'Supervises, mentors, and reviews monthly progress reports for assigned outreach scholars in Panel 1.'
   },
   {
     id: 'user-jsec-2',
-    name: 'Rohan Verma',
-    title: 'Junior Secretary',
-    email: 'rohan.jsec@dakshana.org',
+    name: 'Nitish Gupta',
+    title: 'Junior Secretary (Panel 2)',
+    email: 'nitish.jsec@dakshana.org',
     phone: '+91 98765 43212',
     role: 'junior_sec',
-    department: '',
+    department: 'Panel 2 (Robotics & Literacy)',
     photo: null,
-    bio: 'Supervises, mentors, and reviews progress reports for assigned outreach scholars.'
+    bio: 'Supervises, mentors, and reviews progress reports for assigned outreach scholars in Panel 2.'
   },
   {
     id: 'user-jsec-3',
-    name: 'Sneha Kulkarni',
-    title: 'Junior Secretary',
-    email: 'sneha.jsec@dakshana.org',
+    name: 'Sakshi Athole',
+    title: 'Junior Secretary (Panel 3)',
+    email: 'sakshi.jsec@dakshana.org',
     phone: '+91 98765 43213',
     role: 'junior_sec',
-    department: '',
+    department: 'Panel 3 (Media & Cluster Outreach)',
     photo: null,
-    bio: 'Supervises, mentors, and reviews fieldwork documentation for assigned outreach scholars.'
+    bio: 'Supervises, mentors, and reviews fieldwork documentation for assigned outreach scholars in Panel 3.'
   },
   // Outreach Scholars (Strictly one internship role across Batch 1 & Batch 2 with individual target visits and JEE/NEET stream)
   {
@@ -160,7 +160,7 @@ export const INITIAL_REPORTS = [
     nextMonthGoals: 'Launch intermediate math workshop module.',
     status: 'reviewed',
     reviewerFeedback: 'Outstanding diligence Aarav. Whiteboard kits approved by Senior Secretary.',
-    reviewedBy: 'Priya Sharma',
+    reviewedBy: 'Aditi Devliya',
     updatedAt: '2026-10-10'
   },
   {
@@ -191,8 +191,8 @@ export const INITIAL_REPORTS = [
     challengesFaced: 'Component shortage for circuit breadboards.',
     nextMonthGoals: 'Science demonstration day for parents.',
     status: 'reviewed',
-    reviewerFeedback: 'Great practical engagement! Please coordinate with Rohan on inventory.',
-    reviewedBy: 'Rohan Verma',
+    reviewerFeedback: 'Great practical engagement! Please coordinate with Nitish on inventory.',
+    reviewedBy: 'Nitish Gupta',
     updatedAt: '2026-10-11'
   },
   {
@@ -215,11 +215,11 @@ export const INITIAL_REPORTS = [
 
 // Visual Session Tracking Data with Batch breakdown
 export const INITIAL_SESSIONS = [
-  { internId: 'user-intern-1', internName: 'Aarav Gupta', batch: 'Batch 1', sessionsCount: 16, studentsReached: 48, wing: 'Wing 1 (Priya)', topic: 'Foundational Numeracy' },
-  { internId: 'user-intern-2', internName: 'Meera Iyer', batch: 'Batch 1', sessionsCount: 12, studentsReached: 65, wing: 'Wing 1 (Priya)', topic: 'Health & Hygiene' },
-  { internId: 'user-intern-3', internName: 'Kabir Das', batch: 'Batch 2', sessionsCount: 18, studentsReached: 54, wing: 'Wing 2 (Rohan)', topic: 'Robotics & Science' },
-  { internId: 'user-intern-4', internName: 'Ananya Rao', batch: 'Batch 2', sessionsCount: 14, studentsReached: 38, wing: 'Wing 2 (Rohan)', topic: 'Literacy & Phonics' },
-  { internId: 'user-intern-5', internName: 'Vikram Joshi', batch: 'Batch 2', sessionsCount: 8, studentsReached: 120, wing: 'Wing 3 (Sneha)', topic: 'Media Storytelling' },
+  { internId: 'user-intern-1', internName: 'Aarav Gupta', batch: 'Batch 1', sessionsCount: 16, studentsReached: 48, wing: 'Panel 1 (Aditi)', topic: 'Foundational Numeracy' },
+  { internId: 'user-intern-2', internName: 'Meera Iyer', batch: 'Batch 1', sessionsCount: 12, studentsReached: 65, wing: 'Panel 1 (Aditi)', topic: 'Health & Hygiene' },
+  { internId: 'user-intern-3', internName: 'Kabir Das', batch: 'Batch 2', sessionsCount: 18, studentsReached: 54, wing: 'Panel 2 (Nitish)', topic: 'Robotics & Science' },
+  { internId: 'user-intern-4', internName: 'Ananya Rao', batch: 'Batch 2', sessionsCount: 14, studentsReached: 38, wing: 'Panel 2 (Nitish)', topic: 'Literacy & Phonics' },
+  { internId: 'user-intern-5', internName: 'Vikram Joshi', batch: 'Batch 2', sessionsCount: 8, studentsReached: 120, wing: 'Panel 3 (Sakshi)', topic: 'Media Storytelling' },
 ]
 
 // Reimbursement Cycle Data
@@ -394,7 +394,7 @@ export const INITIAL_POSTS = [
     authorPhoto: null,
     batch: 'Batch 2',
     stream: 'JEE',
-    wing: 'Wing 2 (Rohan)',
+    wing: 'Panel 2 (Nitish)',
     createdAt: '2 hours ago',
     title: 'Hands-on Robotics & Science Circuits at JNV Pune',
     content: 'Conducted an interactive science session with 28 grade-7 students today! We built simple LED circuit breadboards. The curiosity and excitement in their eyes was truly inspiring.',
@@ -405,7 +405,7 @@ export const INITIAL_POSTS = [
     studentsReached: 28,
     cheersCount: 14,
     comments: [
-      { id: 'c1', authorName: 'Rohan Verma', role: 'junior_sec', text: 'Terrific work Kabir! The circuit kits look very well utilized.', time: '1 hour ago' },
+      { id: 'c1', authorName: 'Nitish Gupta', role: 'junior_sec', text: 'Terrific work Kabir! The circuit kits look very well utilized.', time: '1 hour ago' },
       { id: 'c2', authorName: 'Aarav Gupta', role: 'intern', text: 'Incredible setup! Can you share the circuit worksheet?', time: '30 mins ago' }
     ]
   },
@@ -416,7 +416,7 @@ export const INITIAL_POSTS = [
     authorPhoto: null,
     batch: 'Batch 1',
     stream: 'JEE',
-    wing: 'Wing 1 (Priya)',
+    wing: 'Panel 1 (Aditi)',
     createdAt: 'Yesterday at 4:30 PM',
     title: 'Foundational Math Speed Drills with Grade 5 Scholars',
     content: 'Completed school visit #16 at Zilla Parishad Primary School. Introduced Vedic multiplication techniques and division flashcards. 22 students participated actively.',
@@ -427,7 +427,7 @@ export const INITIAL_POSTS = [
     studentsReached: 22,
     cheersCount: 18,
     comments: [
-      { id: 'c3', authorName: 'Priya Sharma', role: 'junior_sec', text: 'Great progress Aarav. Keep this consistency for Batch 1.', time: 'Yesterday' }
+      { id: 'c3', authorName: 'Aditi Devliya', role: 'junior_sec', text: 'Great progress Aarav. Keep this consistency for Batch 1.', time: 'Yesterday' }
     ]
   },
   {
@@ -437,7 +437,7 @@ export const INITIAL_POSTS = [
     authorPhoto: null,
     batch: 'Batch 1',
     stream: 'NEET',
-    wing: 'Wing 1 (Priya)',
+    wing: 'Panel 1 (Aditi)',
     createdAt: '2 days ago',
     title: 'Health, Hygiene & Nutrition Awareness Drive',
     content: 'Distributed hygiene cards and demonstrated proper hand-washing steps to over 40 primary students. Their teachers were very supportive.',
@@ -456,7 +456,7 @@ export const INITIAL_POSTS = [
     authorPhoto: null,
     batch: 'Batch 2',
     stream: 'NEET',
-    wing: 'Wing 2 (Rohan)',
+    wing: 'Panel 2 (Nitish)',
     createdAt: '3 days ago',
     title: 'English Literacy & Reading Circles in Cluster 2',
     content: 'Completed visit #14. Held guided reading sessions with 18 beginner learners. The phonics flashcards helped immensely with word pronunciation.',
@@ -487,7 +487,7 @@ export const INITIAL_QUERIES = [
     answers: [
       {
         id: 'ans-1',
-        authorName: 'Priya Sharma',
+        authorName: 'Aditi Devliya',
         authorRole: 'junior_sec',
         text: 'Carry a printed copy of the official Dakshana Outreach Program Intimation Circular from the Materials Hub. If the school requires a school-specific letter, message your assigned Junior Secretary on WhatsApp with the school name and Principal name, and we will dispatch a digital signed PDF within 30 minutes.',
         isOfficial: true,
@@ -518,7 +518,7 @@ export const INITIAL_QUERIES = [
     answers: [
       {
         id: 'ans-3',
-        authorName: 'Rohan Verma',
+        authorName: 'Nitish Gupta',
         authorRole: 'junior_sec',
         text: 'Yes! Download the official Cash Voucher PDF from the Materials Hub. Fill in the travel details (from/to, purpose, amount up to ₹250 per voucher). If paid via UPI, attach the UPI transaction screenshot as supporting proof in your bills PDF.',
         isOfficial: true,
@@ -541,7 +541,7 @@ export const INITIAL_QUERIES = [
     answers: [
       {
         id: 'ans-4',
-        authorName: 'Sneha Kulkarni',
+        authorName: 'Sakshi Athole',
         authorRole: 'junior_sec',
         text: 'Yes, Saturday morning half-days are fully permitted and count toward your verified school visits, as long as school attendance is normal and the session is completed.',
         isOfficial: true,
@@ -564,7 +564,7 @@ export const INITIAL_QUERIES = [
     answers: [
       {
         id: 'ans-5',
-        authorName: 'Priya Sharma',
+        authorName: 'Aditi Devliya',
         authorRole: 'junior_sec',
         text: 'Yes, joint visits are allowed for larger schools (>60 students). Both interns must independently log their visit in the Activity Feed and detail the separate classroom sections they conducted.',
         isOfficial: true,
@@ -584,7 +584,7 @@ export const INITIAL_ASSIGNED_TASKS = [
     title: 'Verify October School Visit Logs for assigned Outreach Scholars',
     description: 'Check conducted school visit submissions against session attendance forms before the 20th of this month.',
     assignedToId: 'user-jsec-1',
-    assignedToName: 'Priya Sharma',
+    assignedToName: 'Aditi Devliya',
     assignedToRole: 'junior_sec',
     assignedBy: 'Senior Secretary',
     priority: 'high',
@@ -597,7 +597,7 @@ export const INITIAL_ASSIGNED_TASKS = [
     title: 'Distribute updated 2026–27 teaching kits and math modules',
     description: 'Ensure all assigned Batch 1 scholars have received physical workbooks and flashcards for rural visits.',
     assignedToId: 'user-jsec-1',
-    assignedToName: 'Priya Sharma',
+    assignedToName: 'Aditi Devliya',
     assignedToRole: 'junior_sec',
     assignedBy: 'Senior Secretary',
     priority: 'medium',
@@ -610,7 +610,7 @@ export const INITIAL_ASSIGNED_TASKS = [
     title: 'Conduct mid-semester check-in call with scholars having <8 visits',
     description: 'Reach out to scholars behind on their semester milestone to identify transportation or school permission hurdles.',
     assignedToId: 'user-jsec-2',
-    assignedToName: 'Rohan Verma',
+    assignedToName: 'Nitish Gupta',
     assignedToRole: 'junior_sec',
     assignedBy: 'Senior Secretary',
     priority: 'high',
@@ -623,7 +623,7 @@ export const INITIAL_ASSIGNED_TASKS = [
     title: 'Review travel ticket PDFs before submitting claims to Senior Sec',
     description: 'Audit bus tickets and cash voucher receipts submitted by assigned scholars to ensure seamless approvals.',
     assignedToId: 'user-jsec-2',
-    assignedToName: 'Rohan Verma',
+    assignedToName: 'Nitish Gupta',
     assignedToRole: 'junior_sec',
     assignedBy: 'Senior Secretary',
     priority: 'medium',
@@ -636,7 +636,7 @@ export const INITIAL_ASSIGNED_TASKS = [
     title: 'Coordinate Batch 2 school outreach scheduling for rural talukas',
     description: 'Align high school permission letters for scheduled visits in upcoming cluster sessions.',
     assignedToId: 'user-jsec-3',
-    assignedToName: 'Sneha Kulkarni',
+    assignedToName: 'Sakshi Athole',
     assignedToRole: 'junior_sec',
     assignedBy: 'Senior Secretary',
     priority: 'high',
@@ -649,7 +649,7 @@ export const INITIAL_ASSIGNED_TASKS = [
     title: 'Compile regional grassroots feedback summary for Governing Board',
     description: 'Consolidate classroom feedback and student response notes for presentation to Trustees.',
     assignedToId: 'user-jsec-3',
-    assignedToName: 'Sneha Kulkarni',
+    assignedToName: 'Sakshi Athole',
     assignedToRole: 'junior_sec',
     assignedBy: 'Dr. Rajiv Menon (Management)',
     priority: 'medium',
@@ -733,7 +733,7 @@ export const INITIAL_SUGGESTIONS = [
     id: 'sug-2',
     title: 'Clarify Reimbursement Voucher limit for Auto Rickshaw sharing',
     description: 'Multiple interns from Pune cluster requested written clarification on whether two scholars taking the same auto can each claim ₹250 or only one claim per trip.',
-    submittedBy: 'Priya Sharma (Junior Secretary)',
+    submittedBy: 'Aditi Devliya (Junior Secretary, Panel 1)',
     submittedRole: 'junior_sec',
     category: 'Reimbursements',
     status: 'pending',
@@ -759,7 +759,7 @@ export const INITIAL_SUGGESTIONS = [
     id: 'sug-4',
     title: 'Direct WhatsApp intimation template for urgent schedule adjustments',
     description: 'Junior secretaries need a standardized notice format when schools shift timing unexpectedly.',
-    submittedBy: 'Rohan Verma (Junior Secretary)',
+    submittedBy: 'Nitish Gupta (Junior Secretary, Panel 2)',
     submittedRole: 'junior_sec',
     category: 'Operations',
     status: 'rectified',

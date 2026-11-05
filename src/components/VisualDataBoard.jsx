@@ -6,7 +6,11 @@ export default function VisualDataBoard({ sessions, allUsers }) {
   const [selectedBatch, setSelectedBatch] = useState('all')
 
   const filteredSessions = sessions.filter(s => {
-    const matchesWing = selectedWing === 'all' || s.wing.includes(selectedWing)
+    const matchesWing = selectedWing === 'all' || 
+      (s.wing && s.wing.includes(selectedWing)) ||
+      (selectedWing === 'Panel 1' && s.wing && (s.wing.includes('Wing 1') || s.wing.includes('Aditi'))) ||
+      (selectedWing === 'Panel 2' && s.wing && (s.wing.includes('Wing 2') || s.wing.includes('Nitish'))) ||
+      (selectedWing === 'Panel 3' && s.wing && (s.wing.includes('Wing 3') || s.wing.includes('Sakshi')))
     const matchesBatch = selectedBatch === 'all' || s.batch === selectedBatch
     return matchesWing && matchesBatch
   })
@@ -51,16 +55,16 @@ export default function VisualDataBoard({ sessions, allUsers }) {
             </div>
 
             <div className="flex items-center space-x-1.5 border-l border-white/20 pl-2">
-              <span className="text-emerald-200 font-bold">Wing:</span>
+              <span className="text-emerald-200 font-bold">Panel:</span>
               <select
                 value={selectedWing}
                 onChange={(e) => setSelectedWing(e.target.value)}
                 className="bg-white/20 text-white font-bold rounded-lg px-2 py-1 focus:outline-hidden cursor-pointer"
               >
-                <option value="all" className="text-slate-900">All Wings</option>
-                <option value="Wing 1" className="text-slate-900">Wing 1 (Priya)</option>
-                <option value="Wing 2" className="text-slate-900">Wing 2 (Rohan)</option>
-                <option value="Wing 3" className="text-slate-900">Wing 3 (Sneha)</option>
+                <option value="all" className="text-slate-900">All Panels</option>
+                <option value="Panel 1" className="text-slate-900">Panel 1 (Aditi Devliya)</option>
+                <option value="Panel 2" className="text-slate-900">Panel 2 (Nitish Gupta)</option>
+                <option value="Panel 3" className="text-slate-900">Panel 3 (Sakshi Athole)</option>
               </select>
             </div>
           </div>
@@ -141,21 +145,27 @@ export default function VisualDataBoard({ sessions, allUsers }) {
         </div>
       </div>
 
-      {/* Breakdown by Wing */}
+      {/* Breakdown by Panel */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-        {['Wing 1', 'Wing 2', 'Wing 3'].map((wingName, idx) => {
-          const wingData = sessions.filter(s => s.wing.includes(wingName))
+        {[
+          { id: 'Panel 1', name: 'Panel 1', jsec: 'Aditi Devliya', wingKey: 'Wing 1' },
+          { id: 'Panel 2', name: 'Panel 2', jsec: 'Nitish Gupta', wingKey: 'Wing 2' },
+          { id: 'Panel 3', name: 'Panel 3', jsec: 'Sakshi Athole', wingKey: 'Wing 3' }
+        ].map((panel, idx) => {
+          const wingData = sessions.filter(s => 
+            s.wing && (s.wing.includes(panel.id) || s.wing.includes(panel.wingKey) || s.wing.includes(panel.jsec.split(' ')[0]))
+          )
           const wingSessions = wingData.reduce((acc, c) => acc + c.sessionsCount, 0)
           const wingStudents = wingData.reduce((acc, c) => acc + c.studentsReached, 0)
 
           return (
-            <div key={wingName} className="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs flex flex-col justify-between hover:border-[#0A643B]/40 transition-all">
+            <div key={panel.id} className="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs flex flex-col justify-between hover:border-[#0A643B]/40 transition-all">
               <div>
                 <span className="text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-[#EBF7F0] text-[#0A643B] border border-[#0A643B]/30">
-                  Sub-Supervision Wing 0{idx + 1}
+                  Sub-Supervision Panel 0{idx + 1}
                 </span>
-                <h4 className="font-bold text-slate-900 text-base mt-2">{wingName} Performance</h4>
-                <p className="text-xs text-slate-500 mt-1">Supervised by Junior Secretary</p>
+                <h4 className="font-bold text-slate-900 text-base mt-2">{panel.name} Performance</h4>
+                <p className="text-xs text-slate-500 mt-1">Supervised by {panel.jsec} (Junior Secretary)</p>
               </div>
 
               <div className="grid grid-cols-2 gap-2 mt-4 pt-4 border-t border-slate-100 text-center text-xs">

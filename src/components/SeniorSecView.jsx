@@ -309,7 +309,7 @@ export default function SeniorSecView({
           <div className="bg-white/10 rounded-xl p-3 border border-white/10">
             <span className="text-xs text-emerald-200 block">Supervisory Staff</span>
             <span className="text-2xl font-extrabold text-white mt-1 block">3 Junior Secs</span>
-            <span className="text-[11px] text-emerald-200">Wing 1, Wing 2, Wing 3</span>
+            <span className="text-[11px] text-emerald-200">Panel 1, Panel 2, Panel 3</span>
           </div>
           <div className="bg-white/10 rounded-xl p-3 border border-white/10">
             <span className="text-xs text-emerald-200 block">Monthly Reports Evaluated</span>
@@ -366,7 +366,7 @@ export default function SeniorSecView({
                       <div>
                         <h4 className="font-bold text-slate-900 text-sm">{jsec.name}</h4>
                         <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-full bg-[#EBF7F0] text-[#0A643B] border border-[#0A643B]/30 inline-block mt-0.5">
-                          Junior Secretary
+                          {jsec.department ? (jsec.department.includes('Panel') ? jsec.department.split(' ')[0] + ' ' + jsec.department.split(' ')[1] : jsec.department) : 'Junior Secretary'}
                         </span>
                         {jsec.phone && (
                           <a href={`tel:${jsec.phone}`} className="text-[11px] text-slate-600 flex items-center mt-1 hover:text-[#0A643B] font-medium">
@@ -604,7 +604,7 @@ export default function SeniorSecView({
                           >
                             {juniorSecs.map(j => (
                               <option key={j.id} value={j.id}>
-                                Transfer to {j.name}
+                                Transfer to {j.name} ({j.department ? (j.department.includes('Panel') ? j.department.split(' ')[0] + ' ' + j.department.split(' ')[1] : j.department) : 'Panel'})
                               </option>
                             ))}
                           </select>
@@ -1514,7 +1514,9 @@ export default function SeniorSecView({
                   className="w-full text-sm rounded-xl border border-slate-300 p-2.5 bg-white focus:ring-2 focus:ring-[#0A643B] focus:outline-hidden cursor-pointer"
                 >
                   {juniorSecs.map((j) => (
-                    <option key={j.id} value={j.id}>{j.name}</option>
+                    <option key={j.id} value={j.id}>
+                      {j.name} ({j.department ? (j.department.includes('Panel') ? j.department.split(' ')[0] + ' ' + j.department.split(' ')[1] : j.department) : 'Junior Secretary'})
+                    </option>
                   ))}
                 </select>
               </div>
