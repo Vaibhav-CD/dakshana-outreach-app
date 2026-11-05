@@ -54,7 +54,14 @@ export default function InternView({
     setTimeout(() => setSugSuccessNotice(null), 4000)
   }
 
-  const assignedSec = allUsers.find(u => u.id === currentUser.assignedTo)
+  const assignedSec = allUsers.find(u => 
+    u.id === currentUser.assignedTo || 
+    (currentUser.assignedTo && (
+      (u.id === 'user-jsec-1' && currentUser.assignedTo === '11111111-1111-4111-8111-111111111111') ||
+      (u.id === 'user-jsec-2' && currentUser.assignedTo === '22222222-2222-4222-8222-222222222222') ||
+      (u.id === 'user-jsec-3' && currentUser.assignedTo === '33333333-3333-4333-8333-333333333333')
+    ))
+  ) || allUsers.find(u => u.id === 'user-jsec-1')
   const internReports = reports.filter(r => r.internId === currentUser.id)
 
   // Personal Visit Milestone Tracking

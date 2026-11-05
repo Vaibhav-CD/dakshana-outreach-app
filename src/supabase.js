@@ -26,6 +26,11 @@ export const LEGACY_ID_MAP = {
   'user-intern-5': 'aaaa0005-0000-4000-8000-000000000005'
 }
 
+export const REVERSE_LEGACY_ID_MAP = Object.entries(LEGACY_ID_MAP).reduce((acc, [k, v]) => {
+  acc[v] = k
+  return acc
+}, {})
+
 export function toValidUuid(val) {
   if (!val) return null
   if (LEGACY_ID_MAP[val]) return LEGACY_ID_MAP[val]
@@ -48,16 +53,16 @@ export async function dbFetchProfiles() {
     }
     if (!data || data.length === 0) return null
     return data.map(d => ({
-      id: d.id,
+      id: REVERSE_LEGACY_ID_MAP[d.id] || d.id,
       name: d.full_name,
       email: d.email,
       role: d.role,
       batch: d.batch,
       title: d.role === 'intern' ? 'Outreach Scholar' : d.role === 'senior_sec' ? 'Senior Secretary' : d.role === 'junior_sec' ? 'Junior Secretary' : 'Trustee',
-      department: d.department,
+      department: d.department || (d.role === 'junior_sec' ? (d.id === '11111111-1111-4111-8111-111111111111' ? 'Panel 1' : d.id === '22222222-2222-4222-8222-222222222222' ? 'Panel 2' : 'Panel 3') : ''),
       phone: d.phone,
       photo: d.photo_url || null,
-      assignedTo: d.assigned_to,
+      assignedTo: REVERSE_LEGACY_ID_MAP[d.assigned_to] || d.assigned_to,
       bio: d.bio,
       passwordHash: d.password_hash || null,
       targetVisits: d.target_visits || 15
@@ -112,7 +117,11 @@ export async function dbUpdateProfile(id, updates) {
     const targetId = toValidUuid(id) || id
     const payload = {}
     if (updates.name) payload.full_name = sanitizeInput(updates.name)
+    if (updates.email) payload.email = sanitizeInput(updates.email).toLowerCase().trim()
     if (updates.batch) payload.batch = updates.batch
+    if (updates.department !== undefined) payload.department = sanitizeInput(updates.department)
+    if (updates.bio !== undefined) payload.bio = sanitizeInput(updates.bio)
+    if (updates.phone !== undefined) payload.phone = sanitizeInput(updates.phone)
     if (updates.assignedTo !== undefined) payload.assigned_to = toValidUuid(updates.assignedTo)
     if (updates.photo_url !== undefined) payload.photo_url = updates.photo_url
     if (updates.photo !== undefined) payload.photo_url = updates.photo
@@ -138,10 +147,10 @@ export async function dbFetchReports() {
     if (error || !data || data.length === 0) return null
     return data.map(r => ({
       id: r.id,
-      internId: r.intern_id,
+      internId: REVERSE_LEGACY_ID_MAP[r.intern_id] || r.intern_id,
       internName: r.intern_name,
       batch: r.batch,
-      juniorSecId: r.junior_sec_id,
+      juniorSecId: REVERSE_LEGACY_ID_MAP[r.junior_sec_id] || r.junior_sec_id,
       monthYear: r.month_year,
       tasksCompleted: r.tasks_completed,
       hoursContributed: r.hours_contributed,

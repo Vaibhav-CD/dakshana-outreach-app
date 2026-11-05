@@ -131,13 +131,27 @@ export default function JuniorSecView({
   const allInterns = allUsers.filter(u => u.role === 'intern')
 
   // Wing interns
-  const assignedInterns = allUsers.filter(u => u.role === 'intern' && u.assignedTo === currentUser.id)
+  const assignedInterns = allUsers.filter(u => u.role === 'intern' && (
+    u.assignedTo === currentUser.id ||
+    (currentUser.id === 'user-jsec-1' && u.assignedTo === '11111111-1111-4111-8111-111111111111') ||
+    (currentUser.id === '11111111-1111-4111-8111-111111111111' && u.assignedTo === 'user-jsec-1') ||
+    (currentUser.id === 'user-jsec-2' && u.assignedTo === '22222222-2222-4222-8222-222222222222') ||
+    (currentUser.id === '22222222-2222-4222-8222-222222222222' && u.assignedTo === 'user-jsec-2') ||
+    (currentUser.id === 'user-jsec-3' && u.assignedTo === '33333333-3333-4333-8333-333333333333') ||
+    (currentUser.id === '33333333-3333-4333-8333-333333333333' && u.assignedTo === 'user-jsec-3')
+  ))
   const assignedInternIds = assignedInterns.map(i => i.id)
 
   // Report scoping: if canViewAllReports is true, user can toggle between my_wing and all_wings
   const effectiveReports = (myPowers.canViewAllReports && reportScope === 'all_wings')
     ? reports
-    : reports.filter(r => assignedInternIds.includes(r.internId) || r.juniorSecId === currentUser.id)
+    : reports.filter(r => 
+        assignedInternIds.includes(r.internId) || 
+        r.juniorSecId === currentUser.id ||
+        (currentUser.id === 'user-jsec-1' && r.juniorSecId === '11111111-1111-4111-8111-111111111111') ||
+        (currentUser.id === 'user-jsec-2' && r.juniorSecId === '22222222-2222-4222-8222-222222222222') ||
+        (currentUser.id === 'user-jsec-3' && r.juniorSecId === '33333333-3333-4333-8333-333333333333')
+      )
 
   const pendingReports = effectiveReports.filter(r => r.status === 'submitted')
   const completedReports = effectiveReports.filter(r => r.status === 'reviewed')

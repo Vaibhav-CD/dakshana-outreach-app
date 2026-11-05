@@ -38,7 +38,14 @@ export default function InternDetailModal({
   const [activeTab, setActiveTab] = useState('overview') // 'overview' | 'visits' | 'reports'
 
   // Look up supervisor
-  const supervisor = allUsers.find(u => u.id === intern.assignedTo) || { name: 'Assigned Junior Secretary' }
+  const supervisor = allUsers.find(u => 
+    u.id === intern.assignedTo || 
+    (intern.assignedTo && (
+      (u.id === 'user-jsec-1' && intern.assignedTo === '11111111-1111-4111-8111-111111111111') ||
+      (u.id === 'user-jsec-2' && intern.assignedTo === '22222222-2222-4222-8222-222222222222') ||
+      (u.id === 'user-jsec-3' && intern.assignedTo === '33333333-3333-4333-8333-333333333333')
+    ))
+  ) || { name: 'Assigned Junior Secretary' }
 
   // Session & Visit Data
   const sessionData = sessions.find(s => s.internId === intern.id) || {}

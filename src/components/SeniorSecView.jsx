@@ -342,8 +342,22 @@ export default function SeniorSecView({
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {juniorSecs.map((jsec) => {
-            const secInterns = interns.filter(i => i.assignedTo === jsec.id)
-            const secReports = reports.filter(r => r.juniorSecId === jsec.id)
+            const secInterns = interns.filter(i => 
+              i.assignedTo === jsec.id ||
+              (i.assignedTo && (
+                (jsec.id === 'user-jsec-1' && i.assignedTo === '11111111-1111-4111-8111-111111111111') ||
+                (jsec.id === 'user-jsec-2' && i.assignedTo === '22222222-2222-4222-8222-222222222222') ||
+                (jsec.id === 'user-jsec-3' && i.assignedTo === '33333333-3333-4333-8333-333333333333')
+              ))
+            )
+            const secReports = reports.filter(r => 
+              r.juniorSecId === jsec.id ||
+              (r.juniorSecId && (
+                (jsec.id === 'user-jsec-1' && r.juniorSecId === '11111111-1111-4111-8111-111111111111') ||
+                (jsec.id === 'user-jsec-2' && r.juniorSecId === '22222222-2222-4222-8222-222222222222') ||
+                (jsec.id === 'user-jsec-3' && r.juniorSecId === '33333333-3333-4333-8333-333333333333')
+              ))
+            )
             const secPending = secReports.filter(r => r.status === 'submitted').length
             const b1 = secInterns.filter(i => i.batch === 'Batch 1').length
             const b2 = secInterns.filter(i => i.batch === 'Batch 2').length
@@ -521,7 +535,14 @@ export default function SeniorSecView({
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   {filteredInterns.map((intern) => {
-                    const assignedSec = juniorSecs.find(j => j.id === intern.assignedTo)
+                    const assignedSec = juniorSecs.find(j => 
+                      j.id === intern.assignedTo ||
+                      (intern.assignedTo && (
+                        (j.id === 'user-jsec-1' && intern.assignedTo === '11111111-1111-4111-8111-111111111111') ||
+                        (j.id === 'user-jsec-2' && intern.assignedTo === '22222222-2222-4222-8222-222222222222') ||
+                        (j.id === 'user-jsec-3' && intern.assignedTo === '33333333-3333-4333-8333-333333333333')
+                      ))
+                    )
                     return (
                       <tr key={intern.id} className="hover:bg-slate-50/80 transition-colors">
                         <td

@@ -38,6 +38,7 @@ import {
 } from './mockData'
 import {
   isSupabaseConfigured,
+  REVERSE_LEGACY_ID_MAP,
   dbFetchProfiles,
   dbCreateProfile,
   dbUpdateProfile,
@@ -91,17 +92,40 @@ export default function App() {
         if (session && session.user && session.expiresAt) {
           const now = Date.now()
           if (now < session.expiresAt) {
+            // Check and prune obsolete junior secretary sessions
+            const uName = (session.user.name || '').toLowerCase()
+            const uEmail = (session.user.email || '').toLowerCase()
+            if (['priya sharma', 'rohan verma', 'sneha kulkarni'].includes(uName) ||
+                ['priya.jsec@dakshana.org', 'rohan.jsec@dakshana.org', 'sneha.jsec@dakshana.org'].includes(uEmail)) {
+              localStorage.removeItem('dakshana_session')
+              localStorage.removeItem('dakshana_current_user')
+              return null
+            }
+
             // Valid session within 2 weeks!
             const jsecMap = {
-              'user-jsec-1': { name: 'Aditi Devliya', title: 'Junior Secretary (Panel 1)', department: 'Panel 1' },
-              'user-jsec-2': { name: 'Nitish Gupta', title: 'Junior Secretary (Panel 2)', department: 'Panel 2' },
-              'user-jsec-3': { name: 'Sakshi Athole', title: 'Junior Secretary (Panel 3)', department: 'Panel 3' }
+              'user-jsec-1': { id: 'user-jsec-1', name: 'Aditi Devliya', title: 'Junior Secretary (Panel 1)', department: 'Panel 1', defaultEmail: 'aditi.jsec@dakshana.org' },
+              '11111111-1111-4111-8111-111111111111': { id: 'user-jsec-1', name: 'Aditi Devliya', title: 'Junior Secretary (Panel 1)', department: 'Panel 1', defaultEmail: 'aditi.jsec@dakshana.org' },
+              'user-jsec-2': { id: 'user-jsec-2', name: 'Nitish Gupta', title: 'Junior Secretary (Panel 2)', department: 'Panel 2', defaultEmail: 'nitish.jsec@dakshana.org' },
+              '22222222-2222-4222-8222-222222222222': { id: 'user-jsec-2', name: 'Nitish Gupta', title: 'Junior Secretary (Panel 2)', department: 'Panel 2', defaultEmail: 'nitish.jsec@dakshana.org' },
+              'user-jsec-3': { id: 'user-jsec-3', name: 'Sakshi Athole', title: 'Junior Secretary (Panel 3)', department: 'Panel 3', defaultEmail: 'sakshi.jsec@dakshana.org' },
+              '33333333-3333-4333-8333-333333333333': { id: 'user-jsec-3', name: 'Sakshi Athole', title: 'Junior Secretary (Panel 3)', department: 'Panel 3', defaultEmail: 'sakshi.jsec@dakshana.org' }
             }
             if (jsecMap[session.user?.id]) {
+              const info = jsecMap[session.user.id]
               session.user = { 
                 ...session.user, 
-                ...jsecMap[session.user.id],
-                email: session.user.email || (session.user.id === 'user-jsec-1' ? 'aditi.jsec@dakshana.org' : session.user.id === 'user-jsec-2' ? 'nitish.jsec@dakshana.org' : 'sakshi.jsec@dakshana.org')
+                id: info.id,
+                name: info.name,
+                title: info.title,
+                department: info.department,
+                email: session.user.email || info.defaultEmail
+              }
+              localStorage.setItem('dakshana_session', JSON.stringify(session))
+            } else if (session.user?.assignedTo && REVERSE_LEGACY_ID_MAP[session.user.assignedTo]) {
+              session.user = {
+                ...session.user,
+                assignedTo: REVERSE_LEGACY_ID_MAP[session.user.assignedTo]
               }
               localStorage.setItem('dakshana_session', JSON.stringify(session))
             }
@@ -139,7 +163,22 @@ export default function App() {
       try {
         let parsed = JSON.parse(saved)
         if (Array.isArray(parsed) && parsed.length > 0) {
-          // Migration map to ensure latest Junior Secretary names & panels are synced
+          const obsoleteNames = ['priya sharma', 'rohan verma', 'sneha kulkarni']
+          const obsoleteEmails = ['priya.jsec@dakshana.org', 'rohan.jsec@dakshana.org', 'sneha.jsec@dakshana.org']
+
+          // Strict filter: Remove the 3 obsolete junior secretaries and any duplicate junior sec
+          parsed = parsed.filter(u => {
+            const nameLower = (u.name || '').toLowerCase().trim()
+            const emailLower = (u.email || '').toLowerCase().trim()
+            if (obsoleteNames.includes(nameLower)) return false
+            if (obsoleteEmails.includes(emailLower)) return false
+            if (u.role === 'junior_sec' && !['user-jsec-1', 'user-jsec-2', 'user-jsec-3'].includes(u.id)) {
+              return false
+            }
+            return true
+          })
+
+          // Canonical definition for the 3 active Junior Secretaries
           const jsecMap = {
             'user-jsec-1': {
               name: 'Aditi Devliya',
@@ -163,6 +202,7 @@ export default function App() {
               bio: 'Supervises, mentors, and reviews fieldwork documentation for assigned outreach scholars in Panel 3.'
             }
           }
+
           parsed = parsed.map(u => {
             if (jsecMap[u.id]) {
               const info = jsecMap[u.id]
@@ -171,8 +211,20 @@ export default function App() {
                 : info.defaultEmail
               return { ...u, name: info.name, title: info.title, department: info.department, bio: info.bio, email: emailToUse }
             }
+            if (u.role === 'intern' && u.assignedTo) {
+              const norm = REVERSE_LEGACY_ID_MAP[u.assignedTo] || u.assignedTo
+              return { ...u, assignedTo: norm }
+            }
             return u
           })
+
+          // Ensure the 3 official Junior Secretaries always exist
+          INITIAL_USERS.slice(4, 7).forEach(lead => {
+            if (!parsed.some(u => u.id === lead.id)) {
+              parsed.push(lead)
+            }
+          })
+
           localStorage.setItem('dakshana_all_users', JSON.stringify(parsed))
           return parsed
         }
@@ -347,43 +399,139 @@ export default function App() {
         ])
 
         if (cloudProfiles && cloudProfiles.length > 0) {
+          const obsoleteNames = ['priya sharma', 'rohan verma', 'sneha kulkarni']
+          const obsoleteEmails = ['priya.jsec@dakshana.org', 'rohan.jsec@dakshana.org', 'sneha.jsec@dakshana.org']
+          const canonicalJsecIds = ['user-jsec-1', 'user-jsec-2', 'user-jsec-3']
+
+          const isObsoleteUser = (u) => {
+            if (!u) return false
+            const n = (u.name || u.full_name || '').toLowerCase().trim()
+            const e = (u.email || '').toLowerCase().trim()
+            if (obsoleteNames.includes(n) || obsoleteEmails.includes(e)) return true
+            if (u.role === 'junior_sec' && !canonicalJsecIds.includes(u.id)) return true
+            return false
+          }
+
+          const canonicalJsecs = {
+            'user-jsec-1': {
+              id: 'user-jsec-1',
+              name: 'Aditi Devliya',
+              title: 'Junior Secretary (Panel 1)',
+              department: 'Panel 1',
+              defaultEmail: 'aditi.jsec@dakshana.org',
+              bio: 'Supervises, mentors, and reviews monthly progress reports for assigned outreach scholars in Panel 1.'
+            },
+            'user-jsec-2': {
+              id: 'user-jsec-2',
+              name: 'Nitish Gupta',
+              title: 'Junior Secretary (Panel 2)',
+              department: 'Panel 2',
+              defaultEmail: 'nitish.jsec@dakshana.org',
+              bio: 'Supervises, mentors, and reviews progress reports for assigned outreach scholars in Panel 2.'
+            },
+            'user-jsec-3': {
+              id: 'user-jsec-3',
+              name: 'Sakshi Athole',
+              title: 'Junior Secretary (Panel 3)',
+              department: 'Panel 3',
+              defaultEmail: 'sakshi.jsec@dakshana.org',
+              bio: 'Supervises, mentors, and reviews fieldwork documentation for assigned outreach scholars in Panel 3.'
+            }
+          }
+
           setAllUsers(prev => {
-            const combined = cloudProfiles.map(cp => {
-              const existing = prev.find(u => u.id === cp.id || u.email.toLowerCase() === cp.email.toLowerCase())
-              return {
+            const cleanPrev = (prev || []).filter(u => !isObsoleteUser(u))
+            const cleanCloud = cloudProfiles.filter(u => !isObsoleteUser(u))
+
+            const userMap = new Map()
+            cleanPrev.forEach(u => {
+              userMap.set(u.id, { ...u })
+            })
+
+            cleanCloud.forEach(cp => {
+              const existing = userMap.get(cp.id) || Array.from(userMap.values()).find(u => u.email.toLowerCase() === cp.email.toLowerCase())
+              const mergedId = existing ? existing.id : cp.id
+              const normAssigned = REVERSE_LEGACY_ID_MAP[cp.assignedTo] || cp.assignedTo || existing?.assignedTo
+              const merged = {
                 ...existing,
                 ...cp,
+                id: mergedId,
+                assignedTo: normAssigned,
                 passwordHash: cp.passwordHash || existing?.passwordHash || null
               }
+              userMap.set(mergedId, merged)
             })
+
+            // Guarantee leadership profiles are intact
             INITIAL_USERS.slice(0, 7).forEach(lead => {
-              if (!combined.some(u => u.email === lead.email)) combined.unshift(lead)
+              if (!userMap.has(lead.id)) {
+                userMap.set(lead.id, lead)
+              }
             })
+
+            // Enforce Junior Secretary canonical profiles while preserving edited display emails
+            Object.entries(canonicalJsecs).forEach(([id, info]) => {
+              const existing = userMap.get(id)
+              const emailToKeep = (existing?.email && !obsoleteEmails.includes(existing.email.toLowerCase()))
+                ? existing.email
+                : info.defaultEmail
+              userMap.set(id, {
+                ...existing,
+                id: info.id,
+                name: info.name,
+                title: info.title,
+                department: info.department,
+                bio: existing?.bio || info.bio,
+                role: 'junior_sec',
+                email: emailToKeep
+              })
+            })
+
+            // Final safety filter: strictly 3 Junior Secretaries, no obsolete profiles
+            const combined = Array.from(userMap.values()).filter(u => !isObsoleteUser(u))
             localStorage.setItem('dakshana_all_users', JSON.stringify(combined))
             return combined
           })
 
           setCurrentUser(prevUser => {
             if (!prevUser) return prevUser
-            const matching = cloudProfiles.find(p => p.id === prevUser.id || p.email.toLowerCase() === prevUser.email.toLowerCase())
-            if (matching) {
-              const updated = {
-                ...prevUser,
-                ...matching,
-                passwordHash: matching.passwordHash || prevUser.passwordHash || null
-              }
-              const sessionStr = localStorage.getItem('dakshana_session')
-              if (sessionStr) {
-                try {
-                  const session = JSON.parse(sessionStr)
-                  session.user = updated
-                  localStorage.setItem('dakshana_session', JSON.stringify(session))
-                } catch (e) { }
-              }
-              localStorage.setItem('dakshana_current_user', JSON.stringify(updated))
-              return updated
+            if (isObsoleteUser(prevUser)) {
+              localStorage.removeItem('dakshana_session')
+              localStorage.removeItem('dakshana_current_user')
+              return null
             }
-            return prevUser
+
+            const cleanCloud = cloudProfiles.filter(u => !isObsoleteUser(u))
+            const matching = cleanCloud.find(p => p.id === prevUser.id || (p.email && prevUser.email && p.email.toLowerCase() === prevUser.email.toLowerCase()))
+            const normAssigned = prevUser.assignedTo ? (REVERSE_LEGACY_ID_MAP[prevUser.assignedTo] || prevUser.assignedTo) : prevUser.assignedTo
+
+            const updated = {
+              ...prevUser,
+              ...(matching || {}),
+              assignedTo: matching?.assignedTo ? (REVERSE_LEGACY_ID_MAP[matching.assignedTo] || matching.assignedTo) : normAssigned,
+              passwordHash: matching?.passwordHash || prevUser.passwordHash || null
+            }
+
+            if (canonicalJsecs[updated.id]) {
+              const info = canonicalJsecs[updated.id]
+              updated.name = info.name
+              updated.title = info.title
+              updated.department = info.department
+              if (!updated.email || obsoleteEmails.includes(updated.email.toLowerCase())) {
+                updated.email = info.defaultEmail
+              }
+            }
+
+            const sessionStr = localStorage.getItem('dakshana_session')
+            if (sessionStr) {
+              try {
+                const session = JSON.parse(sessionStr)
+                session.user = updated
+                localStorage.setItem('dakshana_session', JSON.stringify(session))
+              } catch (e) { }
+            }
+            localStorage.setItem('dakshana_current_user', JSON.stringify(updated))
+            return updated
           })
         }
         if (cloudReports && cloudReports.length > 0) {
