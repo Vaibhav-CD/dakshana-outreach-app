@@ -254,3 +254,54 @@ DO $$ BEGIN
     CREATE POLICY "Allow public insert on feedback" ON public.feedback FOR INSERT WITH CHECK (true);
     CREATE POLICY "Allow public update on feedback" ON public.feedback FOR UPDATE USING (true);
 EXCEPTION WHEN duplicate_object THEN null; END $$;
+
+-- ==============================================================================
+-- PRODUCTION HARDENED ROW-LEVEL SECURITY (RLS) POLICIES
+-- NOTE: In production environments with Supabase Auth enabled, revoke open anon
+-- wildcard policies above and apply these authenticated role-bound policies:
+-- ==============================================================================
+/*
+-- 1. Profiles: Users can only update their own profile; only senior_sec/management can update roles
+DROP POLICY IF EXISTS "Allow public update on profiles" ON public.profiles;
+CREATE POLICY "Users can update own profile" ON public.profiles
+    FOR UPDATE TO authenticated
+    USING (auth.uid() = auth_user_id)
+    WITH CHECK (auth.uid() = auth_user_id);
+
+-- 2. Claims: Scholars can only submit claims for themselves; status forced to 'pending'
+DROP POLICY IF EXISTS "Allow public insert on reimbursement_claims" ON public.reimbursement_claims;
+CREATE POLICY "Scholars can insert own pending claims" ON public.reimbursement_claims
+    FOR INSERT TO authenticated
+    WITH CHECK (status = 'pending' AND intern_id IN (SELECT id FROM public.profiles WHERE auth_user_id = auth.uid()));
+
+DROP POLICY IF EXISTS "Allow public update on reimbursement_claims" ON public.reimbursement_claims;
+CREATE POLICY "Only secretariat/management can approve claims" ON public.reimbursement_claims
+    FOR UPDATE TO authenticated
+    USING (EXISTS (
+        SELECT 1 FROM public.profiles 
+        WHERE auth_user_id = auth.uid() AND role IN ('senior_sec', 'management')
+    ));
+
+-- 3. Reports: Scholars cannot pre-review reports upon creation
+DROP POLICY IF EXISTS "Allow public insert on monthly_reports" ON public.monthly_reports;
+CREATE POLICY "Scholars can insert own submitted reports" ON public.monthly_reports
+    FOR INSERT TO authenticated
+    WITH CHECK (status = 'submitted' AND intern_id IN (SELECT id FROM public.profiles WHERE auth_user_id = auth.uid()));
+
+DROP POLICY IF EXISTS "Allow public update on monthly_reports" ON public.monthly_reports;
+CREATE POLICY "Only supervisors can review monthly reports" ON public.monthly_reports
+    FOR UPDATE TO authenticated
+    USING (EXISTS (
+        SELECT 1 FROM public.profiles 
+        WHERE auth_user_id = auth.uid() AND role IN ('senior_sec', 'junior_sec', 'management')
+    ));
+
+-- 4. Circulars: Only leadership can transmit broadcasts
+DROP POLICY IF EXISTS "Allow public insert on broadcast_messages" ON public.broadcast_messages;
+CREATE POLICY "Only leadership can post broadcasts" ON public.broadcast_messages
+    FOR INSERT TO authenticated
+    WITH CHECK (EXISTS (
+        SELECT 1 FROM public.profiles 
+        WHERE auth_user_id = auth.uid() AND role IN ('senior_sec', 'junior_sec', 'management')
+    ));
+*/

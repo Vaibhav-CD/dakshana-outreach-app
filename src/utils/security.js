@@ -19,19 +19,28 @@ export const VALID_LEADERSHIP_HASHES = new Set([
   '6051fc84a7a0d74c225fb18a496b09952da5642e60723ecae543298edd7d82d6'
 ])
 
+// Salt used for client-side password hashing to mitigate rainbow table attacks
+const APP_HASH_SALT = 'dakshana_secure_salt_v2_'
+
 /**
- * Computes SHA-256 hex digest of a string using Web Crypto API
+ * Computes SHA-256 hex digest of a string using Web Crypto API.
+ * Supports salting to protect against precomputed dictionary/rainbow table lookups.
  * Falls back to an internal bitwise implementation if Web Crypto is unavailable.
  */
-export async function hashCredential(input) {
+export async function hashCredential(input, salt = '') {
   if (typeof input !== 'string') return ''
   const trimmed = input.trim()
   if (!trimmed) return ''
 
-  if (typeof window !== 'undefined' && window.crypto && window.crypto.subtle) {
+  const saltedInput = salt ? `${salt}:${trimmed}` : trimmed
+
+  const subtle = (typeof globalThis !== 'undefined' && globalThis.crypto?.subtle) || 
+                 (typeof window !== 'undefined' && window.crypto?.subtle)
+
+  if (subtle) {
     try {
-      const msgUint8 = new TextEncoder().encode(trimmed)
-      const hashBuffer = await window.crypto.subtle.digest('SHA-256', msgUint8)
+      const msgUint8 = new TextEncoder().encode(saltedInput)
+      const hashBuffer = await subtle.digest('SHA-256', msgUint8)
       const hashArray = Array.from(new Uint8Array(hashBuffer))
       return hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
     } catch {
@@ -40,34 +49,44 @@ export async function hashCredential(input) {
   }
 
   // Pure JavaScript SHA-256 fallback for testing / legacy environments
-  return fallbackSha256(trimmed)
+  return fallbackSha256(saltedInput)
 }
 
 /**
- * Verifies an entered password against stored credential or role default
+ * Creates a salted password hash for new user registration or password updates
+ */
+export async function hashUserPassword(password) {
+  return hashCredential(password, APP_HASH_SALT)
+}
+
+/**
+ * Verifies an entered password against stored credential or role default.
+ * Supports salted hashes, unsalted legacy hashes, and role defaults with backward compatibility.
  */
 export async function verifyUserPassword(enteredPassword, user) {
   if (!enteredPassword || !user) return false
-  const inputHash = await hashCredential(enteredPassword)
+  const trimmed = enteredPassword.trim()
+  const rawInputHash = await hashCredential(trimmed)
+  const saltedInputHash = await hashCredential(trimmed, APP_HASH_SALT)
 
-  // 1. If user already has a stored password hash (e.g. after changing password or signing up)
+  // 1. If user already has a stored password hash (salted modern or unsalted legacy)
   if (user.passwordHash) {
-    return user.passwordHash === inputHash
+    return user.passwordHash === saltedInputHash || user.passwordHash === rawInputHash
   }
 
   // 2. Legacy fallback if user had plaintext password in localStorage
   if (user.password) {
     const storedHash = await hashCredential(user.password)
-    if (storedHash === inputHash || user.password === enteredPassword.trim()) {
+    if (storedHash === rawInputHash || user.password === trimmed) {
       return true
     }
   }
 
-  // 3. Fallback to default role hash
+  // 3. Fallback to default role hash (using known legacy unsalted hashes)
   if (user.role === 'intern') {
-    return inputHash === HASH_SCHOLAR_DEFAULT
+    return rawInputHash === HASH_SCHOLAR_DEFAULT
   } else {
-    return inputHash === HASH_STAFF_DEFAULT || VALID_LEADERSHIP_HASHES.has(inputHash)
+    return rawInputHash === HASH_STAFF_DEFAULT || VALID_LEADERSHIP_HASHES.has(rawInputHash)
   }
 }
 
@@ -89,55 +108,55 @@ export async function verifyLeadershipPasskey(enteredPasskey) {
 }
 
 /**
- * Robust HTML, script, and event-handler sanitization for user inputs
- * Removes null bytes, script tags, event handlers (onload, onerror), and raw HTML brackets.
+ * Robust HTML, script, control-character, and event-handler sanitization for user inputs.
+ * Enforces length limits to prevent payload stuffing and LocalStorage quota exhaustion.
  */
-export function sanitizeInput(str) {
-  if (typeof str !== 'string') return str
-  return str
-    .replace(/\0/g, '') // strip null bytes
-    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+export function sanitizeInput(str, maxLength = 3000) {
+  if (str === null || str === undefined) return ''
+  const val = typeof str === 'string' ? str : String(str)
+  return val
+    .slice(0, Math.max(1, maxLength))
+    .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F-\u009F]/g, '') // strip control characters & null bytes
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '') // strip script tags
     .replace(/\bon\w+\s*=/gi, '') // strip inline event handlers like onclick=, onload=
-    .replace(/[<>]/g, '')
+    .replace(/[<>]/g, '') // strip angle brackets
     .trim()
 }
 
 /**
- * Validates and normalizes URLs to prevent javascript: or data: XSS attacks
+ * Validates and normalizes URLs using strict protocol whitelisting.
+ * Completely blocks dangerous schemes (javascript:, data:, vbscript:) and malformed payloads.
  */
 export function safeUrl(url, fallback = '#') {
-  if (typeof url !== 'string') return fallback
+  if (!url || typeof url !== 'string') return fallback
   const trimmed = url.trim()
   if (!trimmed) return fallback
 
-  const lower = trimmed.toLowerCase()
-  // Block dangerous schemes
-  if (
-    lower.startsWith('javascript:') ||
-    lower.startsWith('vbscript:') ||
-    lower.startsWith('data:text/html') ||
-    lower.startsWith('data:application')
-  ) {
+  // Strip control characters
+  const clean = trimmed.replace(/[\u0000-\u001F\u007F-\u009F]/g, '')
+
+  // Allow safe relative paths
+  if (clean.startsWith('/') || clean.startsWith('#')) {
+    // Disallow protocol-relative URLs (e.g. //evil.com)
+    if (clean.startsWith('//')) return fallback
+    return clean
+  }
+
+  try {
+    const parsed = new URL(clean, typeof window !== 'undefined' ? window.location.origin : 'https://dakshana.org')
+    const allowedProtocols = ['https:', 'http:', 'mailto:', 'tel:']
+    if (allowedProtocols.includes(parsed.protocol.toLowerCase())) {
+      // If parsed protocol is valid and original matched, return valid URL
+      return clean
+    }
+    return fallback
+  } catch {
+    // If bare domain like "drive.google.com/..."
+    if (/^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(\/.*)?$/.test(clean)) {
+      return `https://${clean}`
+    }
     return fallback
   }
-
-  // Allow standard protocols
-  if (
-    lower.startsWith('https://') ||
-    lower.startsWith('http://') ||
-    lower.startsWith('mailto:') ||
-    lower.startsWith('tel:') ||
-    lower.startsWith('/')
-  ) {
-    return trimmed
-  }
-
-  // If bare URL (e.g. "bit.ly/..."), default to https://
-  if (/^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/.test(trimmed)) {
-    return `https://${trimmed}`
-  }
-
-  return fallback
 }
 
 /**

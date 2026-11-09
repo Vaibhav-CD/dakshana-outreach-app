@@ -21,7 +21,7 @@ import ErrorBoundary from './components/ErrorBoundary'
 import { Radio, X, Bell, Bug } from 'lucide-react'
 import QueriesHub from './components/QueriesHub'
 import { parseDateToTimestamp, calculateInternshipCountdown } from './utils/dateUtils'
-import { hashCredential } from './utils/security'
+import { hashCredential, hashUserPassword, sanitizeInput } from './utils/security'
 import { sendPhoneNotification } from './utils/notifications'
 import {
   INITIAL_USERS,
@@ -596,7 +596,23 @@ export default function App() {
 
   const handleUpdateProfile = async (updates) => {
     if (!currentUser || !updates) return
-    const updatedUser = { ...currentUser, ...updates }
+
+    // Strict Security Whitelist: prevent mass assignment and privilege escalation (role, id, assignedTo tampering)
+    const sanitizedUpdates = {}
+    if (updates.photo !== undefined) sanitizedUpdates.photo = updates.photo
+    if (updates.email !== undefined && typeof updates.email === 'string') {
+      sanitizedUpdates.email = sanitizeInput(updates.email, 120).toLowerCase().trim()
+    }
+    if (updates.phone !== undefined && typeof updates.phone === 'string') {
+      sanitizedUpdates.phone = sanitizeInput(updates.phone, 30)
+    }
+    if (updates.bio !== undefined && typeof updates.bio === 'string') {
+      sanitizedUpdates.bio = sanitizeInput(updates.bio, 500)
+    }
+
+    if (Object.keys(sanitizedUpdates).length === 0) return
+
+    const updatedUser = { ...currentUser, ...sanitizedUpdates }
     setCurrentUser(updatedUser)
 
     // Update persistent 2-week session
@@ -611,16 +627,17 @@ export default function App() {
     localStorage.setItem('dakshana_current_user', JSON.stringify(updatedUser))
 
     setAllUsers(prev => {
-      const updated = prev.map(u => u.id === currentUser.id ? { ...u, ...updates } : u)
+      const updated = prev.map(u => u.id === currentUser.id ? { ...u, ...sanitizedUpdates } : u)
       localStorage.setItem('dakshana_all_users', JSON.stringify(updated))
       return updated
     })
 
     try {
       const dbPayload = {}
-      if (updates.photo !== undefined) dbPayload.photo_url = updates.photo
-      if (updates.email !== undefined) dbPayload.email = updates.email
-      if (updates.phone !== undefined) dbPayload.phone = updates.phone
+      if (sanitizedUpdates.photo !== undefined) dbPayload.photo_url = sanitizedUpdates.photo
+      if (sanitizedUpdates.email !== undefined) dbPayload.email = sanitizedUpdates.email
+      if (sanitizedUpdates.phone !== undefined) dbPayload.phone = sanitizedUpdates.phone
+      if (sanitizedUpdates.bio !== undefined) dbPayload.bio = sanitizedUpdates.bio
       if (Object.keys(dbPayload).length > 0) {
         await dbUpdateProfile(currentUser.id, dbPayload)
       }
@@ -635,13 +652,14 @@ export default function App() {
 
   const handleUpdateEmail = async (newEmail) => {
     if (!newEmail || typeof newEmail !== 'string') return
-    const cleanEmail = sanitizeInput(newEmail.trim().toLowerCase())
+    const cleanEmail = sanitizeInput(newEmail.trim().toLowerCase(), 120)
     return handleUpdateProfile({ email: cleanEmail })
   }
 
   const handleUpdatePassword = async (newPassword) => {
-    if (!currentUser) return false
-    const passwordHash = await hashCredential(newPassword)
+    if (!currentUser || !newPassword) return false
+    // Use salted password hashing
+    const passwordHash = await hashUserPassword(newPassword)
     
     // Clean user object without plaintext password
     const { password: _oldPwd, ...cleanCurrentUser } = currentUser
@@ -680,37 +698,52 @@ export default function App() {
   }
 
   const handleAddPost = async (newPost) => {
+    if (!currentUser || !newPost) return
+
+    // IDOR Protection: Strictly bind author identity to authenticated session
+    const validatedPost = {
+      ...newPost,
+      id: newPost.id || `post-${Date.now()}`,
+      authorId: currentUser.id,
+      authorName: currentUser.name,
+      authorPhoto: currentUser.photo || null,
+      batch: currentUser.batch || newPost.batch || 'Batch 1',
+      title: sanitizeInput(newPost.title || 'Outreach Milestone Update', 150),
+      content: sanitizeInput(newPost.content || '', 2000),
+      schoolName: newPost.schoolName ? sanitizeInput(newPost.schoolName, 150) : null
+    }
+
     setPosts(prev => {
-      const updated = [newPost, ...prev]
+      const updated = [validatedPost, ...prev]
       localStorage.setItem('dakshana_posts', JSON.stringify(updated))
       return updated
     })
 
     // If marked as done, increment intern's visits count in sessions
-    if (newPost.isCompleted) {
+    if (validatedPost.isCompleted) {
       setSessions(prev => {
-        const found = prev.find(s => s.internId === newPost.authorId)
+        const found = prev.find(s => s.internId === validatedPost.authorId)
         let updated
         if (found) {
           updated = prev.map(s => {
-            if (s.internId === newPost.authorId) {
+            if (s.internId === validatedPost.authorId) {
               return {
                 ...s,
-                sessionsCount: (s.sessionsCount || 0) + (newPost.visitsLogged || 1),
-                studentsReached: (s.studentsReached || 0) + (newPost.studentsReached || 0)
+                sessionsCount: (s.sessionsCount || 0) + (validatedPost.visitsLogged || 1),
+                studentsReached: (s.studentsReached || 0) + (validatedPost.studentsReached || 0)
               }
             }
             return s
           })
         } else {
           updated = [...prev, {
-            internId: newPost.authorId,
-            internName: newPost.authorName,
-            batch: newPost.batch,
-            sessionsCount: newPost.visitsLogged || 1,
-            studentsReached: newPost.studentsReached || 0,
-            wing: newPost.wing,
-            topic: newPost.title
+            internId: validatedPost.authorId,
+            internName: validatedPost.authorName,
+            batch: validatedPost.batch,
+            sessionsCount: validatedPost.visitsLogged || 1,
+            studentsReached: validatedPost.studentsReached || 0,
+            wing: validatedPost.wing,
+            topic: validatedPost.title
           }]
         }
         localStorage.setItem('dakshana_sessions', JSON.stringify(updated))
@@ -719,17 +752,28 @@ export default function App() {
     }
 
     try {
-      await dbCreatePost(newPost)
+      await dbCreatePost(validatedPost)
     } catch (err) {
       console.warn('Could not sync new post to Supabase:', err)
     }
   }
 
   const handleAddComment = async (postId, newComment) => {
+    if (!currentUser || !postId || !newComment) return
+
+    // IDOR Protection: Strictly bind author identity
+    const validatedComment = {
+      ...newComment,
+      authorId: currentUser.id,
+      authorName: currentUser.name,
+      authorRole: currentUser.role,
+      text: sanitizeInput(newComment.text || '', 1000)
+    }
+
     setPosts(prev => {
       const updated = prev.map(p => {
         if (p.id === postId) {
-          const comments = [...(p.comments || []), newComment]
+          const comments = [...(p.comments || []), validatedComment]
           return { ...p, comments }
         }
         return p
@@ -739,7 +783,7 @@ export default function App() {
     })
 
     try {
-      await dbAddCommentToPost(postId, newComment)
+      await dbAddCommentToPost(postId, validatedComment)
     } catch (err) {
       console.warn('Could not sync comment to Supabase:', err)
     }
@@ -945,12 +989,31 @@ export default function App() {
   }
 
   const handleSubmitReport = (newReport) => {
+    if (!currentUser || !newReport) {
+      alert('Authentication required to submit reports.')
+      return
+    }
+
+    // IDOR Protection: Strictly bind report to logged-in scholar and force submitted status
+    const validatedReport = {
+      ...newReport,
+      id: newReport.id || `rep-${Date.now()}`,
+      internId: currentUser.id,
+      internName: currentUser.name,
+      batch: currentUser.batch || 'Batch 1',
+      juniorSecId: currentUser.assignedTo || newReport.juniorSecId || 'user-jsec-1',
+      status: 'submitted', // Cannot be created pre-reviewed
+      reviewerFeedback: '',
+      reviewedBy: null,
+      updatedAt: new Date().toISOString().split('T')[0]
+    }
+
     setReports(prev => {
-      const updated = [newReport, ...prev]
+      const updated = [validatedReport, ...prev]
       localStorage.setItem('dakshana_reports', JSON.stringify(updated))
       return updated
     })
-    dbCreateReport(newReport).catch(console.error)
+    dbCreateReport(validatedReport).catch(console.error)
   }
 
   const handleUpdateReport = (reportId, updates) => {
@@ -965,17 +1028,38 @@ export default function App() {
       return
     }
 
+    // Supervisory boundary check: Junior Sec without global reports view must only review assigned wing scholars
+    if (currentUser.role === 'junior_sec' && !delegatedPowers?.[currentUser.id]?.canViewAllReports) {
+      const targetReport = reports.find(r => r.id === reportId)
+      if (targetReport) {
+        const scholar = allUsers.find(u => u.id === targetReport.internId)
+        const isAssigned = targetReport.juniorSecId === currentUser.id || scholar?.assignedTo === currentUser.id
+        if (!isAssigned) {
+          alert('Access Denied: You are only authorized to review reports for scholars assigned to your wing.')
+          return
+        }
+      }
+    }
+
+    // Whitelist allowed review fields
+    const reviewUpdates = {
+      status: updates.status || 'reviewed',
+      reviewerFeedback: sanitizeInput(updates.reviewerFeedback || '', 1000),
+      reviewedBy: currentUser.name,
+      reviewedAt: new Date().toISOString()
+    }
+
     setReports(prev => {
       const updated = prev.map(rep => {
         if (rep.id === reportId) {
-          return { ...rep, ...updates }
+          return { ...rep, ...reviewUpdates }
         }
         return rep
       })
       localStorage.setItem('dakshana_reports', JSON.stringify(updated))
       return updated
     })
-    dbUpdateReport(reportId, updates).catch(console.error)
+    dbUpdateReport(reportId, reviewUpdates).catch(console.error)
   }
 
   const handleToggleCycle = () => {
@@ -1019,12 +1103,35 @@ export default function App() {
   }
 
   const handleSubmitClaim = (newClaim) => {
+    if (!currentUser || !newClaim) {
+      alert('Authentication required to submit reimbursement claims.')
+      return
+    }
+
+    // IDOR Protection: Strictly bind claim to logged-in scholar and force pending status
+    const rawAmount = parseFloat(newClaim.amount) || 0
+    const clampedAmount = Math.min(25000, Math.max(1, rawAmount))
+
+    const validatedClaim = {
+      ...newClaim,
+      id: newClaim.id || `claim-${Date.now()}`,
+      internId: currentUser.id,
+      internName: currentUser.name,
+      batch: currentUser.batch || 'Batch 1',
+      amount: clampedAmount,
+      upiOrBank: sanitizeInput(newClaim.upiOrBank, 100),
+      purpose: sanitizeInput(newClaim.purpose, 500),
+      status: 'pending', // Strictly cannot be pre-approved or marked paid upon creation
+      approvedBy: null,
+      paidAt: null
+    }
+
     setClaims(prev => {
-      const updated = [newClaim, ...prev]
+      const updated = [validatedClaim, ...prev]
       localStorage.setItem('dakshana_claims', JSON.stringify(updated))
       return updated
     })
-    dbCreateClaim(newClaim).catch(console.error)
+    dbCreateClaim(validatedClaim).catch(console.error)
   }
 
   const handleUpdateClaimStatus = (claimId, newStatus, approverName) => {
@@ -1168,6 +1275,22 @@ export default function App() {
 
   // Assigned Directives & Tasks Handlers ("Done or Not" update tracking)
   const handleToggleTaskDone = (taskId) => {
+    if (!currentUser) return
+    const targetTask = assignedTasks.find(t => t.id === taskId)
+    if (!targetTask) return
+
+    // Authorization Guard: Only the designated assignee, Senior Sec, or Management can complete directives
+    const canToggle = 
+      currentUser.role === 'senior_sec' ||
+      currentUser.role === 'management' ||
+      targetTask.assignedToId === currentUser.id ||
+      (targetTask.assignedToRole === currentUser.role && !targetTask.assignedToId)
+
+    if (!canToggle) {
+      alert('Access Denied: You cannot complete directives assigned to other staff members.')
+      return
+    }
+
     setAssignedTasks(prev => {
       const updated = prev.map(t => {
         if (t.id === taskId) {
@@ -1186,15 +1309,33 @@ export default function App() {
   }
 
   const handleAssignTask = (newTask) => {
+    if (!currentUser || (currentUser.role !== 'senior_sec' && currentUser.role !== 'management')) {
+      alert('Access Denied: Only Secretariat Command or Management can assign directives.')
+      return
+    }
+    const validatedTask = {
+      ...newTask,
+      id: newTask.id || `task-${Date.now()}`,
+      title: sanitizeInput(newTask.title || '', 200),
+      description: sanitizeInput(newTask.description || '', 1000),
+      assignedBy: currentUser.name,
+      assignedByRole: currentUser.role,
+      createdAt: new Date().toISOString().split('T')[0]
+    }
     setAssignedTasks(prev => {
-      const updated = [newTask, ...prev]
+      const updated = [validatedTask, ...prev]
       localStorage.setItem('dakshana_assigned_tasks', JSON.stringify(updated))
       return updated
     })
   }
 
-  // System Improvement & Maintenance Handlers (Senior Secretary Exclusive)
+  // System Improvement & Maintenance Handlers (Senior Secretary / Management Exclusive)
   const handleRectifySuggestion = (suggestionId, rectificationNote) => {
+    if (!currentUser || (currentUser.role !== 'senior_sec' && currentUser.role !== 'management')) {
+      alert('Access Denied: Only Senior Secretary or Management can mark suggestions as rectified.')
+      return
+    }
+
     setSuggestions(prev => {
       const updated = prev.map(s => {
         if (s.id === suggestionId) {
@@ -1203,7 +1344,7 @@ export default function App() {
             status: 'rectified',
             rectifiedAt: new Date().toISOString(),
             rectifiedBy: currentUser?.name || 'Senior Secretary',
-            rectifiedNote: rectificationNote || 'Rectified and verified in maintenance update.'
+            rectifiedNote: sanitizeInput(rectificationNote || 'Rectified and verified in maintenance update.', 500)
           }
         }
         return s
@@ -1214,8 +1355,19 @@ export default function App() {
   }
 
   const handleAddSuggestion = (newSug) => {
+    if (!currentUser || !newSug) return
+    const validatedSug = {
+      ...newSug,
+      id: newSug.id || `sug-${Date.now()}`,
+      title: sanitizeInput(newSug.title || '', 200),
+      description: sanitizeInput(newSug.description || '', 1500),
+      submittedBy: `${currentUser.name} (${currentUser.role === 'intern' ? 'Outreach Scholar' : currentUser.role === 'junior_sec' ? 'Junior Secretary' : 'Staff'})`,
+      submittedRole: currentUser.role,
+      status: 'pending',
+      createdAt: new Date().toISOString().split('T')[0]
+    }
     setSuggestions(prev => {
-      const updated = [newSug, ...prev]
+      const updated = [validatedSug, ...prev]
       localStorage.setItem('dakshana_suggestions', JSON.stringify(updated))
       return updated
     })
@@ -1292,6 +1444,12 @@ export default function App() {
 
   const handleUpdateInternshipEndDate = (newDate, shouldBroadcast = true) => {
     if (!newDate) return
+
+    // Input Validation: Check ISO format (YYYY-MM-DD) and valid date range
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(newDate) || isNaN(Date.parse(newDate))) {
+      alert('Invalid target date format. Please specify a valid date (YYYY-MM-DD).')
+      return
+    }
 
     // Verify authorization: Senior Sec, Management, or specially privileged Junior Sec
     const isAuthorized = currentUser && (

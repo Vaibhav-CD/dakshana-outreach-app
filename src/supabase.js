@@ -127,8 +127,10 @@ export async function dbUpdateProfile(id, updates) {
     if (updates.photo !== undefined) payload.photo_url = updates.photo
     if (updates.password_hash !== undefined) payload.password_hash = updates.password_hash
     if (updates.passwordHash !== undefined) payload.password_hash = updates.passwordHash
-    if (updates.target_visits !== undefined) payload.target_visits = updates.target_visits
-    if (updates.targetVisits !== undefined) payload.target_visits = updates.targetVisits
+    if (updates.target_visits !== undefined || updates.targetVisits !== undefined) {
+      const rawTarget = updates.target_visits !== undefined ? updates.target_visits : updates.targetVisits
+      payload.target_visits = Math.min(100, Math.max(1, parseInt(rawTarget, 10) || 15))
+    }
 
     if (Object.keys(payload).length === 0) return { data: null, error: null }
     const { data, error } = await supabase.from('profiles').update(payload).eq('id', targetId)
@@ -179,11 +181,11 @@ export async function dbCreateReport(report) {
       month_year: report.monthYear,
       tasks_completed: sanitizeInput(report.tasksCompleted),
       hours_contributed: Math.max(0, parseInt(report.hoursContributed, 10) || 0),
-      challenges_faced: sanitizeInput(report.challengesFaced || ''),
-      next_month_goals: sanitizeInput(report.nextMonthGoals || ''),
-      status: report.status || 'submitted',
-      reviewer_feedback: sanitizeInput(report.reviewerFeedback || ''),
-      reviewed_by: sanitizeInput(report.reviewedBy || '') || null
+      challenges_faced: sanitizeInput(report.challengesFaced || '', 1000),
+      next_month_goals: sanitizeInput(report.nextMonthGoals || '', 1000),
+      status: 'submitted', // Enforce default submitted status; cannot be created as pre-reviewed
+      reviewer_feedback: '',
+      reviewed_by: null
     }]).select().single()
     return { data, error }
   } catch (err) {
@@ -239,15 +241,16 @@ export async function dbCreateClaim(claim) {
   if (!supabase) return null
   try {
     const internUuid = toValidUuid(claim.internId) || claim.internId
+    const validatedAmount = Math.min(25000, Math.max(1, parseFloat(claim.amount) || 0))
     const { data, error } = await supabase.from('reimbursement_claims').insert([{
       intern_id: internUuid,
-      intern_name: sanitizeInput(claim.internName),
+      intern_name: sanitizeInput(claim.internName, 100),
       batch: claim.batch || 'Batch 1',
       month_year: claim.monthYear,
-      amount: Math.max(0, parseFloat(claim.amount) || 0),
-      upi_or_bank: sanitizeInput(claim.upiOrBank),
-      purpose: sanitizeInput(claim.purpose),
-      status: claim.status || 'pending'
+      amount: validatedAmount,
+      upi_or_bank: sanitizeInput(claim.upiOrBank, 100),
+      purpose: sanitizeInput(claim.purpose, 500),
+      status: 'pending' // Enforce initial pending status; cannot be created as pre-approved or pre-paid
     }]).select().single()
     return { data, error }
   } catch (err) {
