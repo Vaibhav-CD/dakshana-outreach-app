@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
-import { Award, TrendingUp, Download, LayoutDashboard, FileSpreadsheet, Calendar } from 'lucide-react'
+import { Award, TrendingUp, Download, LayoutDashboard, FileSpreadsheet, Calendar, Compass, MapPin } from 'lucide-react'
 import ProgressIntelligenceHub from './ProgressIntelligenceHub'
 
-export default function ManagementView({ allUsers, reports, sessions = [], assignedTasks = [], currentUser, countdown, onOpenSetEndDateModal }) {
+export default function ManagementView({ allUsers, reports, sessions = [], assignedTasks = [], currentUser, countdown, onOpenSetEndDateModal, onOpenGeoMap }) {
   const [activeSubTab, setActiveSubTab] = useState('intelligence') // 'intelligence' | 'governance'
   const interns = allUsers.filter(u => u.role === 'intern')
   const juniorSecs = allUsers.filter(u => u.role === 'junior_sec')
@@ -29,6 +29,16 @@ export default function ManagementView({ allUsers, reports, sessions = [], assig
 
           {/* Sub-tab navigation */}
           <div className="flex flex-wrap items-center gap-2">
+            {onOpenGeoMap && (
+              <button
+                onClick={onOpenGeoMap}
+                className="px-3.5 py-2 rounded-2xl bg-white/15 hover:bg-white/25 border border-white/25 text-white font-bold text-xs flex items-center shadow-xs transition-all cursor-pointer"
+                title="Pan-India Reach & Regional Hotspots Heatmap"
+              >
+                <Compass className="w-4 h-4 mr-1.5 text-purple-200" />
+                <span>Pan-India Map</span>
+              </button>
+            )}
             {onOpenSetEndDateModal && (
               <button
                 onClick={onOpenSetEndDateModal}

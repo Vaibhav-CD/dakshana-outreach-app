@@ -11,6 +11,7 @@ import ReimbursementModule from './components/ReimbursementModule'
 import ResourceHub from './components/ResourceHub'
 import BroadcastCenter from './components/BroadcastCenter'
 import PostsFeed from './components/PostsFeed'
+import IndiaGeoIntelligenceMap from './components/IndiaGeoIntelligenceMap'
 import InternDetailModal from './components/InternDetailModal'
 import EditProfilePhotoModal from './components/EditProfilePhotoModal'
 import AuthModal from './components/AuthModal'
@@ -1571,6 +1572,7 @@ export default function App() {
                   onAddSuggestion={handleAddSuggestion}
                   countdown={countdown}
                   onOpenSetEndDateModal={() => setIsSetEndDateModalOpen(true)}
+                  onOpenGeoMap={() => handleSetActiveTab('geomap')}
                 />
               )}
 
@@ -1591,6 +1593,7 @@ export default function App() {
                   onAddSuggestion={handleAddSuggestion}
                   onOpenSetEndDateModal={() => setIsSetEndDateModalOpen(true)}
                   onUpdateEmail={handleUpdateEmail}
+                  onOpenGeoMap={() => handleSetActiveTab('geomap')}
                 />
               )}
 
@@ -1618,6 +1621,7 @@ export default function App() {
                   suggestions={suggestions}
                   countdown={countdown}
                   onOpenSetEndDateModal={() => setIsSetEndDateModalOpen(true)}
+                  onOpenGeoMap={() => handleSetActiveTab('geomap')}
                 />
               )}
             </div>
@@ -1672,6 +1676,18 @@ export default function App() {
               onSubmitClaim={handleSubmitClaim}
               onUpdateClaimStatus={handleUpdateClaimStatus}
               delegatedPowers={delegatedPowers}
+            />
+          )}
+
+          {/* TAB: PAN-INDIA REACH & REGIONAL TELEMETRY MAP (Junior Sec, Senior Sec, Management) */}
+          {activeTab === 'geomap' && (currentUser?.role === 'junior_sec' || currentUser?.role === 'senior_sec' || currentUser?.role === 'management') && (
+            <IndiaGeoIntelligenceMap
+              currentUser={currentUser}
+              allUsers={allUsers}
+              sessions={sessions}
+              reports={reports}
+              posts={posts}
+              onSelectIntern={(intern) => setSelectedInternForModal(intern)}
             />
           )}
 

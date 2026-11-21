@@ -27,7 +27,9 @@ import {
   X,
   Archive,
   ClipboardList,
-  Calendar
+  Calendar,
+  Compass,
+  MapPin
 } from 'lucide-react'
 
 import PodiumSpotlight from './PodiumSpotlight'
@@ -57,7 +59,8 @@ export default function SeniorSecView({
   onRectifySuggestion,
   onAddSuggestion,
   countdown,
-  onOpenSetEndDateModal
+  onOpenSetEndDateModal,
+  onOpenGeoMap
 }) {
   const [activeTab, setActiveTab] = useState('assignments') // 'assignments' | 'directives' | 'reports' | 'maintenance' | 'delegation'
   const [selectedBatchFilter, setSelectedBatchFilter] = useState('all') // 'all' | 'Batch 1' | 'Batch 2'
@@ -272,6 +275,16 @@ export default function SeniorSecView({
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
+            {onOpenGeoMap && (
+              <button
+                onClick={onOpenGeoMap}
+                className="px-3.5 py-2.5 rounded-xl bg-white/15 hover:bg-white/25 border border-white/25 text-white font-bold text-xs flex items-center shadow-xs transition-all cursor-pointer"
+                title="Pan-India Reach & Regional Hotspots Map"
+              >
+                <Compass className="w-4 h-4 mr-1.5 text-emerald-200" />
+                <span>Pan-India Map</span>
+              </button>
+            )}
             {onOpenSetEndDateModal && (
               <button
                 onClick={onOpenSetEndDateModal}

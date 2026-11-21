@@ -90,6 +90,8 @@ export default function Header({
         return 'Materials Hub'
       case 'reimbursements':
         return 'Expense Claims & Reimbursements'
+      case 'geomap':
+        return 'Pan-India Reach & Regional Telemetry'
       case 'team':
         return 'Meet the Outreach Team'
       default:

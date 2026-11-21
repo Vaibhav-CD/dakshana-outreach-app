@@ -14,7 +14,8 @@ import {
   HelpCircle,
   Bug,
   Key,
-  Clock
+  Clock,
+  MapPin
 } from 'lucide-react'
 import logoImg from '../assets/logo.png'
 import Avatar from './Avatar'
@@ -52,9 +53,10 @@ export default function Sidebar({
   }
 
   const badge = getRoleBadge(currentUser?.role)
+  const isLeadership = currentUser?.role === 'junior_sec' || currentUser?.role === 'senior_sec' || currentUser?.role === 'management'
 
   // Re-ordered navigation strictly as requested:
-  // 1. Dashboard, 2. Notices, 3. Posts, 4. Queries & Doubts, 5. Materials, 6. Reimbursements, 7. Team
+  // 1. Dashboard, 2. Notices, 3. Posts, 4. Queries & Doubts, 5. Materials, 6. Reimbursements, [Leadership: Reach Map], 7. Team
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'notices', label: 'Notices', icon: Radio, count: unreadBroadcastsCount },
@@ -62,6 +64,7 @@ export default function Sidebar({
     { id: 'queries', label: 'Queries & Doubts', icon: HelpCircle },
     { id: 'resources', label: 'Materials Hub', icon: BookOpen },
     { id: 'reimbursements', label: 'Reimbursements', icon: CreditCard },
+    ...(isLeadership ? [{ id: 'geomap', label: 'Pan-India Reach Map', icon: MapPin }] : []),
     { id: 'team', label: 'Meet the Team', icon: Users }
   ]
 

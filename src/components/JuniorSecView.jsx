@@ -24,7 +24,9 @@ import {
   FileSpreadsheet,
   Calendar,
   Mail,
-  Edit3
+  Edit3,
+  Compass,
+  MapPin
 } from 'lucide-react'
 
 import PodiumSpotlight from './PodiumSpotlight'
@@ -49,7 +51,8 @@ export default function JuniorSecView({
   onToggleTaskDone,
   onAddSuggestion,
   onOpenSetEndDateModal,
-  onUpdateEmail
+  onUpdateEmail,
+  onOpenGeoMap
 }) {
   const [selectedReport, setSelectedReport] = useState(null)
   const [feedbackText, setFeedbackText] = useState('')
@@ -231,6 +234,17 @@ export default function JuniorSecView({
               <MessageSquarePlus className="w-3.5 h-3.5 mr-1.5 text-[#0A643B]" />
               Suggest Improvement
             </button>
+
+            {onOpenGeoMap && (
+              <button
+                onClick={onOpenGeoMap}
+                className="px-3.5 py-2 rounded-xl bg-white/15 hover:bg-white/25 border border-white/25 text-white text-xs font-bold transition-all shadow-xs flex items-center cursor-pointer whitespace-nowrap"
+                title="Open Pan-India Geographic Telemetry Map"
+              >
+                <MapPin className="w-3.5 h-3.5 mr-1.5 text-emerald-200" />
+                <span>Pan-India Map</span>
+              </button>
+            )}
 
             {myPowers.canChangeEndDate && onOpenSetEndDateModal && (
               <button
