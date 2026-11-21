@@ -15,7 +15,6 @@ import {
   Download,
   Share2,
   Layers,
-  Flame,
   Snowflake,
   ShieldAlert,
   ArrowUpRight,
@@ -25,17 +24,12 @@ import {
   Building,
   Calendar,
   BookOpen,
-  Eye,
-  Sliders,
-  Thermometer,
-  Zap,
   Info
 } from 'lucide-react'
 import Avatar from './Avatar'
 import StreamBadge from './StreamBadge'
 
 // Calculated geographic centroids for all 36 Indian states & union territories (Canvas: 612 x 696)
-// Used for state labels, session count tags, and radiant heat halo anchors
 const STATE_CENTERS = {
   an: { x: 521, y: 609, code: 'AN', name: 'Andaman & Nicobar' },
   ap: { x: 263, y: 500, code: 'AP', name: 'Andhra Pradesh' },
@@ -74,179 +68,6 @@ const STATE_CENTERS = {
   ut: { x: 232, y: 175, code: 'UK', name: 'Uttarakhand' },
   wb: { x: 412, y: 310, code: 'WB', name: 'West Bengal' }
 }
-
-// Verified School Outreach Clusters & High-Density Session Hotspots (Coordinates mapped to SVG canvas)
-const CLUSTER_HEAT_SPOTS = [
-  {
-    id: 'spot-pune-saswad',
-    name: 'Pune & Saswad Hub',
-    stateId: 'mh',
-    stateName: 'Maharashtra',
-    x: 155,
-    y: 452,
-    sessions: 16,
-    students: 520,
-    intensity: 'peak',
-    schools: 'ZP High School Saswad, Navodaya Shirur, Pune Model School',
-    panel: 'Panel 1 (Aditi)'
-  },
-  {
-    id: 'spot-bengaluru-doddaballapur',
-    name: 'Bengaluru & Doddaballapur Hub',
-    stateId: 'ka',
-    stateName: 'Karnataka',
-    x: 182,
-    y: 560,
-    sessions: 16,
-    students: 520,
-    intensity: 'peak',
-    schools: 'Govt PU College Doddaballapur, JNV Bangalore Rural',
-    panel: 'Panel 1 (Aditi)'
-  },
-  {
-    id: 'spot-bhopal',
-    name: 'Bhopal Rural Cluster',
-    stateId: 'mp',
-    stateName: 'Madhya Pradesh',
-    x: 212,
-    y: 335,
-    sessions: 8,
-    students: 250,
-    intensity: 'high',
-    schools: 'Govt Model HSS Sehore, Tribal Model HSS Mandideep',
-    panel: 'Panel 3 (Sakshi)'
-  },
-  {
-    id: 'spot-kota',
-    name: 'Kota & Hadoti Belt',
-    stateId: 'rj',
-    stateName: 'Rajasthan',
-    x: 152,
-    y: 285,
-    sessions: 6,
-    students: 190,
-    intensity: 'high',
-    schools: 'Govt Sen Sec School Ladpura, JNV Kota Rural',
-    panel: 'Panel 3 (Sakshi)'
-  },
-  {
-    id: 'spot-varanasi',
-    name: 'Varanasi & Ghazipur Cluster',
-    stateId: 'up',
-    stateName: 'Uttar Pradesh',
-    x: 328,
-    y: 282,
-    sessions: 6,
-    students: 190,
-    intensity: 'high',
-    schools: 'Govt Inter College Varanasi, JNV Ghazipur',
-    panel: 'Panel 2 (Nitish)'
-  },
-  {
-    id: 'spot-warangal',
-    name: 'Warangal Model Cluster',
-    stateId: 'tg',
-    stateName: 'Telangana',
-    x: 248,
-    y: 465,
-    sessions: 5,
-    students: 160,
-    intensity: 'medium',
-    schools: 'Telangana Model School Narsampet, Govt High School Kuravi',
-    panel: 'Panel 2 (Nitish)'
-  },
-  {
-    id: 'spot-kozhikode',
-    name: 'Kozhikode & Wayanad Belt',
-    stateId: 'kl',
-    stateName: 'Kerala',
-    x: 162,
-    y: 608,
-    sessions: 5,
-    students: 155,
-    intensity: 'medium',
-    schools: 'Govt Model School Kunnamangalam, Tribal Welfare High School',
-    panel: 'Panel 1 (Aditi)'
-  },
-  {
-    id: 'spot-wardha',
-    name: 'Wardha Vidarbha Cluster',
-    stateId: 'mh',
-    stateName: 'Maharashtra',
-    x: 235,
-    y: 412,
-    sessions: 4,
-    students: 120,
-    intensity: 'medium',
-    schools: 'Gramodyog Model School, ZP Hinganghat',
-    panel: 'Panel 1 (Aditi)'
-  },
-  {
-    id: 'spot-surat',
-    name: 'Surat Rural Cluster',
-    stateId: 'gj',
-    stateName: 'Gujarat',
-    x: 95,
-    y: 388,
-    sessions: 2,
-    students: 75,
-    intensity: 'low',
-    schools: 'Govt High School Mandvi',
-    panel: 'Panel 1 (Aditi)'
-  },
-  {
-    id: 'spot-gaya',
-    name: 'Gaya Rural Cluster',
-    stateId: 'br',
-    stateName: 'Bihar',
-    x: 365,
-    y: 292,
-    sessions: 2,
-    students: 60,
-    intensity: 'low',
-    schools: 'Govt High School Bodh Gaya',
-    panel: 'Panel 2 (Nitish)'
-  },
-  {
-    id: 'spot-ludhiana',
-    name: 'Ludhiana Outreach Belt',
-    stateId: 'pb',
-    stateName: 'Punjab',
-    x: 155,
-    y: 155,
-    sessions: 2,
-    students: 55,
-    intensity: 'low',
-    schools: 'Govt Senior Secondary School Samrala',
-    panel: 'Panel 3 (Sakshi)'
-  },
-  {
-    id: 'spot-sambalpur',
-    name: 'Sambalpur Tribal Belt',
-    stateId: 'or',
-    stateName: 'Odisha',
-    x: 335,
-    y: 395,
-    sessions: 1,
-    students: 35,
-    intensity: 'low',
-    schools: 'Govt High School Rairakhol',
-    panel: 'Panel 3 (Sakshi)'
-  },
-  {
-    id: 'spot-purulia',
-    name: 'Purulia Rural Belt',
-    stateId: 'wb',
-    stateName: 'West Bengal',
-    x: 388,
-    y: 332,
-    sessions: 1,
-    students: 30,
-    intensity: 'low',
-    schools: 'Govt Sponsored High School Manbazar',
-    panel: 'Panel 3 (Sakshi)'
-  }
-]
 
 // Baseline Pan-India Regional Telemetry Matrix across 36 territories
 const INITIAL_OUTREACH_STATES = [
@@ -832,16 +653,13 @@ export default function IndiaGeoIntelligenceMap({
   posts = [],
   onSelectIntern
 }) {
-  const [selectedStateId, setSelectedStateId] = useState('mh') // Default to highest active hub
+  const [selectedStateId, setSelectedStateId] = useState('ka') // Matches user's screenshot
   const [statusFilter, setStatusFilter] = useState('all') // 'all' | 'hotspot' | 'moderate' | 'coldspot' | 'unreached'
   const [panelFilter, setPanelFilter] = useState('all') // 'all' | 'Panel 1' | 'Panel 2' | 'Panel 3'
   const [zoneFilter, setZoneFilter] = useState('all') // 'all' | 'North' | 'South' | 'West' | 'East' | 'Central' | 'North-East'
   const [searchQuery, setSearchQuery] = useState('')
   const [viewMode, setViewMode] = useState('map') // 'map' | 'directory' | 'coldspots'
-  const [colorMode, setColorMode] = useState('thermal') // 'thermal' (Classic Heatmap) | 'dakshana' (Status Palette)
-  const [showHeatBeacons, setShowHeatBeacons] = useState(true)
   const [hoveredStateId, setHoveredStateId] = useState(null)
-  const [hoveredClusterId, setHoveredClusterId] = useState(null)
   const [copiedNotice, setCopiedNotice] = useState(false)
 
   // Security & Authorization Guard: Strictly for Junior Secretary, Senior Secretary, and Management
@@ -904,26 +722,56 @@ export default function IndiaGeoIntelligenceMap({
     return statesLookup[selectedStateId?.toLowerCase()] || statesData[0]
   }, [statesLookup, selectedStateId, statesData])
 
-  // Dynamic Heatmap Fill Color Generator
-  const getStateColor = (stateId) => {
-    const st = statesLookup[stateId?.toLowerCase()]
-    const count = st?.conductedSessions || 0
+  // Active hovered or selected state for the bottom-left floating info pill
+  const activePillState = useMemo(() => {
+    if (hoveredStateId && statesLookup[hoveredStateId.toLowerCase()]) {
+      return statesLookup[hoveredStateId.toLowerCase()]
+    }
+    return selectedState
+  }, [hoveredStateId, statesLookup, selectedState])
 
-    if (colorMode === 'thermal') {
-      // Classic Scientific Heatmap Gradient:
-      // Zero = Cool Slate -> Low = Cyan/Sky -> Mid = Golden Yellow -> High = Flame Orange -> Peak = Scorching Crimson Red
-      if (count === 0) return { fill: '#F1F5F9', stroke: '#CBD5E1', text: '#94A3B8', level: 'Zero Reach' }
-      if (count <= 2) return { fill: '#BAE6FD', stroke: '#38BDF8', text: '#0284C7', level: 'Low Heat (1-2)' }
-      if (count <= 5) return { fill: '#FDE047', stroke: '#EAB308', text: '#854D0E', level: 'Moderate Heat (3-5)' }
-      if (count <= 9) return { fill: '#FB923C', stroke: '#F97316', text: '#9A3412', level: 'Warm Hub (6-9)' }
-      return { fill: '#EF4444', stroke: '#B91C1C', text: '#FFFFFF', level: 'Scorching Hotspot (10+)' }
-    } else {
-      // Dakshana Operational Status Palette:
-      // Unreached = Light Slate -> Cold Spot = Rose Red -> Active = Warm Amber -> Hotspot = Dakshana Emerald
-      if (count === 0) return { fill: '#F8FAFC', stroke: '#CBD5E1', text: '#94A3B8', level: 'Unreached' }
-      if (st?.status === 'coldspot') return { fill: '#FEE2E2', stroke: '#F87171', text: '#B91C1C', level: 'Cold Spot' }
-      if (st?.status === 'moderate') return { fill: '#FEF3C7', stroke: '#FBBF24', text: '#92400E', level: 'Moderate Active' }
-      return { fill: '#059669', stroke: '#047857', text: '#FFFFFF', level: 'Super Hotspot' }
+  // Clean Reach Color Mapping exactly as requested by user
+  const getReachColor = (stateId) => {
+    const st = statesLookup[stateId?.toLowerCase()]
+    const status = st?.status || 'unreached'
+
+    switch (status) {
+      case 'hotspot':
+        return {
+          fill: '#0A643B', // Vibrant Dakshana Forest Green
+          stroke: '#064E2A',
+          hoverFill: '#074D2D',
+          textColor: '#FFFFFF',
+          badgeBg: 'bg-[#0A643B] text-white',
+          label: 'Hotspot'
+        }
+      case 'moderate':
+        return {
+          fill: '#F59E0B', // Rich Warm Amber / Orange (Active)
+          stroke: '#D97706',
+          hoverFill: '#D97706',
+          textColor: '#FFFFFF',
+          badgeBg: 'bg-[#F59E0B] text-white',
+          label: 'Active'
+        }
+      case 'coldspot':
+        return {
+          fill: '#E11D48', // Clean Soft Crimson / Rose Red
+          stroke: '#BE123C',
+          hoverFill: '#BE123C',
+          textColor: '#FFFFFF',
+          badgeBg: 'bg-[#E11D48] text-white',
+          label: 'Cold Spot'
+        }
+      default: // 'unreached'
+        return {
+          fill: '#F8FAFC', // Light Clean Slate
+          stroke: '#CBD5E1',
+          hoverFill: '#E2E8F0',
+          textColor: '#64748B',
+          badgeBg: 'bg-slate-200 text-slate-700',
+          label: 'Unreached'
+        }
     }
   }
 
@@ -947,15 +795,15 @@ export default function IndiaGeoIntelligenceMap({
   // Copy State Telemetry Brief for WhatsApp or executive memo
   const handleCopyStateBrief = () => {
     if (!selectedState) return
-    const text = `*DAKSHANA OUTREACH REGIONAL TELEMETRY*
+    const text = `*DAKSHANA OUTREACH REGIONAL REACH BRIEF*
 📍 *Region:* ${selectedState.name} (${selectedState.zone} Zone)
-📊 *Status:* ${selectedState.status.toUpperCase()} (${selectedState.conductedSessions} Sessions Conducted)
+📊 *Reach Status:* ${selectedState.status.toUpperCase()} (${selectedState.conductedSessions} Sessions Conducted)
 👥 *Students Impacted:* ${selectedState.studentsReached} high school scholars
 🏫 *Schools Reached:* ${selectedState.schoolsVisited.length} verified campuses
 🎯 *Primary Focus:* ${selectedState.topTopic}
 👥 *Conducting Scholars:* ${selectedState.activeScholars.join(', ') || 'None Assigned'}
-⚠️ *Action Requirement:* ${selectedState.challenges}
-🚀 *Strategic Target:* ${selectedState.opportunity}`
+⚠️ *Regional Gap / Hurdle:* ${selectedState.challenges}
+🚀 *Recommended Expansion:* ${selectedState.opportunity}`
 
     navigator.clipboard.writeText(text).then(() => {
       setCopiedNotice(true)
@@ -972,7 +820,7 @@ export default function IndiaGeoIntelligenceMap({
         </div>
         <h3 className="text-xl font-extrabold text-slate-900">Restricted Geographic Intelligence</h3>
         <p className="text-slate-500 text-xs mt-2 leading-relaxed">
-          The Pan-India Regional Heatmap & Cold Spot Telemetry is an executive console reserved for Junior Secretaries, the Senior Secretary, and Board Trustees.
+          The Pan-India Reach Map is an executive console reserved for Junior Secretaries, the Senior Secretary, and Board Trustees.
         </p>
       </div>
     )
@@ -982,27 +830,27 @@ export default function IndiaGeoIntelligenceMap({
     <div className="space-y-6">
       
       {/* ============================================================== */}
-      {/* 1. EXECUTIVE BANNER WITH REAL-TIME KPI STRIP                   */}
+      {/* 1. EXECUTIVE HEADER BANNER WITH REACH KPI METRICS              */}
       {/* ============================================================== */}
       <div className="bg-gradient-to-r from-[#074D2D] via-[#0A643B] to-[#7B2E68] rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden">
         <div className="relative z-10 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
           <div className="max-w-2xl">
             <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-bold mb-3 border border-white/20">
               <Compass className="w-3.5 h-3.5 text-emerald-200" />
-              <span>Pan-India Geographic Intelligence & Telemetry</span>
+              <span>Pan-India Regional Outreach Console</span>
               <span className="bg-emerald-400 text-emerald-950 px-2 py-0.2 rounded-full text-[10px] font-black uppercase">
                 Official Boundaries
               </span>
             </div>
             <h2 className="text-2xl sm:text-3xl font-black tracking-tight">
-              Pan-India Outreach Heatmap & Regional Hotspots
+              Pan-India Geographic Reach Map
             </h2>
             <p className="text-emerald-100/90 text-xs sm:text-sm mt-1.5 leading-relaxed">
-              Real geographic heat tracking across 36 Indian states & union territories. Identify thriving scholar hotspots, monitor moderate coverage zones, and target cold spots and unreached school districts.
+              Track exactly where school sessions are being conducted properly and pinpoint underserved cold spots and unreached regions across all 36 Indian states and union territories.
             </p>
           </div>
 
-          {/* Quick Heatmap Mode & View Controls */}
+          {/* View Mode Switcher */}
           <div className="flex flex-wrap items-center gap-2">
             <div className="bg-white/10 backdrop-blur-md p-1 rounded-2xl border border-white/20 flex text-xs font-bold">
               <button
@@ -1011,8 +859,8 @@ export default function IndiaGeoIntelligenceMap({
                   viewMode === 'map' ? 'bg-white text-[#0A643B] shadow-md font-black' : 'text-white hover:bg-white/10'
                 }`}
               >
-                <Thermometer className="w-4 h-4 text-emerald-600" />
-                <span>Interactive Heatmap</span>
+                <Compass className="w-4 h-4 text-emerald-600" />
+                <span>Interactive Reach Map</span>
               </button>
               <button
                 onClick={() => setViewMode('coldspots')}
@@ -1020,7 +868,7 @@ export default function IndiaGeoIntelligenceMap({
                   viewMode === 'coldspots' ? 'bg-white text-rose-900 shadow-md font-black' : 'text-white hover:bg-white/10'
                 }`}
               >
-                <Snowflake className="w-4 h-4 text-cyan-300" />
+                <Snowflake className="w-4 h-4 text-cyan-400" />
                 <span>Cold Spots & Gaps</span>
               </button>
               <button
@@ -1036,7 +884,7 @@ export default function IndiaGeoIntelligenceMap({
           </div>
         </div>
 
-        {/* Executive Real-time Metric Cards */}
+        {/* Executive Metric Cards */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mt-6 pt-6 border-t border-white/20">
           <div className="bg-white/10 backdrop-blur-xs rounded-2xl p-3.5 border border-white/15">
             <span className="text-[11px] text-emerald-200 block font-semibold">Total Verified Visits</span>
@@ -1048,7 +896,7 @@ export default function IndiaGeoIntelligenceMap({
           </div>
 
           <div className="bg-white/10 backdrop-blur-xs rounded-2xl p-3.5 border border-white/15">
-            <span className="text-[11px] text-emerald-200 block font-semibold">High-Density Hotspots</span>
+            <span className="text-[11px] text-emerald-200 block font-semibold">Hotspots (Strong Reach)</span>
             <div className="flex items-baseline space-x-2 mt-1">
               <span className="text-2xl sm:text-3xl font-black text-emerald-300">{hotspotsCount}</span>
               <span className="text-xs text-white/80 font-bold">states (10+ visits)</span>
@@ -1057,7 +905,7 @@ export default function IndiaGeoIntelligenceMap({
           </div>
 
           <div className="bg-white/10 backdrop-blur-xs rounded-2xl p-3.5 border border-white/15">
-            <span className="text-[11px] text-amber-200 block font-semibold">Active & Expanding</span>
+            <span className="text-[11px] text-amber-200 block font-semibold">Active (Moderate Reach)</span>
             <div className="flex items-baseline space-x-2 mt-1">
               <span className="text-2xl sm:text-3xl font-black text-amber-300">{moderateCount}</span>
               <span className="text-xs text-amber-200 font-bold">states (4-9 visits)</span>
@@ -1066,10 +914,10 @@ export default function IndiaGeoIntelligenceMap({
           </div>
 
           <div className="bg-white/10 backdrop-blur-xs rounded-2xl p-3.5 border border-white/15">
-            <span className="text-[11px] text-rose-200 block font-semibold">Cold Spots & Unreached</span>
+            <span className="text-[11px] text-rose-200 block font-semibold">Cold Spots & Gaps</span>
             <div className="flex items-baseline space-x-2 mt-1">
               <span className="text-2xl sm:text-3xl font-black text-rose-300">{coldspotsCount + unreachedCount}</span>
-              <span className="text-xs text-rose-200 font-bold">regions ({unreachedCount} zero visits)</span>
+              <span className="text-xs text-rose-200 font-bold">states ({unreachedCount} zero visits)</span>
             </div>
             <span className="text-[10px] text-rose-100 block mt-0.5">JH, CG, NE, HR, PB, OD</span>
           </div>
@@ -1077,7 +925,7 @@ export default function IndiaGeoIntelligenceMap({
       </div>
 
       {/* ============================================================== */}
-      {/* 2. HEATMAP CONTROLS, SCHEME TOGGLE & ADVANCED FILTER STRIP    */}
+      {/* 2. REACH STATUS FILTER & SEARCH BAR                            */}
       {/* ============================================================== */}
       <div className="bg-white rounded-3xl p-4 sm:p-5 border border-slate-200 shadow-xs flex flex-col md:flex-row justify-between items-stretch md:items-center gap-4">
         {/* Search */}
@@ -1093,55 +941,62 @@ export default function IndiaGeoIntelligenceMap({
           {searchQuery && (
             <button
               onClick={() => setSearchQuery('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
             >
               <X className="w-3.5 h-3.5" />
             </button>
           )}
         </div>
 
-        {/* Controls: Color Scheme Switcher & Radiant Beacons Toggle */}
+        {/* Filter Dropdowns */}
         <div className="flex flex-wrap items-center gap-2.5">
-          {/* Color Scheme Toggle */}
-          <div className="flex items-center bg-slate-100 p-1 rounded-xl text-xs font-bold text-slate-700">
-            <span className="px-2 text-[10px] font-extrabold uppercase text-slate-400">Palette:</span>
+          {/* Status Quick Filter */}
+          <div className="flex items-center space-x-1 bg-slate-100 p-1 rounded-xl text-xs font-bold text-slate-700">
             <button
-              onClick={() => setColorMode('thermal')}
-              className={`px-2.5 py-1 rounded-lg text-xs font-extrabold transition-all cursor-pointer flex items-center space-x-1 ${
-                colorMode === 'thermal'
-                  ? 'bg-gradient-to-r from-amber-500 to-rose-600 text-white shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
+              onClick={() => setStatusFilter('all')}
+              className={`px-2.5 py-1 rounded-lg text-xs font-extrabold transition-all cursor-pointer ${
+                statusFilter === 'all' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500 hover:text-slate-900'
               }`}
             >
-              <Flame className="w-3 h-3" />
-              <span>Thermal Heatmap</span>
+              All
             </button>
             <button
-              onClick={() => setColorMode('dakshana')}
+              onClick={() => setStatusFilter('hotspot')}
               className={`px-2.5 py-1 rounded-lg text-xs font-extrabold transition-all cursor-pointer flex items-center space-x-1 ${
-                colorMode === 'dakshana'
-                  ? 'bg-[#0A643B] text-white shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
+                statusFilter === 'hotspot' ? 'bg-[#0A643B] text-white shadow-xs' : 'text-slate-600 hover:text-emerald-800'
               }`}
             >
-              <CheckCircle2 className="w-3 h-3" />
-              <span>Dakshana Reach</span>
+              <span className="w-2 h-2 rounded-full bg-emerald-400 inline-block"></span>
+              <span>Hotspots</span>
+            </button>
+            <button
+              onClick={() => setStatusFilter('moderate')}
+              className={`px-2.5 py-1 rounded-lg text-xs font-extrabold transition-all cursor-pointer flex items-center space-x-1 ${
+                statusFilter === 'moderate' ? 'bg-[#F59E0B] text-white shadow-xs' : 'text-slate-600 hover:text-amber-800'
+              }`}
+            >
+              <span className="w-2 h-2 rounded-full bg-amber-400 inline-block"></span>
+              <span>Active</span>
+            </button>
+            <button
+              onClick={() => setStatusFilter('coldspot')}
+              className={`px-2.5 py-1 rounded-lg text-xs font-extrabold transition-all cursor-pointer flex items-center space-x-1 ${
+                statusFilter === 'coldspot' ? 'bg-[#E11D48] text-white shadow-xs' : 'text-slate-600 hover:text-rose-800'
+              }`}
+            >
+              <span className="w-2 h-2 rounded-full bg-rose-400 inline-block"></span>
+              <span>Cold Spots</span>
+            </button>
+            <button
+              onClick={() => setStatusFilter('unreached')}
+              className={`px-2.5 py-1 rounded-lg text-xs font-extrabold transition-all cursor-pointer flex items-center space-x-1 ${
+                statusFilter === 'unreached' ? 'bg-slate-700 text-white shadow-xs' : 'text-slate-500 hover:text-slate-900'
+              }`}
+            >
+              <span className="w-2 h-2 rounded-full bg-slate-300 inline-block"></span>
+              <span>Unreached</span>
             </button>
           </div>
-
-          {/* Radiant Glow Circle Toggle */}
-          <button
-            onClick={() => setShowHeatBeacons(!showHeatBeacons)}
-            className={`px-3 py-1.5 rounded-xl border text-xs font-bold transition-all cursor-pointer flex items-center space-x-1.5 ${
-              showHeatBeacons
-                ? 'bg-amber-50 border-amber-300 text-amber-900 shadow-2xs'
-                : 'bg-slate-50 border-slate-200 text-slate-500'
-            }`}
-            title="Toggle pulsing radiating heat halos on active school clusters"
-          >
-            <Zap className={`w-3.5 h-3.5 ${showHeatBeacons ? 'text-amber-500 fill-amber-500' : 'text-slate-400'}`} />
-            <span>Heat Radiance</span>
-          </button>
 
           {/* Zone Filter */}
           <select
@@ -1173,91 +1028,63 @@ export default function IndiaGeoIntelligenceMap({
       </div>
 
       {/* ============================================================== */}
-      {/* 3. INTERACTIVE HEATMAP VIEW WITH OFFICIAL ACCURATE INDIA MAP   */}
+      {/* 3. MAIN INTERACTIVE REACH MAP (CLEAN OFFICIAL INDIA MAP)       */}
       {/* ============================================================== */}
       {viewMode === 'map' && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           
-          {/* Main Visual Map Canvas */}
+          {/* Main Visual Map Card */}
           <div className="lg:col-span-8 bg-white rounded-3xl border border-slate-200 shadow-xs p-4 sm:p-6 relative overflow-hidden">
             
-            {/* Header with Heatmap Legend */}
+            {/* Header: Title & Exact 4-Tier Reach Legend (Matches User Request) */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-4 mb-4 border-b border-slate-100">
               <div>
                 <div className="flex items-center space-x-2">
-                  <h3 className="font-black text-slate-900 text-base flex items-center">
-                    <Compass className="w-4 h-4 mr-2 text-[#0A643B]" />
-                    Pan-India Regional Heat Density
+                  <Compass className="w-4 h-4 text-[#0A643B]" />
+                  <h3 className="font-black text-slate-900 text-base">
+                    Pan-India Geographic Reach Map
                   </h3>
-                  <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
-                    36 States & UTs
-                  </span>
                 </div>
                 <p className="text-slate-500 text-xs mt-0.5">
-                  Click any state to open the regional intelligence drawer or hover over heat clusters.
+                  Click on any Indian state to inspect conducted school sessions, attending students, and active scholars.
                 </p>
               </div>
 
-              {/* Dynamic Heat Gradient Bar */}
-              <div className="flex flex-col items-end">
-                <span className="text-[10px] font-bold text-slate-400 mb-1">Session Density Scale</span>
-                <div className="flex items-center space-x-1.5 text-[10px] font-bold">
-                  <span className="text-slate-400">0</span>
-                  {colorMode === 'thermal' ? (
-                    <div className="h-3 w-36 rounded-full bg-gradient-to-r from-slate-200 via-sky-300 via-yellow-400 via-orange-500 to-rose-600 shadow-2xs border border-slate-200" />
-                  ) : (
-                    <div className="h-3 w-36 rounded-full bg-gradient-to-r from-slate-200 via-rose-200 via-amber-300 to-emerald-600 shadow-2xs border border-slate-200" />
-                  )}
-                  <span className="text-slate-800 font-black">16+</span>
+              {/* Clean Reach Status Legend (Exact 4 Badges as in User Screenshot) */}
+              <div className="flex items-center space-x-3 text-xs font-extrabold select-none">
+                <div className="flex items-center space-x-1.5">
+                  <span className="w-3 h-3 rounded-full bg-[#0A643B] inline-block shadow-2xs"></span>
+                  <span className="text-slate-800">Hotspot</span>
+                </div>
+                <div className="flex items-center space-x-1.5">
+                  <span className="w-3 h-3 rounded-full bg-[#F59E0B] inline-block shadow-2xs"></span>
+                  <span className="text-slate-800">Active</span>
+                </div>
+                <div className="flex items-center space-x-1.5">
+                  <span className="w-3 h-3 rounded-full bg-[#E11D48] inline-block shadow-2xs"></span>
+                  <span className="text-slate-800">Cold Spot</span>
+                </div>
+                <div className="flex items-center space-x-1.5">
+                  <span className="w-3 h-3 rounded-full bg-slate-200 border border-slate-300 inline-block shadow-2xs"></span>
+                  <span className="text-slate-500">Unreached</span>
                 </div>
               </div>
             </div>
 
-            {/* SVG Official Map of India */}
+            {/* Clear Vector SVG Map of India (viewBox 0 0 612 696) */}
             <div className="relative w-full flex items-center justify-center py-2 select-none">
               <svg
                 viewBox={IndiaSVGMap.viewBox || "0 0 612 696"}
                 className="w-full max-w-[580px] h-auto drop-shadow-sm transition-all"
-                style={{ maxHeight: '720px' }}
+                style={{ maxHeight: '700px' }}
               >
-                <defs>
-                  {/* Radial Heat Gradient for Peak Hotspots (Pune / Saswad, Bengaluru / Doddaballapur) */}
-                  <radialGradient id="heat-glow-peak" cx="50%" cy="50%" r="50%">
-                    <stop offset="0%" stopColor="#EF4444" stopOpacity="0.95" />
-                    <stop offset="35%" stopColor="#F97316" stopOpacity="0.7" />
-                    <stop offset="70%" stopColor="#F59E0B" stopOpacity="0.3" />
-                    <stop offset="100%" stopColor="#F59E0B" stopOpacity="0" />
-                  </radialGradient>
-
-                  {/* Radial Heat Gradient for Moderate / High Hubs */}
-                  <radialGradient id="heat-glow-warm" cx="50%" cy="50%" r="50%">
-                    <stop offset="0%" stopColor="#F59E0B" stopOpacity="0.9" />
-                    <stop offset="50%" stopColor="#FB923C" stopOpacity="0.5" />
-                    <stop offset="100%" stopColor="#FBBF24" stopOpacity="0" />
-                  </radialGradient>
-
-                  {/* Dakshana Emerald Radial Glow */}
-                  <radialGradient id="heat-glow-emerald" cx="50%" cy="50%" r="50%">
-                    <stop offset="0%" stopColor="#10B981" stopOpacity="0.95" />
-                    <stop offset="40%" stopColor="#059669" stopOpacity="0.6" />
-                    <stop offset="75%" stopColor="#047857" stopOpacity="0.25" />
-                    <stop offset="100%" stopColor="#047857" stopOpacity="0" />
-                  </radialGradient>
-
-                  {/* Subtle Filter for Radiant Heat Dispersion */}
-                  <filter id="heat-blur" x="-30%" y="-30%" width="160%" height="160%">
-                    <feGaussianBlur stdDeviation="4" result="blur" />
-                    <feComposite in="SourceGraphic" in2="blur" operator="over" />
-                  </filter>
-                </defs>
-
                 {/* 1. Official State Boundary Paths from @svg-maps/india */}
                 <g className="states-layer">
                   {IndiaSVGMap.locations.map(loc => {
                     const st = statesLookup[loc.id.toLowerCase()]
                     const isSelected = selectedStateId?.toLowerCase() === loc.id.toLowerCase()
                     const isHovered = hoveredStateId?.toLowerCase() === loc.id.toLowerCase()
-                    const heat = getStateColor(loc.id)
+                    const reach = getReachColor(loc.id)
 
                     return (
                       <path
@@ -1265,12 +1092,12 @@ export default function IndiaGeoIntelligenceMap({
                         id={loc.id}
                         name={loc.name}
                         d={loc.path}
-                        fill={heat.fill}
-                        stroke={isSelected ? '#0A643B' : isHovered ? '#1E293B' : heat.stroke}
+                        fill={isHovered ? reach.hoverFill : reach.fill}
+                        stroke={isSelected ? '#1E293B' : isHovered ? '#0F172A' : reach.stroke}
                         strokeWidth={isSelected ? '2.5' : isHovered ? '2' : '0.8'}
                         strokeLinejoin="round"
                         strokeLinecap="round"
-                        className="transition-all duration-200 cursor-pointer hover:opacity-90"
+                        className="transition-colors duration-150 cursor-pointer"
                         onClick={() => setSelectedStateId(loc.id.toLowerCase())}
                         onMouseEnter={() => setHoveredStateId(loc.id.toLowerCase())}
                         onMouseLeave={() => setHoveredStateId(null)}
@@ -1279,58 +1106,12 @@ export default function IndiaGeoIntelligenceMap({
                   })}
                 </g>
 
-                {/* 2. Radiant Heat Halos Layer (Over active clusters when enabled) */}
-                {showHeatBeacons && (
-                  <g className="heat-halos-layer pointer-events-none">
-                    {CLUSTER_HEAT_SPOTS.map(spot => {
-                      const isPeak = spot.intensity === 'peak'
-                      const isHigh = spot.intensity === 'high'
-                      const haloRadius = isPeak ? 36 : isHigh ? 26 : 18
-                      const gradientId = colorMode === 'dakshana' && isPeak
-                        ? 'url(#heat-glow-emerald)'
-                        : isPeak
-                        ? 'url(#heat-glow-peak)'
-                        : 'url(#heat-glow-warm)'
-
-                      return (
-                        <g key={spot.id} transform={`translate(${spot.x}, ${spot.y})`}>
-                          {/* Radiant Outer Heat Dispersion */}
-                          <circle
-                            r={haloRadius}
-                            fill={gradientId}
-                            filter="url(#heat-blur)"
-                            className="animate-pulse opacity-90"
-                          />
-                          {/* Animated Concentric Ping Ring for Peak Hubs */}
-                          {isPeak && (
-                            <circle
-                              r={haloRadius * 0.75}
-                              fill="none"
-                              stroke={colorMode === 'dakshana' ? '#10B981' : '#EF4444'}
-                              strokeWidth="1.5"
-                              strokeDasharray="3 3"
-                              className="animate-ping opacity-60 origin-center"
-                            />
-                          )}
-                          {/* Inner Core Heat Beacon */}
-                          <circle
-                            r={isPeak ? 5 : 4}
-                            fill={colorMode === 'dakshana' ? '#065F46' : '#B91C1C'}
-                            stroke="#FFFFFF"
-                            strokeWidth="1.5"
-                            className="shadow-sm"
-                          />
-                        </g>
-                      )
-                    })}
-                  </g>
-                )}
-
-                {/* 3. State Labels & Session Counts Layer */}
+                {/* 2. State Code Labels (MH, KA, MP, UP, RJ, etc.) */}
                 <g className="labels-layer pointer-events-none">
                   {Object.entries(STATE_CENTERS).map(([locId, center]) => {
                     const st = statesLookup[locId]
                     const count = st?.conductedSessions || 0
+                    const reach = getReachColor(locId)
                     const isSelected = selectedStateId?.toLowerCase() === locId
                     const isSignificant = count > 0 || ['mh', 'ka', 'up', 'rj', 'mp', 'gj', 'br', 'wb', 'jh', 'ct', 'tg', 'ap', 'kl', 'tn', 'pb', 'hr', 'as', 'jk', 'or'].includes(locId)
 
@@ -1338,41 +1119,41 @@ export default function IndiaGeoIntelligenceMap({
 
                     return (
                       <g key={locId} transform={`translate(${center.x}, ${center.y})`}>
-                        {/* State Code Text */}
+                        {/* 2-Letter Code */}
                         <text
                           textAnchor="middle"
                           dominantBaseline="central"
-                          fill={count >= 10 ? '#FFFFFF' : '#1E293B'}
+                          fill={reach.textColor}
                           fontSize={count >= 10 ? '10' : '8.5'}
                           fontWeight="900"
                           letterSpacing="0.05em"
                           style={{
-                            textShadow: count >= 10
-                              ? '0 1px 2px rgba(0,0,0,0.6)'
-                              : '0 0 3px rgba(255,255,255,0.9), 0 0 3px rgba(255,255,255,0.9)'
+                            textShadow: reach.textColor === '#FFFFFF'
+                              ? '0 1px 2px rgba(0,0,0,0.5)'
+                              : '0 0 3px rgba(255,255,255,0.9)'
                           }}
                         >
                           {center.code}
                         </text>
 
-                        {/* Session Count Bubble for Active States */}
+                        {/* Session Count Bubble when sessions > 0 */}
                         {count > 0 && (
                           <g transform="translate(0, 11)">
                             <rect
-                              x="-10"
+                              x="-9"
                               y="-5"
-                              width="20"
+                              width="18"
                               height="10"
                               rx="5"
                               fill="#0F172A"
                               stroke="#FFFFFF"
                               strokeWidth="0.8"
-                              opacity="0.95"
+                              opacity="0.9"
                             />
                             <text
                               textAnchor="middle"
                               dominantBaseline="central"
-                              fill="#38BDF8"
+                              fill="#FFFFFF"
                               fontSize="6.5"
                               fontWeight="900"
                             >
@@ -1384,121 +1165,57 @@ export default function IndiaGeoIntelligenceMap({
                     )
                   })}
                 </g>
-
-                {/* Interactive Clickable Pins on Cluster Hotspots */}
-                <g className="cluster-hotspots-layer">
-                  {CLUSTER_HEAT_SPOTS.map(spot => (
-                    <circle
-                      key={`hit-${spot.id}`}
-                      cx={spot.x}
-                      cy={spot.y}
-                      r="10"
-                      fill="transparent"
-                      className="cursor-pointer"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        setSelectedStateId(spot.stateId)
-                      }}
-                      onMouseEnter={() => setHoveredClusterId(spot.id)}
-                      onMouseLeave={() => setHoveredClusterId(null)}
-                    />
-                  ))}
-                </g>
               </svg>
 
-              {/* Floating Tooltip for Hovered State */}
-              {hoveredStateId && statesLookup[hoveredStateId] && (
-                <div className="absolute top-4 left-4 bg-slate-900/95 backdrop-blur-md text-white p-3 rounded-2xl shadow-xl border border-slate-700 pointer-events-none max-w-xs z-30 animate-in fade-in duration-150">
-                  <div className="flex items-center justify-between space-x-2">
-                    <span className="font-black text-sm text-white">
-                      {statesLookup[hoveredStateId].name}
-                    </span>
-                    <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-slate-800 text-slate-300">
-                      {statesLookup[hoveredStateId].zone}
+              {/* Floating State Inspector Pill (Exact match to the user's screenshot layout!) */}
+              {activePillState && (
+                <div
+                  onClick={() => setSelectedStateId(activePillState.id)}
+                  className="absolute bottom-4 left-4 bg-white/95 backdrop-blur-md rounded-2xl p-3.5 shadow-lg border border-slate-200/90 flex items-center space-x-3 transition-all cursor-pointer hover:border-[#0A643B] hover:shadow-xl z-20"
+                >
+                  <span
+                    className={`w-3.5 h-3.5 rounded-full flex-shrink-0 ${
+                      activePillState.status === 'hotspot'
+                        ? 'bg-[#0A643B]'
+                        : activePillState.status === 'moderate'
+                        ? 'bg-[#F59E0B]'
+                        : activePillState.status === 'coldspot'
+                        ? 'bg-[#E11D48]'
+                        : 'bg-slate-300'
+                    }`}
+                  />
+                  <div>
+                    <div className="flex items-center space-x-1.5">
+                      <span className="font-black text-slate-900 text-sm">
+                        {activePillState.name}
+                      </span>
+                      <span className="text-[10px] font-bold text-slate-400">
+                        ({activePillState.code})
+                      </span>
+                    </div>
+                    <span className="text-xs text-slate-600 font-semibold block">
+                      {activePillState.conductedSessions} Sessions • {activePillState.studentsReached} Students Reached
                     </span>
                   </div>
-                  <div className="mt-2 flex items-center space-x-3 text-xs">
-                    <div>
-                      <span className="text-[10px] text-slate-400 block font-semibold">Sessions</span>
-                      <span className="font-extrabold text-emerald-400 text-sm">
-                        {statesLookup[hoveredStateId].conductedSessions}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-[10px] text-slate-400 block font-semibold">Students</span>
-                      <span className="font-extrabold text-white text-sm">
-                        {statesLookup[hoveredStateId].studentsReached}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-[10px] text-slate-400 block font-semibold">Status</span>
-                      <span className={`text-[10px] font-black uppercase ${
-                        statesLookup[hoveredStateId].status === 'hotspot'
-                          ? 'text-emerald-400'
-                          : statesLookup[hoveredStateId].status === 'moderate'
-                          ? 'text-amber-300'
-                          : statesLookup[hoveredStateId].status === 'coldspot'
-                          ? 'text-rose-400'
-                          : 'text-slate-400'
-                      }`}>
-                        {statesLookup[hoveredStateId].status}
-                      </span>
-                    </div>
-                  </div>
-                  <p className="text-[10px] text-slate-300 mt-1.5 line-clamp-1">
-                    {statesLookup[hoveredStateId].topTopic}
-                  </p>
                 </div>
-              )}
-
-              {/* Floating Tooltip for Hovered Cluster Beacon */}
-              {hoveredClusterId && (
-                (() => {
-                  const sp = CLUSTER_HEAT_SPOTS.find(s => s.id === hoveredClusterId)
-                  if (!sp) return null
-                  return (
-                    <div className="absolute bottom-4 right-4 bg-gradient-to-r from-slate-950 to-slate-900 text-white p-3.5 rounded-2xl shadow-2xl border border-amber-500/30 pointer-events-none max-w-sm z-30 animate-in fade-in duration-150">
-                      <div className="flex items-center space-x-2">
-                        <Flame className="w-4 h-4 text-amber-400 animate-bounce" />
-                        <span className="font-black text-sm text-white">{sp.name}</span>
-                        <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                          {sp.intensity} intensity
-                        </span>
-                      </div>
-                      <div className="mt-2 text-xs grid grid-cols-2 gap-2 text-slate-300">
-                        <div>
-                          <span className="text-[10px] text-slate-400 block">Verified Sessions</span>
-                          <span className="font-black text-white text-sm">{sp.sessions} Sessions</span>
-                        </div>
-                        <div>
-                          <span className="text-[10px] text-slate-400 block">High School Scholars</span>
-                          <span className="font-black text-amber-300 text-sm">{sp.students} Reached</span>
-                        </div>
-                      </div>
-                      <p className="text-[10px] text-slate-400 mt-2">
-                        <span className="font-bold text-slate-300">Campuses:</span> {sp.schools}
-                      </p>
-                    </div>
-                  )
-                })()
               )}
             </div>
 
-            {/* Quick State Selector Pills */}
+            {/* Quick State Shortcut Pills */}
             <div className="pt-4 border-t border-slate-100 flex items-center justify-between flex-wrap gap-2 text-xs">
               <span className="text-slate-400 font-bold text-[11px] flex items-center">
-                <Info className="w-3.5 h-3.5 mr-1" />
-                Featured Hotspot Clusters:
+                <Info className="w-3.5 h-3.5 mr-1 text-[#0A643B]" />
+                Jump to High-Density Hubs:
               </span>
               <div className="flex flex-wrap items-center gap-1.5">
                 {[
-                  { id: 'mh', label: 'Maharashtra (16)', color: 'bg-emerald-50 text-emerald-800 border-emerald-300' },
-                  { id: 'ka', label: 'Karnataka (16)', color: 'bg-emerald-50 text-emerald-800 border-emerald-300' },
-                  { id: 'mp', label: 'Madhya Pradesh (8)', color: 'bg-amber-50 text-amber-800 border-amber-300' },
-                  { id: 'rj', label: 'Rajasthan (6)', color: 'bg-amber-50 text-amber-800 border-amber-300' },
-                  { id: 'up', label: 'Uttar Pradesh (6)', color: 'bg-amber-50 text-amber-800 border-amber-300' },
-                  { id: 'kl', label: 'Kerala (5)', color: 'bg-amber-50 text-amber-800 border-amber-300' },
-                  { id: 'tg', label: 'Telangana (5)', color: 'bg-amber-50 text-amber-800 border-amber-300' }
+                  { id: 'mh', label: 'Maharashtra (16 Visits)', badge: 'bg-[#EBF7F0] text-[#0A643B] border-[#0A643B]/30' },
+                  { id: 'ka', label: 'Karnataka (16 Visits)', badge: 'bg-[#EBF7F0] text-[#0A643B] border-[#0A643B]/30' },
+                  { id: 'mp', label: 'Madhya Pradesh (8 Visits)', badge: 'bg-amber-50 text-amber-800 border-amber-300' },
+                  { id: 'rj', label: 'Rajasthan (6 Visits)', badge: 'bg-amber-50 text-amber-800 border-amber-300' },
+                  { id: 'up', label: 'Uttar Pradesh (6 Visits)', badge: 'bg-amber-50 text-amber-800 border-amber-300' },
+                  { id: 'kl', label: 'Kerala (5 Visits)', badge: 'bg-amber-50 text-amber-800 border-amber-300' },
+                  { id: 'tg', label: 'Telangana (5 Visits)', badge: 'bg-amber-50 text-amber-800 border-amber-300' }
                 ].map(b => (
                   <button
                     key={b.id}
@@ -1506,7 +1223,7 @@ export default function IndiaGeoIntelligenceMap({
                     className={`px-2.5 py-1 rounded-lg text-[11px] font-extrabold border transition-all cursor-pointer ${
                       selectedStateId?.toLowerCase() === b.id
                         ? 'bg-[#0A643B] text-white border-[#0A643B] shadow-xs'
-                        : `${b.color} hover:shadow-2xs`
+                        : `${b.badge} hover:shadow-2xs`
                     }`}
                   >
                     {b.label}
@@ -1536,9 +1253,9 @@ export default function IndiaGeoIntelligenceMap({
                     ? 'bg-rose-50 text-rose-800 border border-rose-200'
                     : 'bg-slate-100 text-slate-500 border border-slate-200'
                 }`}>
-                  {selectedState.status === 'hotspot' && '🔥 Super Hotspot'}
-                  {selectedState.status === 'moderate' && '⚡ Active Reach'}
-                  {selectedState.status === 'coldspot' && '❄️ Cold Spot'}
+                  {selectedState.status === 'hotspot' && '🟢 Hotspot (Strong Reach)'}
+                  {selectedState.status === 'moderate' && '🟡 Active Reach'}
+                  {selectedState.status === 'coldspot' && '🔴 Cold Spot (Low Visits)'}
                   {selectedState.status === 'unreached' && '⚪ Unreached'}
                 </span>
               </div>
@@ -1709,8 +1426,8 @@ export default function IndiaGeoIntelligenceMap({
                       </span>
                       <span className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase ${
                         state.status === 'unreached'
-                          ? 'bg-rose-100 text-rose-800 border border-rose-200'
-                          : 'bg-amber-100 text-amber-800 border border-amber-200'
+                          ? 'bg-slate-200 text-slate-700 border border-slate-300'
+                          : 'bg-rose-100 text-rose-800 border border-rose-200'
                       }`}>
                         {state.status === 'unreached' ? '0 Visits' : `${state.conductedSessions} Visits`}
                       </span>
@@ -1766,7 +1483,7 @@ export default function IndiaGeoIntelligenceMap({
                 <tr>
                   <th className="py-3.5 px-4">State / Territory</th>
                   <th className="py-3.5 px-4">Zone</th>
-                  <th className="py-3.5 px-4">Heat Status</th>
+                  <th className="py-3.5 px-4">Reach Status</th>
                   <th className="py-3.5 px-4 text-center">Conducted Visits</th>
                   <th className="py-3.5 px-4 text-center">Students Reached</th>
                   <th className="py-3.5 px-4">Supervising Panel</th>
@@ -1798,7 +1515,10 @@ export default function IndiaGeoIntelligenceMap({
                           ? 'bg-rose-50 text-rose-700 border border-rose-300'
                           : 'bg-slate-100 text-slate-500'
                       }`}>
-                        {st.status}
+                        {st.status === 'hotspot' && 'Hotspot'}
+                        {st.status === 'moderate' && 'Active'}
+                        {st.status === 'coldspot' && 'Cold Spot'}
+                        {st.status === 'unreached' && 'Unreached'}
                       </span>
                     </td>
                     <td className="py-3.5 px-4 text-center font-extrabold text-slate-900 text-sm">
