@@ -21,6 +21,7 @@ import Avatar from './Avatar'
 import { compressImage, sanitizeInput } from '../utils/security'
 import StreamBadge from './StreamBadge'
 import { formatDateWithRelative, parseDateToTimestamp } from '../utils/dateUtils'
+import { INDIAN_STATES } from '../utils/indiaStates'
 
 export default function PostsFeed({
   currentUser,
@@ -38,6 +39,9 @@ export default function PostsFeed({
   const [photoUrl, setPhotoUrl] = useState('')
   const [isCompleted, setIsCompleted] = useState(false)
   const [schoolName, setSchoolName] = useState('')
+  const [selectedStateId, setSelectedStateId] = useState('')
+  const [studentsCount, setStudentsCount] = useState(30)
+  const [sessionTopic, setSessionTopic] = useState('')
   const [selectedPresetPhoto, setSelectedPresetPhoto] = useState('')
   const [localImagePreview, setLocalImagePreview] = useState('')
 
@@ -71,6 +75,11 @@ export default function PostsFeed({
     e.preventDefault()
     if (!content.trim() && !title.trim()) return
 
+    const matchedState = INDIAN_STATES.find(s => s.id === selectedStateId)
+    const formattedSchool = isCompleted && schoolName.trim()
+      ? (matchedState ? `${sanitizeInput(schoolName.trim())} · ${matchedState.name}` : sanitizeInput(schoolName.trim()))
+      : null
+
     const newPost = {
       id: `post-${Date.now()}`,
       authorId: currentUser.id,
@@ -80,13 +89,17 @@ export default function PostsFeed({
       stream: currentUser.stream || 'JEE',
       wing: currentUser.department || 'Outreach Wing',
       createdAt: new Date().toISOString(),
-      title: sanitizeInput(title) || 'Outreach Milestone Update',
+      title: sanitizeInput(title) || (isCompleted ? 'Completed Field School Session' : 'Outreach Milestone Update'),
       content: sanitizeInput(content),
       photoUrl: photoUrl || localImagePreview || selectedPresetPhoto || null,
-      schoolName: isCompleted ? sanitizeInput(schoolName) : null,
+      schoolName: formattedSchool,
+      rawSchoolName: isCompleted && schoolName.trim() ? sanitizeInput(schoolName.trim()) : null,
+      stateCode: isCompleted && matchedState ? matchedState.id : null,
+      stateName: isCompleted && matchedState ? matchedState.name : null,
+      sessionTopic: isCompleted && sessionTopic.trim() ? sanitizeInput(sessionTopic.trim()) : null,
       isCompleted: Boolean(isCompleted),
       visitsLogged: isCompleted ? 1 : 0,
-      studentsReached: 0,
+      studentsReached: isCompleted ? Math.max(1, parseInt(studentsCount, 10) || 30) : 0,
       cheersCount: 1,
       comments: []
     }
@@ -103,6 +116,9 @@ export default function PostsFeed({
     setSelectedPresetPhoto('')
     setIsCompleted(false)
     setSchoolName('')
+    setSelectedStateId('')
+    setStudentsCount(30)
+    setSessionTopic('')
     setShowComposer(false)
   }
 
@@ -285,16 +301,70 @@ export default function PostsFeed({
               </label>
 
               {isCompleted && (
-                <div className="pt-2 border-t border-emerald-200/60">
-                  <label className="block font-bold text-slate-700 text-[11px] mb-1">School / Center Name *</label>
-                  <input
-                    required
-                    type="text"
-                    value={schoolName}
-                    onChange={(e) => setSchoolName(e.target.value)}
-                    placeholder="e.g. ZP High School, Taluka Haveli"
-                    className="w-full text-xs rounded-xl border border-slate-300 p-2 bg-white focus:ring-2 focus:ring-[#0A643B] focus:outline-hidden"
-                  />
+                <div className="pt-3 border-t border-emerald-200/60 space-y-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block font-bold text-slate-700 text-[11px] mb-1">
+                        State / Union Territory *
+                      </label>
+                      <select
+                        required
+                        value={selectedStateId}
+                        onChange={(e) => setSelectedStateId(e.target.value)}
+                        className="w-full text-xs rounded-xl border border-slate-300 p-2.5 bg-white font-medium focus:ring-2 focus:ring-[#0A643B] focus:outline-hidden"
+                      >
+                        <option value="">-- Select Indian State / UT --</option>
+                        {INDIAN_STATES.map(st => (
+                          <option key={st.id} value={st.id}>
+                            {st.name} ({st.code})
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block font-bold text-slate-700 text-[11px] mb-1">
+                        Students Reached / Attending *
+                      </label>
+                      <input
+                        required
+                        type="number"
+                        min="1"
+                        max="2000"
+                        value={studentsCount}
+                        onChange={(e) => setStudentsCount(e.target.value)}
+                        placeholder="e.g. 35"
+                        className="w-full text-xs rounded-xl border border-slate-300 p-2.5 bg-white font-medium focus:ring-2 focus:ring-[#0A643B] focus:outline-hidden"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-slate-700 text-[11px] mb-1">
+                      School / Institution Name *
+                    </label>
+                    <input
+                      required
+                      type="text"
+                      value={schoolName}
+                      onChange={(e) => setSchoolName(e.target.value)}
+                      placeholder="e.g. Zilla Parishad High School, Saswad"
+                      className="w-full text-xs rounded-xl border border-slate-300 p-2.5 bg-white focus:ring-2 focus:ring-[#0A643B] focus:outline-hidden"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-slate-700 text-[11px] mb-1">
+                      Curriculum Topic / Session Focus
+                    </label>
+                    <input
+                      type="text"
+                      value={sessionTopic}
+                      onChange={(e) => setSessionTopic(e.target.value)}
+                      placeholder="e.g. Newton Laws of Motion & JEE Foundation Strategy"
+                      className="w-full text-xs rounded-xl border border-slate-300 p-2.5 bg-white focus:ring-2 focus:ring-[#0A643B] focus:outline-hidden"
+                    />
+                  </div>
                 </div>
               )}
             </div>
@@ -434,11 +504,27 @@ export default function PostsFeed({
                   </p>
                 </div>
 
-                {/* School Location Pill if Completed */}
-                {post.schoolName && (
-                  <div className="inline-flex items-center space-x-2 px-3 py-1.5 rounded-xl bg-emerald-50 text-[#0A643B] border border-emerald-200 text-xs font-semibold">
-                    <School className="w-4 h-4 text-[#0A643B]" />
-                    <span>School Visited: <strong>{post.schoolName}</strong></span>
+                {/* School Location & Outreach Telemetry Pills */}
+                {(post.schoolName || post.studentsReached > 0 || post.stateName) && (
+                  <div className="flex flex-wrap items-center gap-2 pt-1">
+                    {post.schoolName && (
+                      <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-xl bg-emerald-50 text-[#0A643B] border border-emerald-200 text-xs font-semibold">
+                        <School className="w-3.5 h-3.5 text-[#0A643B]" />
+                        <span>School: <strong>{post.schoolName}</strong></span>
+                      </div>
+                    )}
+                    {post.stateName && (
+                      <div className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-xl bg-slate-100 text-slate-700 border border-slate-200 text-xs font-bold">
+                        <MapPin className="w-3 h-3 text-[#0A643B]" />
+                        <span>{post.stateName} ({post.stateCode?.toUpperCase()})</span>
+                      </div>
+                    )}
+                    {post.studentsReached > 0 && (
+                      <div className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-xl bg-[#EBF7F0] text-[#0A643B] border border-emerald-300/60 text-xs font-bold">
+                        <Users className="w-3 h-3 text-[#0A643B]" />
+                        <span>{post.studentsReached} Students Reached</span>
+                      </div>
+                    )}
                   </div>
                 )}
 

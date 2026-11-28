@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 import { sanitizeInput } from './utils/security'
+import { findStateInfo } from './utils/indiaStates'
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://zbtvjqxmwrucnetzrywx.supabase.co'
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpidHZqcXhtd3J1Y25ldHpyeXd4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE5MDMwNjQsImV4cCI6MjEwNzQ3OTA2NH0.ewBkHNm5hHb72m3ls7FCi2NJrIzIa7I3D90ouapIDAI'
@@ -316,6 +317,18 @@ export async function dbCreateBroadcast(b) {
 // ==========================================
 // Community Outreach Posts & Notes
 // ==========================================
+// Helper to resolve state from school name or text if state_code is not explicitly stored
+function resolveStateFromText(text) {
+  if (!text) return null
+  const parts = text.split(/[·,\-()]/)
+  for (const part of parts) {
+    const trimmed = part.trim()
+    const state = findStateInfo(trimmed)
+    if (state) return state
+  }
+  return null
+}
+
 export async function dbFetchPosts() {
   if (!supabase) return null
   try {
@@ -328,24 +341,29 @@ export async function dbFetchPosts() {
       return null
     }
     if (!data || data.length === 0) return null
-    return data.map(p => ({
-      id: p.id,
-      authorId: p.author_id,
-      authorName: p.author_name,
-      authorPhoto: p.author_photo,
-      batch: p.batch || 'Batch 1',
-      wing: p.wing,
-      title: p.title,
-      content: p.content,
-      photoUrl: p.photo_url,
-      schoolName: p.school_name,
-      isCompleted: Boolean(p.is_completed),
-      visitsLogged: p.visits_logged || 0,
-      studentsReached: p.students_reached || 0,
-      cheersCount: p.cheers_count || 0,
-      comments: Array.isArray(p.comments) ? p.comments : [],
-      createdAt: p.created_at
-    }))
+    return data.map(p => {
+      const derivedState = p.state_code ? findStateInfo(p.state_code) : resolveStateFromText(p.school_name)
+      return {
+        id: p.id,
+        authorId: p.author_id,
+        authorName: p.author_name,
+        authorPhoto: p.author_photo,
+        batch: p.batch || 'Batch 1',
+        wing: p.wing,
+        title: p.title,
+        content: p.content,
+        photoUrl: p.photo_url,
+        schoolName: p.school_name,
+        stateCode: p.state_code || derivedState?.id || null,
+        stateName: p.state_name || derivedState?.name || null,
+        isCompleted: Boolean(p.is_completed),
+        visitsLogged: p.visits_logged || 0,
+        studentsReached: p.students_reached || 0,
+        cheersCount: p.cheers_count || 0,
+        comments: Array.isArray(p.comments) ? p.comments : [],
+        createdAt: p.created_at
+      }
+    })
   } catch (err) {
     console.warn('Network error fetching posts from Supabase:', err)
     return null
@@ -372,12 +390,24 @@ export async function dbCreatePost(post) {
       cheers_count: Math.max(0, parseInt(post.cheersCount, 10) || 1),
       comments: Array.isArray(post.comments) ? post.comments : []
     }
-    const { data, error } = await supabase.from('posts').insert([payload]).select().single()
-    if (error) {
-      console.warn('Supabase post insert notification:', error.message)
+
+    // Attempt insert with state fields first
+    let result = await supabase.from('posts').insert([{
+      ...payload,
+      state_code: post.stateCode || null,
+      state_name: post.stateName || null
+    }]).select().single()
+
+    // If state_code column doesn't exist in Supabase Postgres schema, gracefully retry with standard payload
+    if (result.error && (result.error.message?.includes('state_code') || result.error.message?.includes('column'))) {
+      result = await supabase.from('posts').insert([payload]).select().single()
+    }
+
+    if (result.error) {
+      console.warn('Supabase post insert notification:', result.error.message)
       return null
     }
-    return data
+    return result.data
   } catch (err) {
     console.warn('Error during dbCreatePost:', err)
     return null

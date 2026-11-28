@@ -661,6 +661,7 @@ export default function IndiaGeoIntelligenceMap({
   const [viewMode, setViewMode] = useState('map') // 'map' | 'directory' | 'coldspots'
   const [hoveredStateId, setHoveredStateId] = useState(null)
   const [copiedNotice, setCopiedNotice] = useState(false)
+  const [dataSourceMode, setDataSourceMode] = useState('cumulative') // 'cumulative' | 'database_only'
 
   // Security & Authorization Guard: Strictly for Junior Secretary, Senior Secretary, and Management
   const isAuthorized = currentUser && (
@@ -672,18 +673,57 @@ export default function IndiaGeoIntelligenceMap({
   // Merge live session & post data dynamically into state metrics
   const statesData = useMemo(() => {
     return INITIAL_OUTREACH_STATES.map(st => {
-      // Check if any live post mentioned this state
-      const matchingPosts = posts.filter(p => {
+      // Find all live posts that belong to this state (by state code, name, or text mention)
+      const matchingPosts = (posts || []).filter(p => {
+        if (!p) return false
+        if (p.stateCode && (p.stateCode.toLowerCase() === st.id.toLowerCase() || p.stateCode.toUpperCase() === st.code.toUpperCase())) {
+          return true
+        }
+        if (p.stateName && p.stateName.toLowerCase() === st.name.toLowerCase()) {
+          return true
+        }
         const text = `${p.schoolName || ''} ${p.content || ''} ${p.title || ''}`.toLowerCase()
-        return text.includes(st.name.toLowerCase()) || text.includes(st.code.toLowerCase())
+        return text.includes(st.name.toLowerCase()) || text.includes(`(${st.code.toLowerCase()})`) || text.includes(st.code.toLowerCase())
       })
-      const extraSessions = matchingPosts.length
-      const extraStudents = matchingPosts.reduce((acc, p) => acc + (p.studentsReached || 0), 0)
 
-      const totalConducted = st.conductedSessions + extraSessions
-      const totalBeneficiaries = st.studentsReached + extraStudents
+      const extraSessions = matchingPosts.reduce((acc, p) => acc + (p.visitsLogged || (p.isCompleted ? 1 : 0) || 1), 0)
+      const extraStudents = matchingPosts.reduce((acc, p) => acc + (parseInt(p.studentsReached, 10) || 0), 0)
 
-      let calculatedStatus = st.status
+      // Dynamically compile visited schools from live posts
+      const dynamicSchools = dataSourceMode === 'database_only' ? [] : [...(st.schoolsVisited || [])]
+      const dynamicScholars = new Set(dataSourceMode === 'database_only' ? [] : (st.activeScholars || []))
+
+      matchingPosts.forEach(p => {
+        if (p.authorName) dynamicScholars.add(p.authorName)
+        if (p.schoolName || p.rawSchoolName) {
+          const rawName = p.rawSchoolName || (p.schoolName ? p.schoolName.split('·')[0].trim() : '')
+          if (rawName) {
+            const foundSchool = dynamicSchools.find(s => s.name.toLowerCase() === rawName.toLowerCase())
+            if (foundSchool) {
+              foundSchool.sessions += (p.visitsLogged || 1)
+              foundSchool.students += (parseInt(p.studentsReached, 10) || 0)
+            } else {
+              dynamicSchools.push({
+                name: rawName,
+                cluster: p.wing || 'Field Outreach',
+                sessions: p.visitsLogged || 1,
+                students: parseInt(p.studentsReached, 10) || 30,
+                topic: p.sessionTopic || p.title || 'Outreach Session'
+              })
+            }
+          }
+        }
+      })
+
+      const totalConducted = dataSourceMode === 'database_only'
+        ? extraSessions
+        : (st.conductedSessions + extraSessions)
+
+      const totalBeneficiaries = dataSourceMode === 'database_only'
+        ? extraStudents
+        : (st.studentsReached + extraStudents)
+
+      let calculatedStatus
       if (totalConducted >= 10) calculatedStatus = 'hotspot'
       else if (totalConducted >= 4) calculatedStatus = 'moderate'
       else if (totalConducted > 0) calculatedStatus = 'coldspot'
@@ -693,10 +733,13 @@ export default function IndiaGeoIntelligenceMap({
         ...st,
         conductedSessions: totalConducted,
         studentsReached: totalBeneficiaries,
-        status: calculatedStatus
+        status: calculatedStatus,
+        activeScholars: Array.from(dynamicScholars),
+        schoolsVisited: dynamicSchools,
+        liveDbSubmissionsCount: matchingPosts.length
       }
     })
-  }, [posts])
+  }, [posts, dataSourceMode])
 
   // Lookup map by ID (both lowercase 'mh' and uppercase 'MH')
   const statesLookup = useMemo(() => {
@@ -1005,8 +1048,32 @@ export default function IndiaGeoIntelligenceMap({
           )}
         </div>
 
-        {/* Filter Dropdowns */}
+        {/* Filter Dropdowns & Data Mode */}
         <div className="flex flex-wrap items-center gap-2.5">
+          {/* Telemetry Source Mode Switcher */}
+          <div className="flex items-center space-x-1 bg-slate-100 p-1 rounded-xl text-xs font-bold text-slate-700 border border-slate-200">
+            <button
+              type="button"
+              onClick={() => setDataSourceMode('cumulative')}
+              className={`px-2.5 py-1 rounded-lg text-xs font-extrabold transition-all cursor-pointer flex items-center space-x-1 ${
+                dataSourceMode === 'cumulative' ? 'bg-[#0A643B] text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
+              }`}
+              title="Cumulative telemetry: Historical verified field clusters + Real-time database submissions"
+            >
+              <span>All Outreach</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setDataSourceMode('database_only')}
+              className={`px-2.5 py-1 rounded-lg text-xs font-extrabold transition-all cursor-pointer flex items-center space-x-1 ${
+                dataSourceMode === 'database_only' ? 'bg-[#0A643B] text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
+              }`}
+              title="Pure database telemetry: Computed 100% strictly from student session records in database"
+            >
+              <span>Live DB Only</span>
+            </button>
+          </div>
+
           {/* Density Quick Filters */}
           <div className="flex items-center space-x-1 bg-slate-100 p-1 rounded-xl text-xs font-bold text-slate-700">
             <button

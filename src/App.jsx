@@ -711,7 +711,14 @@ export default function App() {
       batch: currentUser.batch || newPost.batch || 'Batch 1',
       title: sanitizeInput(newPost.title || 'Outreach Milestone Update', 150),
       content: sanitizeInput(newPost.content || '', 2000),
-      schoolName: newPost.schoolName ? sanitizeInput(newPost.schoolName, 150) : null
+      schoolName: newPost.schoolName ? sanitizeInput(newPost.schoolName, 150) : null,
+      rawSchoolName: newPost.rawSchoolName ? sanitizeInput(newPost.rawSchoolName, 150) : null,
+      stateCode: newPost.stateCode ? sanitizeInput(newPost.stateCode, 10).toLowerCase() : null,
+      stateName: newPost.stateName ? sanitizeInput(newPost.stateName, 100) : null,
+      sessionTopic: newPost.sessionTopic ? sanitizeInput(newPost.sessionTopic, 150) : null,
+      studentsReached: Math.max(0, parseInt(newPost.studentsReached, 10) || 0),
+      visitsLogged: Math.max(0, parseInt(newPost.visitsLogged, 10) || (newPost.isCompleted ? 1 : 0)),
+      isCompleted: Boolean(newPost.isCompleted)
     }
 
     setPosts(prev => {
